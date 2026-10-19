@@ -1,0 +1,32 @@
+[
+  {
+    "route": "/api/overview",
+    "http_status": 200,
+    "data_status": "available"
+  },
+  {
+    "route": "/api/benchmarks",
+    "http_status": 200,
+    "data_status": "available"
+  },
+  {
+    "route": "/api/training",
+    "http_status": 200,
+    "data_status": "available"
+  },
+  {
+    "route": "/api/inference",
+    "http_status": 200,
+    "data_status": "available"
+  },
+  {
+    "route": "/api/hardware",
+    "http_status": 200,
+    "data_status": "available"
+  },
+  {
+    "route": "/api/verification",
+    "http_status": 200,
+    "data_status": "available"
+  }
+]

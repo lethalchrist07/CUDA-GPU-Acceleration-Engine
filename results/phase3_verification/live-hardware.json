@@ -1,0 +1,25 @@
+{
+  "status": "available",
+  "fetched_at": "2026-10-16T16:17:53.195723+00:00",
+  "gpus": [
+    {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "uuid": "GPU-424cb528-3d05-fbf1-8183-d93ed7818db7",
+      "driver_version": "617.42",
+      "memory_total_mib": 6144.0,
+      "memory_used_mib": 0.0,
+      "memory_free_mib": 6001.0,
+      "utilization_percent": 0.0,
+      "temperature_c": 48.0,
+      "power_w": 11.25,
+      "power_limit_w": null
+    }
+  ],
+  "host": {
+    "platform": "Windows-10-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel"
+  },
+  "warnings": [],
+  "source": "nvidia-smi"
+}

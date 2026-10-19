@@ -1,0 +1,334 @@
+{
+  "timestamp_utc": "2026-10-19T09:03:19.337853+00:00",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "torch": "2.6.0+cu124",
+  "torch_cuda": "12.4",
+  "cuda_home": "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.4",
+  "disk_bytes": {
+    "total": 509522997248,
+    "used": 234160906240,
+    "free": 275362091008
+  },
+  "git_head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "HEAD"
+    ],
+    "exit_code": 128,
+    "stdout": "",
+    "stderr": "fatal: Needed a single revision\n"
+  },
+  "git_status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "stdout": "?? .gitignore\n?? CMakeLists.txt\n?? LICENSE\n?? PHASE9_FINAL_TRAINING_AUDIT.md\n?? PHASE9_GPU_PERFORMANCE_REPORT.md\n?? PHASE9_IMPLEMENTATION_REPORT.md\n?? PHASE9_TRAINING_RESULTS.md\n?? PHASE9_VERIFICATION_REPORT.md\n?? README.md\n?? backend/\n?? bin/\n?? build.bat\n?? build.ps1\n?? checkpoints/\n?? config/\n?? docs/\n?? engine/\n?? frontend/\n?? include/\n?? requirements.txt\n?? results/\n?? screenshots/\n?? scripts/\n?? src/\n?? tests/\n",
+    "stderr": ""
+  },
+  "nvcc": {
+    "command": [
+      "nvcc",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2026 NVIDIA Corporation\nBuilt on Sun_Sep_01_02:23:07_Pacific_Standard_Time_2026\nCuda compilation tools, release 13.4, V13.4.92\nBuild cuda_13.4.r13.4/compiler.38855100_0\n",
+    "stderr": ""
+  },
+  "telemetry": {
+    "command": [
+      "nvidia-smi"
+    ],
+    "exit_code": 0,
+    "stdout": "Mon Oct 19 14:33:20 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 617.42                 KMD Version: 617.42        CUDA UMD Version: 13.4     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 3050 ...  WDDM  |   00000000:01:00.0 Off |                  N/A |\n| N/A   53C    P0             12W /   75W |       0MiB /   6144MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|  No running processes found                                                             |\n+-----------------------------------------------------------------------------------------+\n",
+    "stderr": ""
+  },
+  "gpu": "_CudaDeviceProperties(name='NVIDIA GeForce RTX 3050 6GB Laptop GPU', major=8, minor=6, total_memory=6143MB, multi_processor_count=20, uuid=424cb528-3d05-fbf1-8183-d93ed7818db7, L2_cache_size=1MB)",
+  "gpu_free_total_bytes": [
+    5411700736,
+    6441926656
+  ],
+  "extension_compatibility": {
+    "status": "blocked",
+    "error": "\nThe detected CUDA version (13.4) mismatches the version that was used to compile\nPyTorch (12.4). Please make sure to use the same CUDA versions.\n",
+    "scope": "Installed PyTorch build-extension version guard; no compilation attempted"
+  },
+  "historical_integrity": {
+    "bin/benchmark_suite.exe": {
+      "expected": "1f163d9d87bfec2d8693cff1217a74e9a56b9f730b7da4adcb47f2048923cc60",
+      "actual": "1f163d9d87bfec2d8693cff1217a74e9a56b9f730b7da4adcb47f2048923cc60"
+    },
+    "bin/benchmark_regression.exe": {
+      "expected": "3a43c76cc672bf2dd05402f3943868a777b366a7d130de30656214ebd0e51b2a",
+      "actual": "3a43c76cc672bf2dd05402f3943868a777b366a7d130de30656214ebd0e51b2a"
+    },
+    "CMakeLists.txt": {
+      "expected": "4bcd8e6534234a45c0a42e45625ceb4205dc47067f859acb628ba5460f6918b7",
+      "actual": "4bcd8e6534234a45c0a42e45625ceb4205dc47067f859acb628ba5460f6918b7"
+    },
+    "src/benchmark_export.cpp": {
+      "expected": "d0bb1143131f40db35ebd4f858495f79e48cfed6f3271eb4fd6820d8ed9c4e22",
+      "actual": "d0bb1143131f40db35ebd4f858495f79e48cfed6f3271eb4fd6820d8ed9c4e22"
+    },
+    "src/benchmark_main.cu": {
+      "expected": "fe1e5772de56b5c5238ba994710d34cf6961f2db30e6b30ba14aad39f4964d95",
+      "actual": "fe1e5772de56b5c5238ba994710d34cf6961f2db30e6b30ba14aad39f4964d95"
+    },
+    "src/gpu_check.cu": {
+      "expected": "557fb8c54c6accda9d73490d0bd6c65189a6a2600a3ce3a6e1f6aad84aeba2ea",
+      "actual": "557fb8c54c6accda9d73490d0bd6c65189a6a2600a3ce3a6e1f6aad84aeba2ea"
+    },
+    "src/matmul.cu": {
+      "expected": "115ddbff8a0747eadbaf75f2718be3a32d6f70febc0e6f012167596660082105",
+      "actual": "115ddbff8a0747eadbaf75f2718be3a32d6f70febc0e6f012167596660082105"
+    },
+    "src/vector_add.cu": {
+      "expected": "a4ec615ac75539ccb5c06ffdc67e7284bb447ba0aea2b452b5fe07b28a176174",
+      "actual": "a4ec615ac75539ccb5c06ffdc67e7284bb447ba0aea2b452b5fe07b28a176174"
+    },
+    "include/benchmark_export.h": {
+      "expected": "7dd8c430ea4cf28fe62994b9dde6e54b889d6283a48b6a8135717cb704b79cc6",
+      "actual": "7dd8c430ea4cf28fe62994b9dde6e54b889d6283a48b6a8135717cb704b79cc6"
+    },
+    "include/benchmark_types.h": {
+      "expected": "09aec9b03d59913d15ef1a2fbad2b373b120343d7a9cacf7f5eed15b7bbebdf6",
+      "actual": "09aec9b03d59913d15ef1a2fbad2b373b120343d7a9cacf7f5eed15b7bbebdf6"
+    },
+    "include/cuda_utils.cuh": {
+      "expected": "c1281e8b451249cd6229d3ed142823e3931b107db4a8b126e0a553e3b5e5581e",
+      "actual": "c1281e8b451249cd6229d3ed142823e3931b107db4a8b126e0a553e3b5e5581e"
+    },
+    "include/matmul.cuh": {
+      "expected": "f91634fd5f69166f90ab37efbb008f465c6eaa34900b51019085ca960a9ca76f",
+      "actual": "f91634fd5f69166f90ab37efbb008f465c6eaa34900b51019085ca960a9ca76f"
+    },
+    "include/vector_add.cuh": {
+      "expected": "45347c5c5e12085366c22b130a0f83c48641c8390f346a94d3575bd1b65ec411",
+      "actual": "45347c5c5e12085366c22b130a0f83c48641c8390f346a94d3575bd1b65ec411"
+    },
+    "tests/benchmark_regression.cu": {
+      "expected": "8805d7b1f32e39986be9724ba9f3a9a4768543b3a4dbdc62e0c7cbf0e0686e04",
+      "actual": "8805d7b1f32e39986be9724ba9f3a9a4768543b3a4dbdc62e0c7cbf0e0686e04"
+    },
+    "results/phase2_verification_20261016/final_run/benchmark_results.csv": {
+      "expected": "61a611c5f6f7b6870d0754fd7605c149cb9bb1caabc24639e4693b5f089c0e9a",
+      "actual": "61a611c5f6f7b6870d0754fd7605c149cb9bb1caabc24639e4693b5f089c0e9a"
+    },
+    "results/phase2_verification_20261016/final_run/benchmark_results.json": {
+      "expected": "f9b3e5b01127408a6d5a326f2536aa8f2f1cd22ba020938c45ccc2f7354298cb",
+      "actual": "f9b3e5b01127408a6d5a326f2536aa8f2f1cd22ba020938c45ccc2f7354298cb"
+    },
+    "results/phase2_verification_20261016/original_run/benchmark_suite.exe": {
+      "expected": "6569bb1e75184460420b3c83050fd30caf22423b89a9d0d4e7a39940d4b33dbc",
+      "actual": "6569bb1e75184460420b3c83050fd30caf22423b89a9d0d4e7a39940d4b33dbc"
+    }
+  },
+  "checkpoints": {
+    "checkpoints\\resnet18_cifar10\\best_model.pt": {
+      "sha256": "a411eb7c079058e3aada3edb2d851106273527a8d17971936a24671542dc3a78",
+      "bytes": 134220210,
+      "epoch": 15,
+      "keys": [
+        "epoch",
+        "model_state_dict",
+        "metrics",
+        "metadata",
+        "optimizer_state_dict"
+      ],
+      "readable": true
+    },
+    "checkpoints\\resnet18_cifar10\\initial_model.pt": {
+      "sha256": "13e2b654a914c1b6291bb09eacfba27c402c28cb27cf0c6166b960c8955d2374",
+      "bytes": 44776114,
+      "epoch": 0,
+      "keys": [
+        "epoch",
+        "model_state_dict",
+        "metrics",
+        "metadata",
+        "optimizer_state_dict"
+      ],
+      "readable": true
+    },
+    "checkpoints\\resnet18_cifar10\\latest_checkpoint.pt": {
+      "sha256": "7a661831de8f899916949dd5be242d91a9513794c56a2475f95ecc96285417ef",
+      "bytes": 134222394,
+      "epoch": 15,
+      "keys": [
+        "epoch",
+        "model_state_dict",
+        "metrics",
+        "metadata",
+        "optimizer_state_dict"
+      ],
+      "readable": true
+    }
+  },
+  "untracked_file_sha256": {
+    ".gitignore": "cb0554dff086e64d951baba6b245e41710860902c0938bd042c49eaea8e0ec0e",
+    "CMakeLists.txt": "4bcd8e6534234a45c0a42e45625ceb4205dc47067f859acb628ba5460f6918b7",
+    "LICENSE": "1459a94a7c2d49201fbaf61b280fda4ad34b8d68c9b4425bef5ec88005f704c6",
+    "PHASE9_FINAL_TRAINING_AUDIT.md": "19306e26aa0608acc31a17631a4611e6f1703f4df97d65d43a8a81878e252979",
+    "PHASE9_GPU_PERFORMANCE_REPORT.md": "64f5764abb69d57865189593e7c00059b6302576e24aa394e5d8c67829cd00d9",
+    "PHASE9_IMPLEMENTATION_REPORT.md": "7dc0990f14cdbf394119222c9b3b9817009743103974617de5e4e6d4985c58f3",
+    "PHASE9_TRAINING_RESULTS.md": "3389d9b20dfcf136911fefed4da801e6c1504d73cf34b425d743182116b22ffa",
+    "PHASE9_VERIFICATION_REPORT.md": "ec841a620a15185c1f97f264384cd5640a7c6f2560c16648137785135796b030",
+    "README.md": "1e89436e22274e7a9948eb695010a798b94e02f8bb7583bd53eedf4ceb7cbfa1",
+    "backend/README.md": "3eccf1b63d9730634d6d54788f3811cd3d0bd1d186ba372db77e6f16f5f8cbab",
+    "backend/__init__.py": "446631962eb390f8a8dd7290373c1686a03097bc68229d234c907923245df2ef",
+    "backend/app.py": "d447747e06858234c4376834a304e4610445ddf45d021e06ac818b6ace9c2b48",
+    "backend/data.py": "1d5ddd328b613b582dd5a0f8fac86607fe303bc82315359c784b3091358b0dff",
+    "backend/requirements.txt": "d8c76ce411942657148bfe65f5ef57bbea96c0512679f8705a71009e48f40be5",
+    "backend/serving.py": "76dcfebd6f25c1df97783519e208360e40d837e4da03023e00739d4d91a2aa51",
+    "backend/tests/test_api.py": "d7103c75cba99c55185e9812a713b6de3c610beedcf55e107f1bc0ff3b897bab",
+    "backend/tests/test_data.py": "084b23a91bf1f753c759af40a5ee785a109f227b10713c44c64a951110b4ec50",
+    "bin/benchmark_regression.exe": "3a43c76cc672bf2dd05402f3943868a777b366a7d130de30656214ebd0e51b2a",
+    "bin/benchmark_suite.exe": "1f163d9d87bfec2d8693cff1217a74e9a56b9f730b7da4adcb47f2048923cc60",
+    "bin/gpu_check.exe": "f83bf5e7b1b23e486e817c8473135d611554c7903c3f4a36bc7a03e64add9ff2",
+    "build.bat": "7e3f288269112360edc756ad8ab7165ab012f8851c55750224842db9a9c98b21",
+    "build.ps1": "36b201cccdbba827968a184e1db059fdaa1fd8abef67af1eee890b798d7847ea",
+    "checkpoints/.gitkeep": "3e3fd5f7bf7d3b43d6d02a5518e52b146478dd3a94afd36e251cefd042f5c72d",
+    "config/default_config.yaml": "53ab9739b5eab8feec2a72446e3b32243d6b39c22c6e68eecaf33b2d410d0f94",
+    "docs/BENCHMARK_GUIDE.md": "9575f90df68fe67434f1228fe4fc6d592b18b01422975587add4cf3364df6d44",
+    "docs/PHASE6_FINAL_BUILD_VERIFICATION.md": "183eb291ac3699cd8f64c5d9139f574e101e5e8c76146861deb2f531a6d91ed0",
+    "docs/PHASE7_UI_AND_DEMO_REPORT.md": "7df959cc0e5635f7c860db485e0bb75a366c7436e437c680b522f1e79efa3322",
+    "docs/PHASE8_GITHUB_RELEASE_READINESS.md": "428c2ea63ae2f4eafa8eb55c9a42c9da95afdaf834891293d19920b690e04c5a",
+    "docs/PHASE9_FINAL_TRAINING_AUDIT.md": "19306e26aa0608acc31a17631a4611e6f1703f4df97d65d43a8a81878e252979",
+    "docs/PHASE9_GPU_PERFORMANCE_REPORT.md": "64f5764abb69d57865189593e7c00059b6302576e24aa394e5d8c67829cd00d9",
+    "docs/PHASE9_IMPLEMENTATION_REPORT.md": "7dc0990f14cdbf394119222c9b3b9817009743103974617de5e4e6d4985c58f3",
+    "docs/PHASE9_TRAINING_RESULTS.md": "3389d9b20dfcf136911fefed4da801e6c1504d73cf34b425d743182116b22ffa",
+    "docs/PHASE9_VERIFICATION_REPORT.md": "ec841a620a15185c1f97f264384cd5640a7c6f2560c16648137785135796b030",
+    "docs/REDESIGN_VERIFICATION_REPORT.md": "771b847ebb1ed94648ed8028771f0055c4083db8e056e5b05a5aede96a0e67d0",
+    "engine/__init__.py": "69fd99c5d668f1c0c2a55a369bbe0bd83103147aa9a4e85b8a3d29861376236c",
+    "engine/checkpointing/__init__.py": "a4a87940836db2db441659fb2d99fe98b729f8bb2ef192f4341b41795166f2f9",
+    "engine/checkpointing/checkpoint_manager.py": "ee094363e3f8179d162ea75f54cc8ad31e4b1da02706645a8998f296d369ce16",
+    "engine/device/__init__.py": "d8cb20fafba7705465f80df91fe5989ebcc2461a6a8d253fdc66b6367fcc823d",
+    "engine/device/device_manager.py": "2d0b114d5793b9373997ee40daa4e333277255b811fac28299881f4b91f02359",
+    "engine/device/hardware_monitor.py": "fa9e43842f9c6ce890cacc91ad857f82d7b9ffcf28aece33e23b53f220e2f871",
+    "engine/evaluation/__init__.py": "4858da04d226c6814a1b142eeefcde5af88642c03d27e25a5f30f072deaa3f33",
+    "engine/evaluation/metrics.py": "bad3fe85d89e83988240d9a43da226042c1547ad4fefb390342d214d91ab35c9",
+    "engine/llm/__init__.py": "f824bd195e435a151095349d52fb07ec9231ec4aa0d298571c0c665a5d6e548f",
+    "engine/llm/base_backend.py": "283c8a8aa576246860109ef7b0646b9d55bf08b8007459b0535413b4e217aa63",
+    "engine/llm/engine.py": "5619339c66b3b47a15d5ae99e9684303b1a7cdaeab632e53c448c0291ec4ce8a",
+    "engine/llm/mock_backend.py": "d0b34d57a4d8f62d5cb6d69154d087996d1c28643cff490a38bc37bbe6e5907e",
+    "engine/llm/ollama_backend.py": "727bd3bd73434e1c131e19eb16adb38257d6dfc220712b7342a928f31be10153",
+    "engine/llm/safety.py": "f0bc5e97ea4a75c35326d65358fba6878899e924bdb7f4e00055b621ec0456f0",
+    "engine/llm/tracker.py": "cead195578cc3e4f97f3c23c767962f46984196123a3bcb938eeef6e1372cd10",
+    "engine/llm/types.py": "db3969747a3a0bb564142d11ec86e9dbd6e134489e3317e6071bb5d91a8fcbf4",
+    "engine/models/__init__.py": "96f976915a6b593a01a9a4b2fbe2f8527173e9e294bbc1167613c89e1539467b",
+    "engine/models/baseline_mlp.py": "b3a2ed8bed43e7d271464e296c55f37ba2881a8bd994d6ea19aa543744e5c458",
+    "engine/models/resnet.py": "5529e69c28a7efa3bf154cd4ad03bbf514398d890209e4f51f2648aabe95d4bd",
+    "engine/tests/__init__.py": "2cd4c39868acc3793acd401a4984c632d262dd5baf44bd00a54fdaf83936201e",
+    "engine/tests/test_ai_foundation.py": "ec684f0429ad868bb74076a6bb1b2b038ac3940c331bf94558d9abe250550ad6",
+    "engine/tests/test_llm_engine.py": "44cf3baa133e81ac8c44a5c0a962b55d3d99c9fe6d59fca8be9ee09290513617",
+    "engine/tests/test_phase9_ai_engine.py": "791779e96fac0bd1fae3564813ce8cb829099262266ba02adc3705ef3443b065",
+    "engine/tests/test_training_engine.py": "da33e487bde73000c1d2d37e7ec97be8de631ad0d77e3bd5976df040df38bdd0",
+    "engine/training/__init__.py": "b8eaa24860c24da83c61d116661eb994911db94233132db499daf11ca920606b",
+    "engine/training/experiment_tracker.py": "e65486aa9af5edb80da4984b2a63c800f1e556236ce8ddebfde2b6cdb8581ec9",
+    "engine/training/resnet_trainer.py": "67cdcfbf13d90f4a48ef8d55341b546dce6dc3c84697985078eca716ecd75dae",
+    "engine/training/trainer.py": "8ef90716e758e577a3144aa8927888d86dd512f7b1c0274d8dea716873399d9b",
+    "engine/training/trainer_base.py": "d365938ea17428aa12c79e6622e167c099b8851fda5b7b488ba157ff79396e78",
+    "frontend/index.html": "5244332edff116925d25982734945791ee9518b50c23a5e004d531a3b529275e",
+    "frontend/package-lock.json": "22d1e34d520e67dd39918c49049f461851ad496ae8b945b69d7ec27ee3bb7cdf",
+    "frontend/package.json": "2ad4658523824c6f13c034c060e743d99ac6374fbe6cf452333bbb529499c040",
+    "frontend/postcss.config.js": "190c877db466995bf1482f4a16abd06e04a89ede3119341e2a86ff96e1737b27",
+    "frontend/src/App.tsx": "59b7ca78548e45a901b811084992975a62a867eeb456749b376e68fba04176c3",
+    "frontend/src/components/BenchmarksSection.tsx": "f97c685ffb8531062c7ac293dde6b6cadd9a1b1091a1a3654e3f622c658e5bd1",
+    "frontend/src/components/HardwareSection.tsx": "b6b8c6527422a4547e0519844617147b5d0ddddcb12c8eb0f6c97c66dcab2578",
+    "frontend/src/components/InferenceSection.tsx": "5d788618bec8f0f0d375fc1817e7593f360f36668303e066a2cc1cae381af959",
+    "frontend/src/components/MetricCard.tsx": "62a7bd2fa1855ce8d58ba2991ba7b27722f4fc89bc7c2c785f326e10459409c1",
+    "frontend/src/components/Navbar.tsx": "30acae3b90b63ed6d6e3c58389d384651edfb77a7c8d22cb10dd6b86087cab4e",
+    "frontend/src/components/OverviewSection.tsx": "c051b447cc63887df8e9e93ce53d0831090ec927b1f96d5d3b6a4b12a944d199",
+    "frontend/src/components/StatusBadge.tsx": "207e6dbc30052480380bf3e3f25e0b2af7d4c954db8e88e33ad5d03aad5b7c68",
+    "frontend/src/components/TrainingSection.tsx": "23358242e9e3ddcc61d1ed2a18289202062c8ad2a8523b73cebc81b98b29ce81",
+    "frontend/src/components/VerificationSection.tsx": "70ce72e30124c73c166fdc3ed0a4c83beb802b6313274ec5e1bd92aa09b61e2f",
+    "frontend/src/components/WarningBanner.tsx": "53d5f132221d66b678efae47463e0cfd03575d6bcc5835c8193f73992b466d4f",
+    "frontend/src/index.css": "20c81f0a4190dbce879b44e3b66959d954b0decfe238d1c3ea43b6a3a756270d",
+    "frontend/src/main.tsx": "2ed12a1457cd60b31c0f44f3ea59b8bbc2ddd4a49add3165228d093878fb7c24",
+    "frontend/src/services/api.ts": "d6e56e863b254c3e991b0d5fe825928ea247422c1bfa8bef01a5bd492b28c9ba",
+    "frontend/src/types/api.ts": "398ad8cc8af473afb3cc4f7682f4fed1a1a1e1ba14d33828272cf077d529620f",
+    "frontend/tailwind.config.js": "18799f48eef5403b28d42c27f41ec3146afcccd1fdc0d85324e3d27d3cefe5ac",
+    "frontend/tsconfig.json": "f56ffe2fd7db401694ba111fdcce9f41ce36ea53d5f75b7b512cda67a208c9c6",
+    "frontend/tsconfig.node.json": "9e2abb169ea87b7190613a1d4da57ca608463a453bd4231fa3aeee5e308370dd",
+    "frontend/vite.config.ts": "eff7f4d64a6b8ef549fc14de662f3e5f42220a338bc20810c54b4e9ba85103c6",
+    "include/benchmark_export.h": "7dd8c430ea4cf28fe62994b9dde6e54b889d6283a48b6a8135717cb704b79cc6",
+    "include/benchmark_types.h": "09aec9b03d59913d15ef1a2fbad2b373b120343d7a9cacf7f5eed15b7bbebdf6",
+    "include/cuda_utils.cuh": "c1281e8b451249cd6229d3ed142823e3931b107db4a8b126e0a553e3b5e5581e",
+    "include/matmul.cuh": "f91634fd5f69166f90ab37efbb008f465c6eaa34900b51019085ca960a9ca76f",
+    "include/vector_add.cuh": "45347c5c5e12085366c22b130a0f83c48641c8390f346a94d3575bd1b65ec411",
+    "requirements.txt": "9be182ef4765b53b55b27c7aa07f52232caf2b89efdb1abb63195335ba8c08e7",
+    "results/benchmark_results.csv": "ca5656538f72d15f1359d7986e9ae0dd541bf07504b03435922285fc880492a3",
+    "results/benchmark_results.json": "72e449c61a0470060416be17a10a6e7deb926112c9132dcb9d6348fe11113e0a",
+    "results/hardware_telemetry.csv": "9af4d7afab6a3626574a0bd4eeb083ab892569bcb20dacf8f82e9eec3b9de163",
+    "results/inference_experiments.csv": "847f4ece001046e8efc755a794b4170b51f965a3adafd0c7fc92b3e599921197",
+    "results/inference_experiments.json": "d5e54fb02a4e7add192a38ba95fab78324ee4a2adcfc39089c3cc0ff500c1c12",
+    "results/phase2_verification_20261016/COMMANDS.md": "4539ae1093741e3d8abe913dd2643c7f8775400430092099c56b1ceb3ce272ac",
+    "results/phase2_verification_20261016/VERIFICATION_REPORT.md": "b1dc5e350aab424d33b8c8b8b493e41ed006dfc3770135f3cb6c6d4329a034db",
+    "results/phase2_verification_20261016/apply_timing_fixes.py": "04ce6784011f4aba66a3773fe30400b37ddac66ef56b19e61c87d846a563e4e8",
+    "results/phase2_verification_20261016/capture_provenance.py": "e91b29836941a8461b783e42231028a18e8b38d7939b0abaf8e85cc2eebce60b",
+    "results/phase2_verification_20261016/changes.patch": "3a3d38229ecd12f216489c6368cb5c40ba9920f29eaa7656163fbba598ba3931",
+    "results/phase2_verification_20261016/check_failure_paths.py": "5d3f58a17b1f0a1682d0c47195ebaaca254434e14fd48efbc4a0deb33919be6d",
+    "results/phase2_verification_20261016/checkpoints/test_checkpoint.pt": "5df20e23599d6603c6cce6b3ab8a946116e3d1f3808214da4b7f8b1bb22a5d3f",
+    "results/phase2_verification_20261016/final_run/benchmark_results.csv": "61a611c5f6f7b6870d0754fd7605c149cb9bb1caabc24639e4693b5f089c0e9a",
+    "results/phase2_verification_20261016/final_run/benchmark_results.json": "f9b3e5b01127408a6d5a326f2536aa8f2f1cd22ba020938c45ccc2f7354298cb",
+    "results/phase2_verification_20261016/manifest.json": "46d2842faf687dee27172e4f02dfb5061d4cd027956f71e25ef0fa148f1b0161",
+    "results/phase2_verification_20261016/nvidia-smi.txt": "79d2992c558a9f6f59b341cda7403446f31f9f60e83fa4d8b8d392587e4176a7",
+    "results/phase2_verification_20261016/original_hashes.txt": "0b780193508d1c56c48f839be739c44784d6015879bf986fd02b04de80bcbd3f",
+    "results/phase2_verification_20261016/original_run/benchmark_suite.exe": "6569bb1e75184460420b3c83050fd30caf22423b89a9d0d4e7a39940d4b33dbc",
+    "results/phase2_verification_20261016/original_run/results/benchmark_results.csv": "9bb65b15abc03d44ff713d662bcfcfc955f3dd126f2250869f65d1740d042e53",
+    "results/phase2_verification_20261016/original_run/results/benchmark_results.json": "2e19e93be2b715d27c9af88426f771813726130a9c12e72b60ec4abd91286627",
+    "results/phase2_verification_20261016/original_sources/CMakeLists.txt": "7651ce7adbc1ac3f67b15be60d540f5e7644ad752e78b6ef9f706c1a3ef226ee",
+    "results/phase2_verification_20261016/original_sources/include/benchmark_export.h": "bc9fcbd39253d5c71da38798846367e8ce558f30c38976c45067f40a6e9fda4f",
+    "results/phase2_verification_20261016/original_sources/include/benchmark_types.h": "8cafa8e6a1e1d49929453933122b024a1a53beeb8adf32e2e931d5f83df10ed4",
+    "results/phase2_verification_20261016/original_sources/include/cuda_utils.cuh": "c1281e8b451249cd6229d3ed142823e3931b107db4a8b126e0a553e3b5e5581e",
+    "results/phase2_verification_20261016/original_sources/include/matmul.cuh": "f91634fd5f69166f90ab37efbb008f465c6eaa34900b51019085ca960a9ca76f",
+    "results/phase2_verification_20261016/original_sources/include/vector_add.cuh": "45347c5c5e12085366c22b130a0f83c48641c8390f346a94d3575bd1b65ec411",
+    "results/phase2_verification_20261016/original_sources/src/benchmark_export.cpp": "12caf3e633f0413540ab8a5a258609ace8d8d9cb3f047d543a5a28bc35659f31",
+    "results/phase2_verification_20261016/original_sources/src/benchmark_main.cu": "2608518974d5ed6ab841ddd4e70350460cff4508f339ac6122f83ac1f66b450b",
+    "results/phase2_verification_20261016/original_sources/src/gpu_check.cu": "557fb8c54c6accda9d73490d0bd6c65189a6a2600a3ce3a6e1f6aad84aeba2ea",
+    "results/phase2_verification_20261016/original_sources/src/matmul.cu": "0167b65bbd6ed87a9975c9ccf368253482479b667ba2126050a1abd34f6679d9",
+    "results/phase2_verification_20261016/original_sources/src/vector_add.cu": "da3458dbdc5d9da035b873270e40307e37111f745ee29cad4e5b65c97c0d4d9a",
+    "results/phase2_verification_20261016/prior_results/benchmark_results.csv": "ca5656538f72d15f1359d7986e9ae0dd541bf07504b03435922285fc880492a3",
+    "results/phase2_verification_20261016/prior_results/benchmark_results.json": "72e449c61a0470060416be17a10a6e7deb926112c9132dcb9d6348fe11113e0a",
+    "results/phase2_verification_20261016/prior_results/inference_experiments.csv": "847f4ece001046e8efc755a794b4170b51f965a3adafd0c7fc92b3e599921197",
+    "results/phase2_verification_20261016/prior_results/inference_experiments.json": "d5e54fb02a4e7add192a38ba95fab78324ee4a2adcfc39089c3cc0ff500c1c12",
+    "results/phase2_verification_20261016/prior_results/training_experiments.csv": "7256485acb8ded0f210f58107827dff2ff9c4b840697a77de73dc6d5b4e0ccbd",
+    "results/phase2_verification_20261016/prior_results/training_experiments.json": "5c7043e8875f2c45b13c5d6346210ac49266c6fe15425039b65019a7cccc9b2a",
+    "results/phase2_verification_20261016/rebuild.cmd": "4c2e79f158c644afcd9bd6bab1546c784523a46eba44c23fbf95cc4b19fa81c1",
+    "results/phase2_verification_20261016/verified_run/benchmark_results.csv": "94432a71f55448e24205b9d875d62897f66caec1701b67f1982f584354cae30a",
+    "results/phase2_verification_20261016/verified_run/benchmark_results.json": "ca80818aa82565f65ce4e152a1cd79095071d408cc6401382f1607268294ba36",
+    "results/phase2_verification_20261016/verify_artifacts.py": "4bd43d3f4eca964440c9adaccb6678557426945d4c9f933395a9c551a9f3c29f",
+    "results/phase3_verification/CONTINUATION_REPORT.md": "deffa669553da82af51f4195cda2c9f00d4bf50f2eed7d8fa1dd5ad979c25488",
+    "results/phase3_verification/PHASE3_FINAL_VERIFICATION_REPORT.md": "5beac8ae722fe4569c3bbc9694c390bf0948225dc01435b963155baff2f01ace",
+    "results/phase3_verification/STATUS.md": "5065fb1b0656696968d469b4060af1b17fed6055d2668ec19770879201e0530f",
+    "results/phase3_verification/backend-live-routes.json": "b549d572bb39b99736501dd3557e7a3868517ac32b6c4529802c6e1015edaf83",
+    "results/phase3_verification/live-hardware.json": "b8dc11e5bb199543fb2d3f11098b739e73021c06f09835bf03e6b1ec7d0e6dcd",
+    "results/phase4_verification/PHASE4_FINAL_VALIDATION_REPORT.md": "662e1b3e44f8b882f37669b4586af636799073c28fdd3d9ca39cf5d59d85ce29",
+    "results/phase9_gpu_benchmarks.json": "7a4087a6b64fe06689991633309c14a4dc35c893da9f2c420950a948fae92d2a",
+    "results/phase9_training_experiments.csv": "66fb921c82631d9292ab8220a0d851b513adb7c3377097928eb218b934ce935e",
+    "results/phase9_training_experiments.json": "3849f399ece4f7bdb87eac2ca7bee047ddc93c2a1f528da20422af173255d36e",
+    "results/training_experiments.csv": "89e649d9ff6be803e26c7158bf33c66d69af3af6c02090e2f506dd68acb9206f",
+    "results/training_experiments.json": "c3aa8276b256f67280869d0fdc701a1a78d2ddfbf7cffe24927119d09a723598",
+    "screenshots/README.md": "4044159ae304fc6a48185eec700f0e85e574ddce5c97682d2fb67787c80e6588",
+    "scripts/audit_phase10_baseline.py": "89ec887a557de91e74e153617d51efc05a4997dde2b595722d43eb2acbe5bc28",
+    "scripts/install_phase3.cmd": "646b71ad5d30c4564655a1263c7e1e701b886a09fcd6365c37d13ecb0526e312",
+    "scripts/run_gpu_benchmarks.py": "d26ae40d0c8ea91e2f7e98f610badb01f5a5d2dd49b210e6877cd89583e68cfa",
+    "scripts/run_llm_inference.py": "12c4d83fd783059dd68b5b8586dea54eee0e3377962717bce862e37c28bd9557",
+    "scripts/run_tests.ps1": "fa0348fcbd610f7e45d4b14041f2294e1cc865f1290462fbab23e1d691b857eb",
+    "scripts/test_phase3_integration.py": "5f362999be72a800b48f8a34e10be7fa2b24ddd1c659b5df3acd2c6edfb8120d",
+    "scripts/test_phase4_validation.py": "3cae7545d1e3b8bbf6c837220fc885878616581b2c73d57df4288189a6b4949b",
+    "scripts/train_experiment.py": "48060db6af88fdea9c8566f609e420dce778c51aa0d604bb33821f2a2b04b9b7",
+    "scripts/train_resnet_cifar10.py": "b92767f9a1282079ec2d3624ec2f82924cfaf6e50a29e4a6285635d1db576093",
+    "scripts/verify_ai_foundation.py": "8de3cf7550c9ba477e4f67471ca241093b865748983adb3b0bc827fff4698986",
+    "src/benchmark_export.cpp": "d0bb1143131f40db35ebd4f858495f79e48cfed6f3271eb4fd6820d8ed9c4e22",
+    "src/benchmark_main.cu": "fe1e5772de56b5c5238ba994710d34cf6961f2db30e6b30ba14aad39f4964d95",
+    "src/gpu_check.cu": "557fb8c54c6accda9d73490d0bd6c65189a6a2600a3ce3a6e1f6aad84aeba2ea",
+    "src/matmul.cu": "115ddbff8a0747eadbaf75f2718be3a32d6f70febc0e6f012167596660082105",
+    "src/vector_add.cu": "a4ec615ac75539ccb5c06ffdc67e7284bb447ba0aea2b452b5fe07b28a176174",
+    "tests/benchmark_regression.cu": "8805d7b1f32e39986be9724ba9f3a9a4768543b3a4dbdc62e0c7cbf0e0686e04"
+  }
+}

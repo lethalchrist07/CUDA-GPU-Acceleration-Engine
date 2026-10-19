@@ -1,0 +1,70 @@
+{
+  "bin/benchmark_suite.exe": {
+    "sha256": "1f163d9d87bfec2d8693cff1217a74e9a56b9f730b7da4adcb47f2048923cc60",
+    "bytes": 151040
+  },
+  "bin/benchmark_regression.exe": {
+    "sha256": "3a43c76cc672bf2dd05402f3943868a777b366a7d130de30656214ebd0e51b2a",
+    "bytes": 143360
+  },
+  "CMakeLists.txt": {
+    "sha256": "4bcd8e6534234a45c0a42e45625ceb4205dc47067f859acb628ba5460f6918b7",
+    "bytes": 2474
+  },
+  "src/benchmark_export.cpp": {
+    "sha256": "d0bb1143131f40db35ebd4f858495f79e48cfed6f3271eb4fd6820d8ed9c4e22",
+    "bytes": 8051
+  },
+  "src/benchmark_main.cu": {
+    "sha256": "fe1e5772de56b5c5238ba994710d34cf6961f2db30e6b30ba14aad39f4964d95",
+    "bytes": 11351
+  },
+  "src/gpu_check.cu": {
+    "sha256": "557fb8c54c6accda9d73490d0bd6c65189a6a2600a3ce3a6e1f6aad84aeba2ea",
+    "bytes": 11904
+  },
+  "src/matmul.cu": {
+    "sha256": "115ddbff8a0747eadbaf75f2718be3a32d6f70febc0e6f012167596660082105",
+    "bytes": 13419
+  },
+  "src/vector_add.cu": {
+    "sha256": "a4ec615ac75539ccb5c06ffdc67e7284bb447ba0aea2b452b5fe07b28a176174",
+    "bytes": 7065
+  },
+  "include/benchmark_export.h": {
+    "sha256": "7dd8c430ea4cf28fe62994b9dde6e54b889d6283a48b6a8135717cb704b79cc6",
+    "bytes": 578
+  },
+  "include/benchmark_types.h": {
+    "sha256": "09aec9b03d59913d15ef1a2fbad2b373b120343d7a9cacf7f5eed15b7bbebdf6",
+    "bytes": 3120
+  },
+  "include/cuda_utils.cuh": {
+    "sha256": "c1281e8b451249cd6229d3ed142823e3931b107db4a8b126e0a553e3b5e5581e",
+    "bytes": 2521
+  },
+  "include/matmul.cuh": {
+    "sha256": "f91634fd5f69166f90ab37efbb008f465c6eaa34900b51019085ca960a9ca76f",
+    "bytes": 1171
+  },
+  "include/vector_add.cuh": {
+    "sha256": "45347c5c5e12085366c22b130a0f83c48641c8390f346a94d3575bd1b65ec411",
+    "bytes": 566
+  },
+  "tests/benchmark_regression.cu": {
+    "sha256": "8805d7b1f32e39986be9724ba9f3a9a4768543b3a4dbdc62e0c7cbf0e0686e04",
+    "bytes": 4397
+  },
+  "results/phase2_verification_20261016/final_run/benchmark_results.csv": {
+    "sha256": "61a611c5f6f7b6870d0754fd7605c149cb9bb1caabc24639e4693b5f089c0e9a",
+    "bytes": 3299
+  },
+  "results/phase2_verification_20261016/final_run/benchmark_results.json": {
+    "sha256": "f9b3e5b01127408a6d5a326f2536aa8f2f1cd22ba020938c45ccc2f7354298cb",
+    "bytes": 15364
+  },
+  "results/phase2_verification_20261016/original_run/benchmark_suite.exe": {
+    "sha256": "6569bb1e75184460420b3c83050fd30caf22423b89a9d0d4e7a39940d4b33dbc",
+    "bytes": 115712
+  }
+}

@@ -1,0 +1,7 @@
+experiment_id,timestamp,model_name,quantization,parameter_size,device,device_name,prompt_tokens,output_tokens,ttft_ms,generation_duration_ms,total_duration_ms,tokens_per_second,backend_vram_mb,pytorch_vram_mb,global_vram_used_mb
+infer_cpu_qwen3.5_4b,2026-10-13 20:06:40,qwen3.5:4b,Q4_K_M,4.2B,cpu,Intel Core i5-13450HX (CPU),23,64,406.0,7335.94,20115.19,8.72,0.0,0.0,982.5
+infer_gpu_qwen3.5_4b,2026-10-13 20:06:48,qwen3.5:4b,Q4_K_M,4.2B,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,23,64,175.89,7373.76,7649.39,8.68,0.0,0.0,982.5
+infer_cpu_qwen3.5_4b,2026-10-13 20:10:19,qwen3.5:4b,Q4_K_M,4.2B,cpu,Intel Core i5-13450HX (CPU),23,80,436.12,9348.83,18470.65,8.56,0.0,0.0,982.5
+infer_gpu_qwen3.5_4b,2026-10-13 20:10:28,qwen3.5:4b,Q4_K_M,4.2B,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,23,80,177.99,8666.58,8921.63,9.23,0.0,0.0,982.5
+infer_cpu_qwen3.5_4b,2026-10-13 20:33:34,qwen3.5:4b,Q4_K_M,4.2B,cpu,Intel Core i5-13450HX (CPU),26,80,420.2,7628.98,16428.7,10.49,0.0,0.0,982.5
+infer_gpu_qwen3.5_4b,2026-10-13 20:33:43,qwen3.5:4b,Q4_K_M,4.2B,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,26,80,214.05,8407.33,8699.72,9.52,0.0,0.0,982.5

@@ -1,0 +1,35 @@
+﻿# CUDA AI Acceleration Engine - Default Configuration
+system:
+  project_name: "CUDA AI Acceleration Engine"
+  version: "0.2.0-phase2"
+  seed: 42
+
+hardware:
+  preferred_device: "cuda"  # Options: "cuda", "cpu"
+  fallback_to_cpu: true
+  max_gpu_memory_mb: 5120   # 5GB safety limit for 6GB VRAM
+  safety_margin_mb: 512
+
+model:
+  name: "baseline_mlp"
+  input_dim: 64
+  hidden_dims: [128, 64]
+  output_dim: 10
+  activation: "relu"        # Options: "relu", "gelu", "silu"
+  dropout: 0.1
+
+data:
+  batch_size: 64
+  num_samples: 1000
+  test_split: 0.2
+  num_workers: 0
+
+training:
+  epochs: 5
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: "adamw"
+
+checkpointing:
+  checkpoint_dir: "checkpoints"
+  save_best_only: true

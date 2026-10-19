@@ -1,0 +1,4 @@
+experiment_id,timestamp,model_name,parameters,device,device_name,epochs,batch_size,learning_rate,optimizer,seed,use_amp,total_train_time_ms,avg_epoch_time_ms,final_train_loss,final_val_loss,best_val_accuracy,peak_gpu_memory_mb,speedup_vs_cpu
+cpu_mlp_10ep_42,2026-10-13 19:55:06,BaselineMLP,465172,cpu,Intel Core i5-13450HX,10,128,0.001,adamw,42,False,23509.74,2350.97,0.076,0.7419,76.4,0.0,1.0
+gpu_fp32_mlp_10ep_42,2026-10-13 19:55:16,BaselineMLP,465172,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,10,128,0.001,adamw,42,False,6936.07,693.61,0.0738,0.7861,75.55,25.2,3.39
+gpu_amp_mlp_10ep_42,2026-10-13 19:55:29,BaselineMLP,465172,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,10,128,0.001,adamw,42,True,13216.11,1321.61,0.0855,0.7728,75.5,32.58,1.78

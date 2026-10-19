@@ -1,0 +1,4 @@
+experiment_id,timestamp,model_name,parameters,device,device_name,epochs,batch_size,learning_rate,optimizer,seed,use_amp,total_train_time_ms,avg_epoch_time_ms,final_train_loss,final_val_loss,best_val_accuracy,peak_gpu_memory_mb,speedup_vs_cpu
+gpu_amp_resnet18_b128_ep2_pilot,2026-10-19 12:08:59,ResNet18,11173962,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,2,128,0.001,adamw,42,True,17515.97,6726.62,1.6963,1.8691,30.2,479.16,19.71
+gpu_amp_resnet18_b128_ep1_resumed,2026-10-19 12:09:24,ResNet18,11173962,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,1,128,0.001,adamw,42,True,7915.08,5498.6,1.542,1.6489,38.8,479.82,21.27
+gpu_amp_resnet18_b128_ep15_1792399262,2026-10-19 14:11:02,ResNet18,11173962,cuda:0,NVIDIA GeForce RTX 3050 6GB Laptop GPU,15,128,0.001,adamw,42,True,787166.15,50251.5,0.1551,0.2648,90.92,479.16,1.0

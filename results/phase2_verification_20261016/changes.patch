@@ -1,0 +1,855 @@
+--- original/CMakeLists.txt
++++ CMakeLists.txt
+@@ -49,3 +49,22 @@
+ target_include_directories(benchmark_suite PRIVATE
+     ${CMAKE_SOURCE_DIR}/include
+ )
++
++include(CTest)
++if(BUILD_TESTING)
++    add_executable(benchmark_regression
++        tests/benchmark_regression.cu
++        src/vector_add.cu
++        src/matmul.cu
++        src/benchmark_export.cpp
++    )
++    target_include_directories(benchmark_regression PRIVATE ${CMAKE_SOURCE_DIR}/include)
++    target_compile_options(benchmark_regression PRIVATE
++        $<$<COMPILE_LANGUAGE:CUDA>:--use_fast_math -O3>
++        $<$<COMPILE_LANGUAGE:CXX>:/O2 /W3>
++    )
++    add_test(NAME cuda_benchmark_regression COMMAND benchmark_regression)
++    add_test(NAME benchmark_help COMMAND benchmark_suite --help)
++    add_test(NAME benchmark_rejects_unknown_option COMMAND benchmark_suite --not-a-supported-option)
++    set_tests_properties(benchmark_rejects_unknown_option PROPERTIES WILL_FAIL TRUE)
++endif()
+--- original/include/benchmark_export.h
++++ include/benchmark_export.h
+@@ -12,4 +12,5 @@
+                    const std::vector<BenchmarkResult>& results,
+                    const std::string& device_name,
+                    const std::string& driver_ver,
+-                   const std::string& runtime_ver);
++                   const std::string& runtime_ver,
++                   size_t expected_count);
+--- original/include/benchmark_types.h
++++ include/benchmark_types.h
+@@ -3,22 +3,24 @@
+ #include <string>
+ #include <vector>
+ #include <algorithm>
++#include <cmath>
++#include <limits>
+ 
+ struct BenchmarkResult {
+     std::string category;          // e.g. "Vector Addition", "Matrix Multiplication"
+     std::string variant;           // e.g. "Basic CUDA", "Tiled Shared Memory"
+     std::string workload_size;     // e.g. "10,000,000 elements", "1024x1024"
+     size_t dimension = 0;          // N or matrix dimension
+-    double memory_mb = 0.0;        // Total active memory in MB
++    double memory_mb = 0.0;        // Legacy field name: total active memory in MiB
+     double cpu_time_ms = 0.0;      // Median CPU time
+     double gpu_h2d_ms = 0.0;       // Median Host-to-Device transfer
+     double gpu_kernel_ms = 0.0;    // Median Kernel execution time
+     double gpu_d2h_ms = 0.0;       // Median Device-to-Host transfer
+-    double gpu_end_to_end_ms = 0.0;// Median End-to-End time (H2D + Kernel + D2H)
++    double gpu_end_to_end_ms = 0.0;// Host wall time: H2D through synchronized D2H; excludes allocation
+     double kernel_speedup = 0.0;   // cpu_time_ms / gpu_kernel_ms
+     double end_to_end_speedup = 0.0; // cpu_time_ms / gpu_end_to_end_ms
+     double gflops = 0.0;           // GFLOPS of kernel
+-    double memory_bandwidth_gb_s = 0.0; // Effective GB/s
++    double memory_bandwidth_gb_s = 0.0; // Estimated requested global-memory bytes / kernel seconds, not DRAM throughput
+     float max_abs_error = 0.0f;
+     double rmse = 0.0;
+     float tolerance = 1e-4f;
+@@ -26,7 +28,36 @@
+     bool verified = false;
+     int warmup_runs = 3;
+     int timed_runs = 5;
++    int cpu_timed_runs = 0;
++    std::vector<double> cpu_samples_ms, h2d_samples_ms, kernel_samples_ms, d2h_samples_ms, e2e_samples_ms;
+ };
++
++// Reject non-finite values: fabs(NaN) > tolerance alone would silently pass.
++inline void verifyAgainstCPU(const float* actual, const float* reference, size_t count,
++                             BenchmarkResult& result) {
++    result.max_abs_error = 0.0f;
++    result.mismatched_elements = 0;
++    double squared_error = 0.0;
++    for (size_t i = 0; i < count; ++i) {
++        const float diff = std::fabs(actual[i] - reference[i]);
++        if (!std::isfinite(diff)) {
++            ++result.mismatched_elements;
++            result.max_abs_error = std::numeric_limits<float>::infinity();
++            squared_error = std::numeric_limits<double>::infinity();
++        } else {
++            result.max_abs_error = std::max(result.max_abs_error, diff);
++            squared_error += static_cast<double>(diff) * diff;
++            if (diff > result.tolerance) ++result.mismatched_elements;
++        }
++    }
++    result.rmse = count ? std::sqrt(squared_error / count) : 0.0;
++    result.verified = count > 0 && result.mismatched_elements == 0;
++}
++
++inline bool benchmarksPassed(const std::vector<BenchmarkResult>& results, size_t expected_count) {
++    return expected_count > 0 && results.size() == expected_count &&
++        std::all_of(results.begin(), results.end(), [](const BenchmarkResult& r) { return r.verified; });
++}
+ 
+ inline double computeMedian(std::vector<double> vals) {
+     if (vals.empty()) return 0.0;
+--- original/src/benchmark_export.cpp
++++ src/benchmark_export.cpp
+@@ -4,6 +4,22 @@
+ #include <iomanip>
+ #include <chrono>
+ #include <ctime>
++
++namespace {
++void writeJSONNumber(std::ostream& file, double value) {
++    if (std::isfinite(value)) file << value;
++    else file << "null";
++}
++
++void writeSamples(std::ostream& file, const char* name, const std::vector<double>& samples, bool last) {
++    file << "        \"" << name << "\": [";
++    for (size_t i = 0; i < samples.size(); ++i) {
++        if (i) file << ", ";
++        writeJSONNumber(file, samples[i]);
++    }
++    file << "]" << (last ? "\n" : ",\n");
++}
++}
+ 
+ bool exportToCSV(const std::string& filepath, const std::vector<BenchmarkResult>& results) {
+     std::ofstream file(filepath);
+@@ -16,33 +32,37 @@
+     file << "Category,Variant,WorkloadSize,Dimension,MemoryMB,"
+          << "CPUTimeMs,GPUH2DMs,GPUKernelMs,GPUD2HMs,GPUEndToEndMs,"
+          << "KernelSpeedup,EndToEndSpeedup,GFLOPS,MemoryBandwidthGBs,"
+-         << "MaxAbsError,RMSE,Tolerance,MismatchedElements,Verified,WarmupRuns,TimedRuns\n";
++         << "MaxAbsError,RMSE,Tolerance,MismatchedElements,Verified,WarmupRuns,TimedRuns,CPUTimedRuns\n";
+ 
+     for (const auto& r : results) {
+         file << "\"" << r.category << "\","
+              << "\"" << r.variant << "\","
+              << "\"" << r.workload_size << "\","
+              << r.dimension << ","
+-             << std::fixed << std::setprecision(2) << r.memory_mb << ","
+-             << std::setprecision(4) << r.cpu_time_ms << ","
++             << std::fixed << std::setprecision(9) << r.memory_mb << ","
++             << r.cpu_time_ms << ","
+              << r.gpu_h2d_ms << ","
+              << r.gpu_kernel_ms << ","
+              << r.gpu_d2h_ms << ","
+              << r.gpu_end_to_end_ms << ","
+-             << std::setprecision(2) << r.kernel_speedup << ","
++             << r.kernel_speedup << ","
+              << r.end_to_end_speedup << ","
+              << r.gflops << ","
+              << r.memory_bandwidth_gb_s << ","
+-             << std::scientific << std::setprecision(6) << r.max_abs_error << ","
++             << std::scientific << std::setprecision(9) << r.max_abs_error << ","
+              << r.rmse << ","
+              << r.tolerance << ","
+              << std::fixed << r.mismatched_elements << ","
+              << (r.verified ? "PASS" : "FAIL") << ","
+              << r.warmup_runs << ","
+-             << r.timed_runs << "\n";
++             << r.timed_runs << "," << r.cpu_timed_runs << "\n";
+     }
+ 
+     file.close();
++    if (!file) {
++        std::cerr << "[-] Failed to write CSV export: " << filepath << std::endl;
++        return false;
++    }
+     std::cout << "[+] Exported benchmark results to CSV: " << filepath << std::endl;
+     return true;
+ }
+@@ -51,7 +71,8 @@
+                    const std::vector<BenchmarkResult>& results,
+                    const std::string& device_name,
+                    const std::string& driver_ver,
+-                   const std::string& runtime_ver) {
++                   const std::string& runtime_ver,
++                   size_t expected_count) {
+     std::ofstream file(filepath);
+     if (!file.is_open()) {
+         std::cerr << "[-] Failed to open JSON export file: " << filepath << std::endl;
+@@ -71,17 +92,30 @@
+     }
+ 
+     file << "{\n";
++    file << "  \"schema_version\": 2,\n";
+     file << "  \"system_info\": {\n";
+     file << "    \"device_name\": \"" << device_name << "\",\n";
+     file << "    \"cuda_driver_version\": \"" << driver_ver << "\",\n";
+     file << "    \"cuda_runtime_version\": \"" << runtime_ver << "\",\n";
+     file << "    \"timestamp\": \"" << timeString << "\"\n";
+     file << "  },\n";
++    file << "  \"measurement_notes\": {\n";
++    file << "    \"time_unit\": \"ms; medians of individual samples\",\n";
++    file << "    \"memory_mb_unit\": \"MiB (legacy field name)\",\n";
++    file << "    \"gpu_end_to_end\": \"host steady_clock: H2D, launch, D2H, synchronization and timing instrumentation; excludes allocation, initialization, verification\",\n";
++    file << "    \"gpu_events\": \"CUDA event intervals on default stream; pageable host buffers; not isolated DMA or profiler kernel durations\",\n";
++    file << "    \"cpu_baseline\": \"single-threaded C++ reference; one warmup; not optimized BLAS\",\n";
++    file << "    \"memory_bandwidth_gb_s\": \"estimated requested global-memory bytes / kernel seconds / 1e9; cache reuse included; NOT measured DRAM bandwidth\",\n";
++    file << "    \"gflops\": \"vector N or matrix 2*N^3 operations / kernel seconds / 1e9\",\n";
++    file << "    \"build\": \"CUDA sm_86; --use_fast_math; build configuration recorded in verification log\"\n";
++    file << "  },\n";
+     file << "  \"summary\": {\n";
++    file << "    \"expected_benchmarks\": " << expected_count << ",\n";
+     file << "    \"total_benchmarks\": " << results.size() << ",\n";
+     file << "    \"passed\": " << passedCount << ",\n";
+     file << "    \"failed\": " << (results.size() - passedCount) << ",\n";
+-    file << "    \"status\": \"" << (passedCount == results.size() ? "PASS" : "FAIL") << "\"\n";
++    file << "    \"missing_benchmarks\": " << (expected_count > results.size() ? expected_count - results.size() : 0) << ",\n";
++    file << "    \"status\": \"" << (benchmarksPassed(results, expected_count) ? "PASS" : "FAIL") << "\"\n";
+     file << "  },\n";
+     file << "  \"benchmarks\": [\n";
+ 
+@@ -93,23 +127,34 @@
+         file << "      \"variant\": \"" << r.variant << "\",\n";
+         file << "      \"workload_size\": \"" << r.workload_size << "\",\n";
+         file << "      \"dimension\": " << r.dimension << ",\n";
+-        file << "      \"memory_mb\": " << std::fixed << std::setprecision(2) << r.memory_mb << ",\n";
+-        file << "      \"cpu_time_ms\": " << std::setprecision(4) << r.cpu_time_ms << ",\n";
++        file << "      \"memory_mb\": " << std::fixed << std::setprecision(9) << r.memory_mb << ",\n";
++        file << "      \"cpu_time_ms\": " << r.cpu_time_ms << ",\n";
+         file << "      \"gpu_h2d_ms\": " << r.gpu_h2d_ms << ",\n";
+         file << "      \"gpu_kernel_ms\": " << r.gpu_kernel_ms << ",\n";
+         file << "      \"gpu_d2h_ms\": " << r.gpu_d2h_ms << ",\n";
+         file << "      \"gpu_end_to_end_ms\": " << r.gpu_end_to_end_ms << ",\n";
+-        file << "      \"kernel_speedup\": " << std::setprecision(2) << r.kernel_speedup << ",\n";
++        file << "      \"kernel_speedup\": " << r.kernel_speedup << ",\n";
+         file << "      \"end_to_end_speedup\": " << r.end_to_end_speedup << ",\n";
+         file << "      \"gflops\": " << r.gflops << ",\n";
+         file << "      \"memory_bandwidth_gb_s\": " << r.memory_bandwidth_gb_s << ",\n";
+-        file << "      \"max_abs_error\": " << std::scientific << std::setprecision(6) << r.max_abs_error << ",\n";
+-        file << "      \"rmse\": " << r.rmse << ",\n";
++        file << "      \"max_abs_error\": " << std::scientific << std::setprecision(9);
++        writeJSONNumber(file, r.max_abs_error);
++        file << ",\n      \"rmse\": ";
++        writeJSONNumber(file, r.rmse);
++        file << ",\n";
+         file << "      \"tolerance\": " << r.tolerance << ",\n";
+         file << "      \"mismatched_elements\": " << std::fixed << r.mismatched_elements << ",\n";
+         file << "      \"verified\": " << (r.verified ? "true" : "false") << ",\n";
+         file << "      \"warmup_runs\": " << r.warmup_runs << ",\n";
+-        file << "      \"timed_runs\": " << r.timed_runs << "\n";
++        file << "      \"timed_runs\": " << r.timed_runs << ",\n";
++        file << "      \"cpu_timed_runs\": " << r.cpu_timed_runs << ",\n";
++        file << "      \"samples_ms\": {\n" << std::setprecision(9);
++        writeSamples(file, "cpu", r.cpu_samples_ms, false);
++        writeSamples(file, "h2d", r.h2d_samples_ms, false);
++        writeSamples(file, "kernel", r.kernel_samples_ms, false);
++        writeSamples(file, "d2h", r.d2h_samples_ms, false);
++        writeSamples(file, "end_to_end", r.e2e_samples_ms, true);
++        file << "      }\n";
+         file << "    }" << (i + 1 < results.size() ? "," : "") << "\n";
+     }
+ 
+@@ -117,6 +162,10 @@
+     file << "}\n";
+ 
+     file.close();
++    if (!file) {
++        std::cerr << "[-] Failed to write JSON export: " << filepath << std::endl;
++        return false;
++    }
+     std::cout << "[+] Exported benchmark results to JSON: " << filepath << std::endl;
+     return true;
+ }
+--- original/src/benchmark_main.cu
++++ src/benchmark_main.cu
+@@ -2,6 +2,7 @@
+ #include <iomanip>
+ #include <vector>
+ #include <string>
++#include <filesystem>
+ #include "cuda_utils.cuh"
+ #include "benchmark_types.h"
+ #include "vector_add.cuh"
+@@ -15,6 +16,33 @@
+ }
+ 
+ int main(int argc, char* argv[]) {
++    std::filesystem::path outputDir = "results";
++    for (int i = 1; i < argc; ++i) {
++        const std::string arg = argv[i];
++        if (arg == "--help" || arg == "-h") {
++            std::cout << "Usage: benchmark_suite.exe [--output-dir DIRECTORY] [--help]\n"
++                      << "Runs device 0: vector sizes 100000, 1000000, 10000000, 25000000;\n"
++                      << "basic and tiled matrix sizes 256, 512, 1024, 2048.\n"
++                      << "GPU warmup/timed runs: vector 3/5, matrix 2/3. CPU: one warmup,\n"
++                      << "5 vector samples, 3 matrix samples (2 at 2048).\n"
++                      << "E2E: host wall time for H2D, launch, D2H and synchronization;\n"
++                      << "excludes allocation, initialization and verification.\n"
++                      << "Speedups compare this single-threaded CPU reference only.\n";
++            return 0;
++        }
++        if (arg == "--output-dir" && i + 1 < argc && std::string(argv[i + 1]).rfind("--", 0) != 0) {
++            outputDir = argv[++i];
++        } else {
++            std::cerr << "Unknown or incomplete argument: " << arg << " (use --help)\n";
++            return 2;
++        }
++    }
++    std::error_code directoryError;
++    std::filesystem::create_directories(outputDir, directoryError);
++    if (directoryError) {
++        std::cerr << "Cannot create output directory: " << directoryError.message() << "\n";
++        return 1;
++    }
+     std::cout << "========================================================================================\n";
+     std::cout << "      CUDA GPU Acceleration Engine - Comprehensive Benchmark Suite (Phase 2)\n";
+     std::cout << "========================================================================================\n\n";
+@@ -29,25 +57,35 @@
+     }
+ 
+     int driverVersion = 0, runtimeVersion = 0;
+-    cudaDriverGetVersion(&driverVersion);
+-    cudaRuntimeGetVersion(&runtimeVersion);
++    if (cudaSetDevice(deviceId) != cudaSuccess ||
++        cudaDriverGetVersion(&driverVersion) != cudaSuccess ||
++        cudaRuntimeGetVersion(&runtimeVersion) != cudaSuccess) {
++        std::cerr << "Failed to initialize CUDA device or query versions.\n";
++        return 1;
++    }
+ 
+     std::string deviceName = prop.name;
+-    std::string driverVerStr = std::to_string(driverVersion / 1000) + "." + std::to_string(driverVersion % 100);
+-    std::string runtimeVerStr = std::to_string(runtimeVersion / 1000) + "." + std::to_string(runtimeVersion % 100);
++    std::string driverVerStr = std::to_string(driverVersion / 1000) + "." + std::to_string((driverVersion % 1000) / 10);
++    std::string runtimeVerStr = std::to_string(runtimeVersion / 1000) + "." + std::to_string((runtimeVersion % 1000) / 10);
+ 
+     size_t freeMem = 0, totalMem = 0;
+-    cudaMemGetInfo(&freeMem, &totalMem);
++    if (cudaMemGetInfo(&freeMem, &totalMem) != cudaSuccess) {
++        std::cerr << "Failed to query CUDA memory.\n";
++        return 1;
++    }
+ 
+     std::cout << "[SYSTEM / ENVIRONMENT]\n";
+     std::cout << "  Device:             " << deviceName << "\n";
+     std::cout << "  Compute Capability: " << prop.major << "." << prop.minor << "\n";
+-    std::cout << "  Total VRAM:         " << (totalMem / (1024 * 1024)) << " MB\n";
+-    std::cout << "  Free VRAM:          " << (freeMem / (1024 * 1024)) << " MB\n";
++    std::cout << "  Total VRAM:         " << (totalMem / (1024 * 1024)) << " MiB\n";
++    std::cout << "  Free VRAM:          " << (freeMem / (1024 * 1024)) << " MiB\n";
+     std::cout << "  CUDA Driver:        " << driverVerStr << "\n";
+     std::cout << "  CUDA Runtime:       " << runtimeVerStr << "\n";
+     std::cout << "  Streaming Multiprocessors: " << prop.multiProcessorCount << "\n\n";
+ 
++    std::cout << "Times are medians. E2E is synchronized host wall time, excluding allocation.\n"
++              << "CPU baseline: single-threaded reference, not optimized BLAS.\n"
++              << "Bandwidth is estimated requested global-memory traffic, not measured DRAM throughput.\n";
+     std::vector<BenchmarkResult> allResults;
+ 
+     // ========================================================
+@@ -120,9 +158,9 @@
+             std::cout << "      End-to-End:    " << tiledRes.gpu_end_to_end_ms << " ms (E2E Speedup: " 
+                       << tiledRes.end_to_end_speedup << "x)\n";
+             std::cout << "      GFLOPS:        " << tiledRes.gflops << " GFLOPS\n";
+-            double tiledOverBasic = (basicRes.gpu_kernel_ms > 0.0) 
++            double tiledOverBasic = (tiledRes.gpu_kernel_ms > 0.0)
+                 ? (basicRes.gpu_kernel_ms / tiledRes.gpu_kernel_ms) : 0.0;
+-            std::cout << "      Tiled vs Basic:" << tiledOverBasic << "x Faster\n";
++            std::cout << "      Basic/Tiled kernel time ratio: " << tiledOverBasic << "x\n";
+             std::cout << "      Status:        " << (tiledRes.verified ? "[PASS]" : "[FAIL]") 
+                       << " (Max Err: " << std::scientific << tiledRes.max_abs_error << ")\n";
+         }
+@@ -133,44 +171,47 @@
+     // ========================================================
+     printHeader("PERFORMANCE SUMMARY TABLE");
+     std::cout << std::left 
+-              << std::setw(22) << "Workload" 
+-              << std::setw(20) << "Variant" 
++              << std::setw(40) << "Workload"
++              << std::setw(27) << "Variant"
+               << std::setw(11) << "CPU (ms)" 
+               << std::setw(11) << "GPU K(ms)" 
+               << std::setw(12) << "GPU E2E(ms)" 
+-              << std::setw(10) << "K-Speedup" 
+-              << std::setw(10) << "E2E-Spd" 
++              << std::setw(13) << "K-Speedup(x)"
++              << std::setw(13) << "E2E-Spd(x)"
+               << std::setw(11) << "GFLOPS" 
+               << std::setw(8)  << "Status" << "\n";
+-    std::cout << std::string(105, '-') << "\n";
+-
+-    bool allPassed = true;
++    std::cout << std::string(146, '-') << "\n";
++
++    const size_t expectedCount = vectorSizes.size() + 2 * matrixSizes.size();
++    bool allPassed = benchmarksPassed(allResults, expectedCount);
++    if (allResults.size() != expectedCount) {
++        std::cerr << "Incomplete benchmark run: " << allResults.size() << "/" << expectedCount << " results.\n";
++    }
+     for (const auto& r : allResults) {
+         if (!r.verified) allPassed = false;
+         std::cout << std::left 
+-                  << std::setw(22) << (r.category + " " + r.workload_size)
+-                  << std::setw(20) << r.variant
+-                  << std::setw(11) << std::fixed << std::setprecision(2) << r.cpu_time_ms
++                  << std::setw(40) << (r.category + " " + r.workload_size)
++                  << std::setw(27) << r.variant
++                  << std::setw(11) << std::fixed << std::setprecision(4) << r.cpu_time_ms
+                   << std::setw(11) << r.gpu_kernel_ms
+                   << std::setw(12) << r.gpu_end_to_end_ms
+-                  << std::setw(10) << (std::to_string(static_cast<int>(r.kernel_speedup)) + "." + 
+-                                       std::to_string(static_cast<int>(r.kernel_speedup * 10) % 10) + "x")
+-                  << std::setw(10) << (std::to_string(static_cast<int>(r.end_to_end_speedup)) + "." + 
+-                                       std::to_string(static_cast<int>(r.end_to_end_speedup * 10) % 10) + "x")
++                  << std::setw(13) << std::setprecision(3) << r.kernel_speedup
++                  << std::setw(13) << r.end_to_end_speedup
+                   << std::setw(11) << r.gflops
+                   << std::setw(8)  << (r.verified ? "[PASS]" : "[FAIL]") << "\n";
+     }
+-    std::cout << std::string(105, '-') << "\n";
++    std::cout << std::string(146, '-') << "\n";
+ 
+     // ========================================================
+     // 5. EXPORT RESULTS TO CSV AND JSON
+     // ========================================================
+     printHeader("EXPORTING BENCHMARK ARTIFACTS");
+-    std::string csvPath = "results/benchmark_results.csv";
+-    std::string jsonPath = "results/benchmark_results.json";
+-
+-    exportToCSV(csvPath, allResults);
+-    exportToJSON(jsonPath, allResults, deviceName, driverVerStr, runtimeVerStr);
++    std::string csvPath = (outputDir / "benchmark_results.csv").string();
++    std::string jsonPath = (outputDir / "benchmark_results.json").string();
++
++    const bool csvExported = exportToCSV(csvPath, allResults);
++    const bool jsonExported = exportToJSON(jsonPath, allResults, deviceName, driverVerStr, runtimeVerStr, expectedCount);
++    allPassed = allPassed && csvExported && jsonExported;
+ 
+     std::cout << "\n========================================================================================\n";
+     if (allPassed) {
+--- original/src/matmul.cu
++++ src/matmul.cu
+@@ -79,6 +79,7 @@
+                          int timed_runs, 
+                          BenchmarkResult& outBasicResult, 
+                          BenchmarkResult& outTiledResult) {
++    if (n <= 0 || warmup_runs < 0 || timed_runs <= 0) return false;
+     const size_t elements = static_cast<size_t>(n) * n;
+     const size_t bytes = elements * sizeof(float);
+     const size_t total_required_gpu_bytes = 3 * bytes;
+@@ -122,9 +123,9 @@
+     int cpu_runs = (n >= 2048) ? 2 : timed_runs; // For 2048x2048, 2 runs suffice to save time
+     cpu_times.reserve(cpu_runs);
+     for (int r = 0; r < cpu_runs; ++r) {
+-        auto t0 = std::chrono::high_resolution_clock::now();
++        auto t0 = std::chrono::steady_clock::now();
+         matmulCPU(h_A.data(), h_B.data(), h_C_cpu.data(), n);
+-        auto t1 = std::chrono::high_resolution_clock::now();
++        auto t1 = std::chrono::steady_clock::now();
+         double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+         cpu_times.push_back(ms);
+     }
+@@ -159,15 +160,18 @@
+     // ==========================================
+     // Warmup
+     for (int w = 0; w < warmup_runs; ++w) {
+-        cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice);
+-        cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice);
++        CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
++        CUDA_CHECK(cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice));
+         matmulBasicKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
+-        cudaMemcpy(h_C_basic.data(), d_C, bytes, cudaMemcpyDeviceToHost);
+-        cudaDeviceSynchronize();
++        CUDA_CHECK(cudaGetLastError());
++        CUDA_CHECK(cudaMemcpy(h_C_basic.data(), d_C, bytes, cudaMemcpyDeviceToHost));
++        CUDA_CHECK(cudaDeviceSynchronize());
+     }
+ 
+     std::vector<double> basic_h2d, basic_kernel, basic_d2h, basic_e2e;
+     for (int r = 0; r < timed_runs; ++r) {
++        CUDA_CHECK(cudaDeviceSynchronize());
++        const auto wall_start = std::chrono::steady_clock::now();
+         CUDA_CHECK(cudaEventRecord(evH2DStart));
+         CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
+         CUDA_CHECK(cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice));
+@@ -175,6 +179,7 @@
+ 
+         CUDA_CHECK(cudaEventRecord(evKStart));
+         matmulBasicKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
++        CUDA_CHECK(cudaGetLastError());
+         CUDA_CHECK(cudaEventRecord(evKStop));
+ 
+         CUDA_CHECK(cudaEventRecord(evD2HStart));
+@@ -182,6 +187,7 @@
+         CUDA_CHECK(cudaEventRecord(evD2HStop));
+ 
+         CUDA_CHECK(cudaEventSynchronize(evD2HStop));
++        const auto wall_stop = std::chrono::steady_clock::now();
+ 
+         float h2d_ms = 0.0f, k_ms = 0.0f, d2h_ms = 0.0f;
+         CUDA_CHECK(cudaEventElapsedTime(&h2d_ms, evH2DStart, evH2DStop));
+@@ -191,7 +197,7 @@
+         basic_h2d.push_back(h2d_ms);
+         basic_kernel.push_back(k_ms);
+         basic_d2h.push_back(d2h_ms);
+-        basic_e2e.push_back(h2d_ms + k_ms + d2h_ms);
++        basic_e2e.push_back(std::chrono::duration<double, std::milli>(wall_stop - wall_start).count());
+     }
+ 
+     outBasicResult.gpu_h2d_ms = computeMedian(basic_h2d);
+@@ -208,36 +214,31 @@
+                                             (outBasicResult.gpu_kernel_ms * 1e-3)) / 1e9;
+ 
+     // Verify Basic
+-    float max_err_basic = 0.0f;
+-    double sum_sq_basic = 0.0;
+-    int mismatches_basic = 0;
+-    for (size_t i = 0; i < elements; ++i) {
+-        float diff = std::fabs(h_C_basic[i] - h_C_cpu[i]);
+-        if (diff > max_err_basic) max_err_basic = diff;
+-        sum_sq_basic += diff * diff;
+-        if (diff > outBasicResult.tolerance) {
+-            mismatches_basic++;
+-        }
+-    }
+-    outBasicResult.max_abs_error = max_err_basic;
+-    outBasicResult.rmse = std::sqrt(sum_sq_basic / elements);
+-    outBasicResult.mismatched_elements = mismatches_basic;
+-    outBasicResult.verified = (mismatches_basic == 0);
++    verifyAgainstCPU(h_C_basic.data(), h_C_cpu.data(), elements, outBasicResult);
++    outBasicResult.cpu_timed_runs = cpu_runs;
++    outBasicResult.cpu_samples_ms = cpu_times;
++    outBasicResult.h2d_samples_ms = basic_h2d;
++    outBasicResult.kernel_samples_ms = basic_kernel;
++    outBasicResult.d2h_samples_ms = basic_d2h;
++    outBasicResult.e2e_samples_ms = basic_e2e;
+ 
+     // ==========================================
+     // 6. RUN TILED SHARED MEMORY KERNEL BENCHMARK
+     // ==========================================
+     // Warmup
+     for (int w = 0; w < warmup_runs; ++w) {
+-        cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice);
+-        cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice);
++        CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
++        CUDA_CHECK(cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice));
+         matmulTiledSharedKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
+-        cudaMemcpy(h_C_tiled.data(), d_C, bytes, cudaMemcpyDeviceToHost);
+-        cudaDeviceSynchronize();
++        CUDA_CHECK(cudaGetLastError());
++        CUDA_CHECK(cudaMemcpy(h_C_tiled.data(), d_C, bytes, cudaMemcpyDeviceToHost));
++        CUDA_CHECK(cudaDeviceSynchronize());
+     }
+ 
+     std::vector<double> tiled_h2d, tiled_kernel, tiled_d2h, tiled_e2e;
+     for (int r = 0; r < timed_runs; ++r) {
++        CUDA_CHECK(cudaDeviceSynchronize());
++        const auto wall_start = std::chrono::steady_clock::now();
+         CUDA_CHECK(cudaEventRecord(evH2DStart));
+         CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
+         CUDA_CHECK(cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice));
+@@ -245,6 +246,7 @@
+ 
+         CUDA_CHECK(cudaEventRecord(evKStart));
+         matmulTiledSharedKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
++        CUDA_CHECK(cudaGetLastError());
+         CUDA_CHECK(cudaEventRecord(evKStop));
+ 
+         CUDA_CHECK(cudaEventRecord(evD2HStart));
+@@ -252,6 +254,7 @@
+         CUDA_CHECK(cudaEventRecord(evD2HStop));
+ 
+         CUDA_CHECK(cudaEventSynchronize(evD2HStop));
++        const auto wall_stop = std::chrono::steady_clock::now();
+ 
+         float h2d_ms = 0.0f, k_ms = 0.0f, d2h_ms = 0.0f;
+         CUDA_CHECK(cudaEventElapsedTime(&h2d_ms, evH2DStart, evH2DStop));
+@@ -261,7 +264,7 @@
+         tiled_h2d.push_back(h2d_ms);
+         tiled_kernel.push_back(k_ms);
+         tiled_d2h.push_back(d2h_ms);
+-        tiled_e2e.push_back(h2d_ms + k_ms + d2h_ms);
++        tiled_e2e.push_back(std::chrono::duration<double, std::milli>(wall_stop - wall_start).count());
+     }
+ 
+     outTiledResult.gpu_h2d_ms = computeMedian(tiled_h2d);
+@@ -275,37 +278,29 @@
+     outTiledResult.gflops = (totalFlops / (outTiledResult.gpu_kernel_ms * 1e-3)) / 1e9;
+     // Tiled kernel reads each element once per tile phase from global memory:
+     // Global loads: 2 * (n / MATMUL_TILE_DIM) * elements + elements write
+-    double globalTransfers = (2.0 * static_cast<double>(n) / MATMUL_TILE_DIM + 1.0) * elements * sizeof(float);
++    double globalTransfers = (2.0 * ((n + MATMUL_TILE_DIM - 1) / MATMUL_TILE_DIM) + 1.0) * elements * sizeof(float);
+     outTiledResult.memory_bandwidth_gb_s = (globalTransfers / (outTiledResult.gpu_kernel_ms * 1e-3)) / 1e9;
+ 
+     // Verify Tiled
+-    float max_err_tiled = 0.0f;
+-    double sum_sq_tiled = 0.0;
+-    int mismatches_tiled = 0;
+-    for (size_t i = 0; i < elements; ++i) {
+-        float diff = std::fabs(h_C_tiled[i] - h_C_cpu[i]);
+-        if (diff > max_err_tiled) max_err_tiled = diff;
+-        sum_sq_tiled += diff * diff;
+-        if (diff > outTiledResult.tolerance) {
+-            mismatches_tiled++;
+-        }
+-    }
+-    outTiledResult.max_abs_error = max_err_tiled;
+-    outTiledResult.rmse = std::sqrt(sum_sq_tiled / elements);
+-    outTiledResult.mismatched_elements = mismatches_tiled;
+-    outTiledResult.verified = (mismatches_tiled == 0);
++    verifyAgainstCPU(h_C_tiled.data(), h_C_cpu.data(), elements, outTiledResult);
++    outTiledResult.cpu_timed_runs = cpu_runs;
++    outTiledResult.cpu_samples_ms = cpu_times;
++    outTiledResult.h2d_samples_ms = tiled_h2d;
++    outTiledResult.kernel_samples_ms = tiled_kernel;
++    outTiledResult.d2h_samples_ms = tiled_d2h;
++    outTiledResult.e2e_samples_ms = tiled_e2e;
+ 
+     // Cleanup
+-    cudaEventDestroy(evH2DStart);
+-    cudaEventDestroy(evH2DStop);
+-    cudaEventDestroy(evKStart);
+-    cudaEventDestroy(evKStop);
+-    cudaEventDestroy(evD2HStart);
+-    cudaEventDestroy(evD2HStop);
+-
+-    cudaFree(d_A);
+-    cudaFree(d_B);
+-    cudaFree(d_C);
++    CUDA_CHECK(cudaEventDestroy(evH2DStart));
++    CUDA_CHECK(cudaEventDestroy(evH2DStop));
++    CUDA_CHECK(cudaEventDestroy(evKStart));
++    CUDA_CHECK(cudaEventDestroy(evKStop));
++    CUDA_CHECK(cudaEventDestroy(evD2HStart));
++    CUDA_CHECK(cudaEventDestroy(evD2HStop));
++
++    CUDA_CHECK(cudaFree(d_A));
++    CUDA_CHECK(cudaFree(d_B));
++    CUDA_CHECK(cudaFree(d_C));
+ 
+     return true;
+ }
+--- original/src/vector_add.cu
++++ src/vector_add.cu
+@@ -21,6 +21,7 @@
+ }
+ 
+ bool runVectorAddBenchmark(size_t n, int warmup_runs, int timed_runs, BenchmarkResult& outResult) {
++    if (n == 0 || warmup_runs < 0 || timed_runs <= 0) return false;
+     const size_t bytes = n * sizeof(float);
+     const size_t total_required_gpu_bytes = 3 * bytes;
+ 
+@@ -56,9 +57,9 @@
+     std::vector<double> cpu_times;
+     cpu_times.reserve(timed_runs);
+     for (int r = 0; r < timed_runs; ++r) {
+-        auto t0 = std::chrono::high_resolution_clock::now();
++        auto t0 = std::chrono::steady_clock::now();
+         vectorAddCPU(h_A.data(), h_B.data(), h_C_cpu.data(), n);
+-        auto t1 = std::chrono::high_resolution_clock::now();
++        auto t1 = std::chrono::steady_clock::now();
+         double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+         cpu_times.push_back(ms);
+     }
+@@ -75,11 +76,12 @@
+ 
+     // 4. GPU Warmup
+     for (int w = 0; w < warmup_runs; ++w) {
+-        cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice);
+-        cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice);
++        CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
++        CUDA_CHECK(cudaMemcpy(d_B, h_B.data(), bytes, cudaMemcpyHostToDevice));
+         vectorAddKernel<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, n);
+-        cudaMemcpy(h_C_gpu.data(), d_C, bytes, cudaMemcpyDeviceToHost);
+-        cudaDeviceSynchronize();
++        CUDA_CHECK(cudaGetLastError());
++        CUDA_CHECK(cudaMemcpy(h_C_gpu.data(), d_C, bytes, cudaMemcpyDeviceToHost));
++        CUDA_CHECK(cudaDeviceSynchronize());
+     }
+ 
+     // 5. Timed GPU Runs
+@@ -97,6 +99,8 @@
+     CUDA_CHECK(cudaEventCreate(&evD2HStop));
+ 
+     for (int r = 0; r < timed_runs; ++r) {
++        CUDA_CHECK(cudaDeviceSynchronize());
++        const auto wall_start = std::chrono::steady_clock::now();
+         // H2D
+         CUDA_CHECK(cudaEventRecord(evH2DStart));
+         CUDA_CHECK(cudaMemcpy(d_A, h_A.data(), bytes, cudaMemcpyHostToDevice));
+@@ -106,6 +110,7 @@
+         // Kernel
+         CUDA_CHECK(cudaEventRecord(evKStart));
+         vectorAddKernel<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, n);
++        CUDA_CHECK(cudaGetLastError());
+         CUDA_CHECK(cudaEventRecord(evKStop));
+ 
+         // D2H
+@@ -114,6 +119,7 @@
+         CUDA_CHECK(cudaEventRecord(evD2HStop));
+ 
+         CUDA_CHECK(cudaEventSynchronize(evD2HStop));
++        const auto wall_stop = std::chrono::steady_clock::now();
+ 
+         float h2d_ms = 0.0f, k_ms = 0.0f, d2h_ms = 0.0f;
+         CUDA_CHECK(cudaEventElapsedTime(&h2d_ms, evH2DStart, evH2DStop));
+@@ -123,7 +129,7 @@
+         h2d_times.push_back(h2d_ms);
+         kernel_times.push_back(k_ms);
+         d2h_times.push_back(d2h_ms);
+-        e2e_times.push_back(h2d_ms + k_ms + d2h_ms);
++        e2e_times.push_back(std::chrono::duration<double, std::milli>(wall_stop - wall_start).count());
+     }
+ 
+     outResult.gpu_h2d_ms = computeMedian(h2d_times);
+@@ -141,35 +147,25 @@
+                                        (outResult.gpu_kernel_ms * 1e-3)) / 1e9;
+ 
+     // 7. Numerical Verification
+-    float max_err = 0.0f;
+-    double sum_sq_err = 0.0;
+-    int mismatches = 0;
+-
+-    for (size_t i = 0; i < n; ++i) {
+-        float diff = std::fabs(h_C_gpu[i] - h_C_cpu[i]);
+-        if (diff > max_err) max_err = diff;
+-        sum_sq_err += diff * diff;
+-        if (diff > outResult.tolerance) {
+-            mismatches++;
+-        }
+-    }
+-
+-    outResult.max_abs_error = max_err;
+-    outResult.rmse = std::sqrt(sum_sq_err / n);
+-    outResult.mismatched_elements = mismatches;
+-    outResult.verified = (mismatches == 0);
++    verifyAgainstCPU(h_C_gpu.data(), h_C_cpu.data(), n, outResult);
++    outResult.cpu_timed_runs = timed_runs;
++    outResult.cpu_samples_ms = cpu_times;
++    outResult.h2d_samples_ms = h2d_times;
++    outResult.kernel_samples_ms = kernel_times;
++    outResult.d2h_samples_ms = d2h_times;
++    outResult.e2e_samples_ms = e2e_times;
+ 
+     // Cleanup
+-    cudaEventDestroy(evH2DStart);
+-    cudaEventDestroy(evH2DStop);
+-    cudaEventDestroy(evKStart);
+-    cudaEventDestroy(evKStop);
+-    cudaEventDestroy(evD2HStart);
+-    cudaEventDestroy(evD2HStop);
++    CUDA_CHECK(cudaEventDestroy(evH2DStart));
++    CUDA_CHECK(cudaEventDestroy(evH2DStop));
++    CUDA_CHECK(cudaEventDestroy(evKStart));
++    CUDA_CHECK(cudaEventDestroy(evKStop));
++    CUDA_CHECK(cudaEventDestroy(evD2HStart));
++    CUDA_CHECK(cudaEventDestroy(evD2HStop));
+ 
+-    cudaFree(d_A);
+-    cudaFree(d_B);
+-    cudaFree(d_C);
++    CUDA_CHECK(cudaFree(d_A));
++    CUDA_CHECK(cudaFree(d_B));
++    CUDA_CHECK(cudaFree(d_C));
+ 
+     return true;
+ }
+--- /dev/null
++++ tests/benchmark_regression.cu
+@@ -0,0 +1,94 @@
++#include "vector_add.cuh"
++#include "matmul.cuh"
++#include "benchmark_export.h"
++#include <filesystem>
++#include <fstream>
++#include <iterator>
++#include <limits>
++
++#define REQUIRE(condition) do { if (!(condition)) { \
++    std::cerr << "Failed at line " << __LINE__ << ": " #condition "\n"; return false; \
++} } while (0)
++
++bool runRegression() {
++    BenchmarkResult result;
++    result.tolerance = 1e-5f;
++    float reference[] = {1.0f, -2.0f, 0.0f};
++    float actual[] = {1.0f, -2.0f, 0.0f};
++    verifyAgainstCPU(actual, reference, 3, result);
++    REQUIRE(result.verified);
++    actual[0] = std::numeric_limits<float>::quiet_NaN();
++    actual[1] = std::numeric_limits<float>::infinity();
++    verifyAgainstCPU(actual, reference, 3, result);
++    REQUIRE(!result.verified && result.mismatched_elements == 2);
++    REQUIRE(!benchmarksPassed({}, 12));
++    BenchmarkResult passed;
++    passed.verified = true;
++    REQUIRE(!benchmarksPassed({passed}, 12));
++    REQUIRE(!benchmarksPassed({result}, 1));
++    REQUIRE(benchmarksPassed({passed}, 1));
++
++    // A directory is a guaranteed invalid file target, independent of permissions.
++    REQUIRE(!exportToCSV(".", {passed}));
++    REQUIRE(!exportToJSON(".", {passed}, "test", "13.4", "13.4", 1));
++    const std::string failurePath = "benchmark_regression_failure.json";
++    REQUIRE(exportToJSON(failurePath, {result}, "test", "13.4", "13.4", 12));
++    std::ifstream file(failurePath);
++    std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
++    REQUIRE(contents.find("\"status\": \"FAIL\"") != std::string::npos);
++    REQUIRE(contents.find("\"max_abs_error\": null") != std::string::npos);
++    REQUIRE(contents.find("\"missing_benchmarks\": 11") != std::string::npos);
++    file.close();
++    std::filesystem::remove(failurePath);
++
++    REQUIRE(!runVectorAddBenchmark(0, 1, 1, result));
++    REQUIRE(!runVectorAddBenchmark(257, 1, 0, result));
++    REQUIRE(runVectorAddBenchmark(257, 1, 3, result));
++    REQUIRE(result.verified && result.cpu_samples_ms.size() == 3);
++    REQUIRE(result.gpu_end_to_end_ms > 0 && result.gpu_kernel_ms > 0);
++    BenchmarkResult basic, tiled;
++    REQUIRE(!runMatmulBenchmarks(0, 1, 1, basic, tiled));
++    REQUIRE(runMatmulBenchmarks(17, 1, 3, basic, tiled));
++    REQUIRE(basic.verified && tiled.verified);
++
++    // Independent double-precision reference, mixed-sign inputs and partial tiles.
++    const int n = 33;
++    const size_t count = n * n, bytes = count * sizeof(float);
++    std::vector<float> a(count), b(count), expected(count), output(count);
++    for (size_t i = 0; i < count; ++i) {
++        a[i] = static_cast<float>(static_cast<int>((i * 37 + 11) % 101) - 50) / 64.0f;
++        b[i] = static_cast<float>(static_cast<int>((i * 19 + 7) % 97) - 48) / 64.0f;
++    }
++    for (int row = 0; row < n; ++row) {
++        for (int col = 0; col < n; ++col) {
++            double sum = 0;
++            for (int k = 0; k < n; ++k) sum += static_cast<double>(a[row*n+k]) * b[k*n+col];
++            expected[row*n+col] = static_cast<float>(sum);
++        }
++    }
++    float *da = nullptr, *db = nullptr, *dc = nullptr;
++    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&da), bytes));
++    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&db), bytes));
++    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&dc), bytes));
++    CUDA_CHECK(cudaMemcpy(da, a.data(), bytes, cudaMemcpyHostToDevice));
++    CUDA_CHECK(cudaMemcpy(db, b.data(), bytes, cudaMemcpyHostToDevice));
++    const dim3 block(MATMUL_TILE_DIM, MATMUL_TILE_DIM);
++    const dim3 grid((n + MATMUL_TILE_DIM - 1) / MATMUL_TILE_DIM,
++                    (n + MATMUL_TILE_DIM - 1) / MATMUL_TILE_DIM);
++    for (int variant = 0; variant < 2; ++variant) {
++        CUDA_CHECK(cudaMemset(dc, 0xff, bytes));
++        if (variant == 0) matmulBasicKernel<<<grid, block>>>(da, db, dc, n);
++        else matmulTiledSharedKernel<<<grid, block>>>(da, db, dc, n);
++        CUDA_CHECK(cudaGetLastError());
++        CUDA_CHECK(cudaMemcpy(output.data(), dc, bytes, cudaMemcpyDeviceToHost));
++        verifyAgainstCPU(output.data(), expected.data(), count, result);
++        REQUIRE(result.verified);
++    }
++    CUDA_CHECK(cudaFree(da));
++    CUDA_CHECK(cudaFree(db));
++    CUDA_CHECK(cudaFree(dc));
++    std::cout << "PASS: non-finite/missing/export failures, vector tail, partial matrix tiles, independent CPU reference.\n";
++    return true;
++}
++
++int main() { return runRegression() ? 0 : 1; }

@@ -1,0 +1,155 @@
+# ==============================================================================
+# CUDA GPU Acceleration Engine - Git Ignore Configuration
+# ==============================================================================
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.venv*/
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Node.js & Frontend Build Outputs
+node_modules/
+frontend/node_modules/
+.npm-cache/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.turbo
+.parcel-cache
+
+# Frontend compiled distribution (source repo contains source files)
+frontend/dist/
+
+# C++ / CMake / Visual Studio Build Artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+*.ninja*
+*.ninja_deps
+*.ninja_log
+
+# Visual Studio & Windows MSVC Machine Artifacts
+.vs/
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.ide
+*.obj
+*.o
+*.pdb
+*.idb
+*.ilk
+*.tlog
+*.lastbuildstate
+*.log
+*.pid
+x64/
+x86/
+Debug/
+Release/
+
+# Native Binaries: Exclude intermediate/temporary binaries,
+# but preserve Phase 2 verified reference executables required by cryptographic manifest
+*.exe
+!bin/benchmark_suite.exe
+!bin/benchmark_regression.exe
+!bin/gpu_check.exe
+!results/phase2_verification_20261016/original_run/benchmark_suite.exe
+
+# Machine-Specific Model Checkpoints & Large Binary Weights
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.onnx
+checkpoints/
+!checkpoints/.gitkeep
+
+# Datasets & Local Archives
+data/
+*.tar.gz
+*.tar
+*.gz
+*.zip
+*.tgz
+
+# Compiled Python/C++ Extension Build Outputs & Libraries
+*.pyd
+*.dll
+*.exp
+*.lib
+*.so
+*.dylib
+
+
+# Environment Variables, Secrets & Local Credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+secrets/
+
+# OS-Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor Local Settings
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+# Temporary files & scratch dirs
+scratch/
+*.tmp
+*.bak
