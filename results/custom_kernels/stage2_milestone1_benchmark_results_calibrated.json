@@ -1,0 +1,2577 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-20T12:59:59.456955",
+    "device_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "device_capability": [
+      8,
+      6
+    ],
+    "vram_total_gb": 6.0,
+    "pytorch_version": "2.6.0+cu124",
+    "cuda_version": "12.4",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "telemetry_start": {
+      "temperature_c": 54.0,
+      "graphics_clock_mhz": 1492.0,
+      "memory_clock_mhz": 7001.0,
+      "power_draw_w": 13.42
+    },
+    "bandwidth_definition": "Decimal GB/s (10^9 B/s) with GiB/s (1024^3 B/s) recorded separately",
+    "reduction_baseline": "torch.sum(x, dtype=torch.float32) for native single-pass accumulation",
+    "telemetry_end": {
+      "temperature_c": 55.0,
+      "graphics_clock_mhz": 922.0,
+      "memory_clock_mhz": 5501.0,
+      "power_draw_w": 11.99
+    },
+    "peak_allocated_mb": 190.73,
+    "peak_reserved_mb": 200.0,
+    "final_free_vram_gb": 5.03
+  },
+  "benchmarks": {
+    "fp32": {
+      "100000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.00608,
+            "median_ms": 0.01638,
+            "max_ms": 0.08602,
+            "mean_ms": 0.02042,
+            "std_ms": 0.01164
+          },
+          "custom_e2e": {
+            "min_ms": 0.0257,
+            "median_ms": 0.0343,
+            "max_ms": 0.229,
+            "mean_ms": 0.03871,
+            "std_ms": 0.02881
+          },
+          "ref_kernel": {
+            "min_ms": 0.01533,
+            "median_ms": 0.03072,
+            "max_ms": 0.18125,
+            "mean_ms": 0.03933,
+            "std_ms": 0.03078
+          },
+          "ref_e2e": {
+            "min_ms": 0.0259,
+            "median_ms": 0.0477,
+            "max_ms": 0.3012,
+            "mean_ms": 0.06318,
+            "std_ms": 0.05489
+          },
+          "bytes_transferred": 1200000,
+          "bandwidth_gbps": 73.26,
+          "bandwidth_gibps": 68.23,
+          "speedup_kernel": 1.875,
+          "speedup_e2e": 1.391
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01691,
+            "max_ms": 0.21277,
+            "mean_ms": 0.02545,
+            "std_ms": 0.02905
+          },
+          "custom_e2e": {
+            "min_ms": 0.025,
+            "median_ms": 0.034,
+            "max_ms": 0.4163,
+            "mean_ms": 0.04369,
+            "std_ms": 0.05564
+          },
+          "ref_kernel": {
+            "min_ms": 0.01638,
+            "median_ms": 0.06554,
+            "max_ms": 0.14042,
+            "mean_ms": 0.06136,
+            "std_ms": 0.02566
+          },
+          "ref_e2e": {
+            "min_ms": 0.0275,
+            "median_ms": 0.1003,
+            "max_ms": 0.3259,
+            "mean_ms": 0.09443,
+            "std_ms": 0.04576
+          },
+          "bytes_transferred": 800000,
+          "bandwidth_gbps": 47.31,
+          "bandwidth_gibps": 44.06,
+          "speedup_kernel": 3.876,
+          "speedup_e2e": 2.95
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.01536,
+            "median_ms": 0.0215,
+            "max_ms": 0.12493,
+            "mean_ms": 0.02388,
+            "std_ms": 0.01588
+          },
+          "custom_e2e": {
+            "min_ms": 0.0255,
+            "median_ms": 0.03665,
+            "max_ms": 0.2565,
+            "mean_ms": 0.03935,
+            "std_ms": 0.03224
+          },
+          "ref_kernel": {
+            "min_ms": 0.02253,
+            "median_ms": 0.02752,
+            "max_ms": 0.13632,
+            "mean_ms": 0.0436,
+            "std_ms": 0.02932
+          },
+          "ref_e2e": {
+            "min_ms": 0.0336,
+            "median_ms": 0.0432,
+            "max_ms": 0.2444,
+            "mean_ms": 0.06262,
+            "std_ms": 0.04604
+          },
+          "bytes_transferred": 1200000,
+          "bandwidth_gbps": 55.81,
+          "bandwidth_gibps": 51.98,
+          "speedup_kernel": 1.28,
+          "speedup_e2e": 1.179
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.01446,
+            "median_ms": 0.01552,
+            "max_ms": 0.09011,
+            "mean_ms": 0.02023,
+            "std_ms": 0.01205
+          },
+          "custom_e2e": {
+            "min_ms": 0.0251,
+            "median_ms": 0.02955,
+            "max_ms": 0.2112,
+            "mean_ms": 0.03613,
+            "std_ms": 0.02645
+          },
+          "ref_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01634,
+            "max_ms": 0.0809,
+            "mean_ms": 0.02239,
+            "std_ms": 0.01264
+          },
+          "ref_e2e": {
+            "min_ms": 0.0249,
+            "median_ms": 0.02705,
+            "max_ms": 0.219,
+            "mean_ms": 0.03687,
+            "std_ms": 0.02804
+          },
+          "bytes_transferred": 800000,
+          "bandwidth_gbps": 51.55,
+          "bandwidth_gibps": 48.01,
+          "speedup_kernel": 1.053,
+          "speedup_e2e": 0.915
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01683,
+            "max_ms": 0.14867,
+            "mean_ms": 0.02501,
+            "std_ms": 0.02055
+          },
+          "custom_e2e": {
+            "min_ms": 0.0249,
+            "median_ms": 0.034,
+            "max_ms": 0.3201,
+            "mean_ms": 0.04303,
+            "std_ms": 0.04192
+          },
+          "ref_kernel": {
+            "min_ms": 0.00512,
+            "median_ms": 0.01582,
+            "max_ms": 0.14563,
+            "mean_ms": 0.02548,
+            "std_ms": 0.02239
+          },
+          "ref_e2e": {
+            "min_ms": 0.0239,
+            "median_ms": 0.0325,
+            "max_ms": 0.2092,
+            "mean_ms": 0.04219,
+            "std_ms": 0.03349
+          },
+          "bytes_transferred": 800000,
+          "bandwidth_gbps": 47.53,
+          "bandwidth_gibps": 44.27,
+          "speedup_kernel": 0.94,
+          "speedup_e2e": 0.956
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.0137,
+            "median_ms": 0.01638,
+            "max_ms": 0.08909,
+            "mean_ms": 0.02285,
+            "std_ms": 0.01327
+          },
+          "custom_e2e": {
+            "min_ms": 0.0244,
+            "median_ms": 0.0297,
+            "max_ms": 0.2167,
+            "mean_ms": 0.03776,
+            "std_ms": 0.02758
+          },
+          "ref_kernel": {
+            "min_ms": 0.00589,
+            "median_ms": 0.01536,
+            "max_ms": 0.08909,
+            "mean_ms": 0.02146,
+            "std_ms": 0.01444
+          },
+          "ref_e2e": {
+            "min_ms": 0.0246,
+            "median_ms": 0.0259,
+            "max_ms": 0.202,
+            "mean_ms": 0.03774,
+            "std_ms": 0.02881
+          },
+          "bytes_transferred": 800000,
+          "bandwidth_gbps": 48.84,
+          "bandwidth_gibps": 45.49,
+          "speedup_kernel": 0.938,
+          "speedup_e2e": 0.872
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.0256,
+            "median_ms": 0.03789,
+            "max_ms": 0.43008,
+            "mean_ms": 0.05258,
+            "std_ms": 0.06001
+          },
+          "custom_e2e": {
+            "min_ms": 0.0359,
+            "median_ms": 0.05075,
+            "max_ms": 0.486,
+            "mean_ms": 0.07315,
+            "std_ms": 0.07827
+          },
+          "ref_kernel": {
+            "min_ms": 0.01946,
+            "median_ms": 0.03155,
+            "max_ms": 0.09728,
+            "mean_ms": 0.03081,
+            "std_ms": 0.01168
+          },
+          "ref_e2e": {
+            "min_ms": 0.0296,
+            "median_ms": 0.0419,
+            "max_ms": 0.2295,
+            "mean_ms": 0.04452,
+            "std_ms": 0.02764
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 10.56,
+          "bandwidth_gibps": 9.83,
+          "speedup_kernel": 0.833,
+          "speedup_e2e": 0.826
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.00819,
+            "median_ms": 0.02323,
+            "max_ms": 0.10957,
+            "mean_ms": 0.02573,
+            "std_ms": 0.01357
+          },
+          "custom_e2e": {
+            "min_ms": 0.0296,
+            "median_ms": 0.03715,
+            "max_ms": 0.2295,
+            "mean_ms": 0.04147,
+            "std_ms": 0.0279
+          },
+          "ref_kernel": {
+            "min_ms": 0.02048,
+            "median_ms": 0.04608,
+            "max_ms": 0.16896,
+            "mean_ms": 0.05276,
+            "std_ms": 0.0289
+          },
+          "ref_e2e": {
+            "min_ms": 0.031,
+            "median_ms": 0.0798,
+            "max_ms": 0.3282,
+            "mean_ms": 0.08209,
+            "std_ms": 0.04703
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 17.22,
+          "bandwidth_gibps": 16.04,
+          "speedup_kernel": 1.984,
+          "speedup_e2e": 2.148
+        }
+      },
+      "1000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.08397,
+            "median_ms": 0.0857,
+            "max_ms": 0.13082,
+            "mean_ms": 0.08939,
+            "std_ms": 0.01026
+          },
+          "custom_e2e": {
+            "min_ms": 0.0947,
+            "median_ms": 0.0966,
+            "max_ms": 0.2465,
+            "mean_ms": 0.10376,
+            "std_ms": 0.02396
+          },
+          "ref_kernel": {
+            "min_ms": 0.08397,
+            "median_ms": 0.08704,
+            "max_ms": 0.22013,
+            "mean_ms": 0.09415,
+            "std_ms": 0.0203
+          },
+          "ref_e2e": {
+            "min_ms": 0.0947,
+            "median_ms": 0.1,
+            "max_ms": 0.2965,
+            "mean_ms": 0.11107,
+            "std_ms": 0.03601
+          },
+          "bytes_transferred": 12000000,
+          "bandwidth_gbps": 140.02,
+          "bandwidth_gibps": 130.41,
+          "speedup_kernel": 1.016,
+          "speedup_e2e": 1.035
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.05834,
+            "median_ms": 0.06042,
+            "max_ms": 0.09523,
+            "mean_ms": 0.06409,
+            "std_ms": 0.00803
+          },
+          "custom_e2e": {
+            "min_ms": 0.0687,
+            "median_ms": 0.07065,
+            "max_ms": 0.2274,
+            "mean_ms": 0.07721,
+            "std_ms": 0.02275
+          },
+          "ref_kernel": {
+            "min_ms": 0.05939,
+            "median_ms": 0.06451,
+            "max_ms": 0.20192,
+            "mean_ms": 0.0721,
+            "std_ms": 0.02195
+          },
+          "ref_e2e": {
+            "min_ms": 0.0698,
+            "median_ms": 0.0791,
+            "max_ms": 0.2315,
+            "mean_ms": 0.08753,
+            "std_ms": 0.03306
+          },
+          "bytes_transferred": 8000000,
+          "bandwidth_gbps": 132.41,
+          "bandwidth_gibps": 123.31,
+          "speedup_kernel": 1.068,
+          "speedup_e2e": 1.12
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.08394,
+            "median_ms": 0.08642,
+            "max_ms": 0.19558,
+            "mean_ms": 0.09813,
+            "std_ms": 0.02063
+          },
+          "custom_e2e": {
+            "min_ms": 0.0946,
+            "median_ms": 0.097,
+            "max_ms": 0.3407,
+            "mean_ms": 0.11915,
+            "std_ms": 0.04033
+          },
+          "ref_kernel": {
+            "min_ms": 0.13718,
+            "median_ms": 0.13926,
+            "max_ms": 0.18022,
+            "mean_ms": 0.14313,
+            "std_ms": 0.00926
+          },
+          "ref_e2e": {
+            "min_ms": 0.1477,
+            "median_ms": 0.15165,
+            "max_ms": 0.3143,
+            "mean_ms": 0.15873,
+            "std_ms": 0.02572
+          },
+          "bytes_transferred": 12000000,
+          "bandwidth_gbps": 138.86,
+          "bandwidth_gibps": 129.32,
+          "speedup_kernel": 1.611,
+          "speedup_e2e": 1.563
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.05837,
+            "median_ms": 0.06037,
+            "max_ms": 0.11235,
+            "mean_ms": 0.06455,
+            "std_ms": 0.01119
+          },
+          "custom_e2e": {
+            "min_ms": 0.0688,
+            "median_ms": 0.07035,
+            "max_ms": 0.2141,
+            "mean_ms": 0.08059,
+            "std_ms": 0.0277
+          },
+          "ref_kernel": {
+            "min_ms": 0.06029,
+            "median_ms": 0.0839,
+            "max_ms": 0.24781,
+            "mean_ms": 0.08623,
+            "std_ms": 0.02804
+          },
+          "ref_e2e": {
+            "min_ms": 0.0698,
+            "median_ms": 0.1156,
+            "max_ms": 0.3318,
+            "mean_ms": 0.11743,
+            "std_ms": 0.04142
+          },
+          "bytes_transferred": 8000000,
+          "bandwidth_gbps": 132.52,
+          "bandwidth_gibps": 123.42,
+          "speedup_kernel": 1.39,
+          "speedup_e2e": 1.643
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.05837,
+            "median_ms": 0.06037,
+            "max_ms": 0.09318,
+            "mean_ms": 0.0624,
+            "std_ms": 0.00661
+          },
+          "custom_e2e": {
+            "min_ms": 0.0691,
+            "median_ms": 0.07045,
+            "max_ms": 0.229,
+            "mean_ms": 0.0757,
+            "std_ms": 0.02286
+          },
+          "ref_kernel": {
+            "min_ms": 0.05926,
+            "median_ms": 0.06141,
+            "max_ms": 0.12592,
+            "mean_ms": 0.06978,
+            "std_ms": 0.01563
+          },
+          "ref_e2e": {
+            "min_ms": 0.0691,
+            "median_ms": 0.0727,
+            "max_ms": 0.2587,
+            "mean_ms": 0.08859,
+            "std_ms": 0.03409
+          },
+          "bytes_transferred": 8000000,
+          "bandwidth_gbps": 132.52,
+          "bandwidth_gibps": 123.42,
+          "speedup_kernel": 1.017,
+          "speedup_e2e": 1.032
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.05837,
+            "median_ms": 0.06019,
+            "max_ms": 0.11469,
+            "mean_ms": 0.06404,
+            "std_ms": 0.01071
+          },
+          "custom_e2e": {
+            "min_ms": 0.0693,
+            "median_ms": 0.0706,
+            "max_ms": 0.2405,
+            "mean_ms": 0.08295,
+            "std_ms": 0.03458
+          },
+          "ref_kernel": {
+            "min_ms": 0.05837,
+            "median_ms": 0.06144,
+            "max_ms": 0.07763,
+            "mean_ms": 0.0662,
+            "std_ms": 0.00762
+          },
+          "ref_e2e": {
+            "min_ms": 0.0693,
+            "median_ms": 0.0715,
+            "max_ms": 0.2336,
+            "mean_ms": 0.07984,
+            "std_ms": 0.02354
+          },
+          "bytes_transferred": 8000000,
+          "bandwidth_gbps": 132.91,
+          "bandwidth_gibps": 123.78,
+          "speedup_kernel": 1.021,
+          "speedup_e2e": 1.013
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.04403,
+            "median_ms": 0.06861,
+            "max_ms": 0.41152,
+            "mean_ms": 0.07076,
+            "std_ms": 0.05352
+          },
+          "custom_e2e": {
+            "min_ms": 0.055,
+            "median_ms": 0.0911,
+            "max_ms": 0.5588,
+            "mean_ms": 0.09202,
+            "std_ms": 0.07274
+          },
+          "ref_kernel": {
+            "min_ms": 0.04096,
+            "median_ms": 0.04301,
+            "max_ms": 0.45238,
+            "mean_ms": 0.05761,
+            "std_ms": 0.0577
+          },
+          "ref_e2e": {
+            "min_ms": 0.0523,
+            "median_ms": 0.05375,
+            "max_ms": 0.5959,
+            "mean_ms": 0.07124,
+            "std_ms": 0.07636
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 58.3,
+          "bandwidth_gibps": 54.3,
+          "speedup_kernel": 0.627,
+          "speedup_e2e": 0.59
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.0377,
+            "median_ms": 0.04955,
+            "max_ms": 0.33475,
+            "mean_ms": 0.05376,
+            "std_ms": 0.04126
+          },
+          "custom_e2e": {
+            "min_ms": 0.0481,
+            "median_ms": 0.05985,
+            "max_ms": 0.4244,
+            "mean_ms": 0.07028,
+            "std_ms": 0.05898
+          },
+          "ref_kernel": {
+            "min_ms": 0.04198,
+            "median_ms": 0.0444,
+            "max_ms": 0.38605,
+            "mean_ms": 0.05942,
+            "std_ms": 0.04951
+          },
+          "ref_e2e": {
+            "min_ms": 0.0529,
+            "median_ms": 0.05495,
+            "max_ms": 0.4939,
+            "mean_ms": 0.07353,
+            "std_ms": 0.06337
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 80.73,
+          "bandwidth_gibps": 75.18,
+          "speedup_kernel": 0.896,
+          "speedup_e2e": 0.918
+        }
+      },
+      "10000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.76493,
+            "median_ms": 0.76902,
+            "max_ms": 2.45859,
+            "mean_ms": 0.80804,
+            "std_ms": 0.23848
+          },
+          "custom_e2e": {
+            "min_ms": 0.7767,
+            "median_ms": 0.7827,
+            "max_ms": 2.5481,
+            "mean_ms": 0.82707,
+            "std_ms": 0.24929
+          },
+          "ref_kernel": {
+            "min_ms": 0.76582,
+            "median_ms": 0.77107,
+            "max_ms": 6.50317,
+            "mean_ms": 0.89068,
+            "std_ms": 0.81
+          },
+          "ref_e2e": {
+            "min_ms": 0.7766,
+            "median_ms": 0.7855,
+            "max_ms": 6.6001,
+            "mean_ms": 0.91066,
+            "std_ms": 0.8213
+          },
+          "bytes_transferred": 120000000,
+          "bandwidth_gbps": 156.04,
+          "bandwidth_gibps": 145.33,
+          "speedup_kernel": 1.003,
+          "speedup_e2e": 1.004
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.51677,
+            "median_ms": 0.52157,
+            "max_ms": 2.03469,
+            "mean_ms": 0.55825,
+            "std_ms": 0.21345
+          },
+          "custom_e2e": {
+            "min_ms": 0.5274,
+            "median_ms": 0.5368,
+            "max_ms": 2.1293,
+            "mean_ms": 0.57946,
+            "std_ms": 0.22558
+          },
+          "ref_kernel": {
+            "min_ms": 0.51712,
+            "median_ms": 0.52629,
+            "max_ms": 1.98554,
+            "mean_ms": 0.56347,
+            "std_ms": 0.20625
+          },
+          "ref_e2e": {
+            "min_ms": 0.5282,
+            "median_ms": 0.54315,
+            "max_ms": 2.0943,
+            "mean_ms": 0.58784,
+            "std_ms": 0.22
+          },
+          "bytes_transferred": 80000000,
+          "bandwidth_gbps": 153.38,
+          "bandwidth_gibps": 142.85,
+          "speedup_kernel": 1.009,
+          "speedup_e2e": 1.012
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.7639,
+            "median_ms": 0.77051,
+            "max_ms": 2.23642,
+            "mean_ms": 0.80543,
+            "std_ms": 0.2069
+          },
+          "custom_e2e": {
+            "min_ms": 0.7748,
+            "median_ms": 0.7841,
+            "max_ms": 2.3511,
+            "mean_ms": 0.82528,
+            "std_ms": 0.22133
+          },
+          "ref_kernel": {
+            "min_ms": 1.27693,
+            "median_ms": 1.29174,
+            "max_ms": 3.4425,
+            "mean_ms": 1.33536,
+            "std_ms": 0.30432
+          },
+          "ref_e2e": {
+            "min_ms": 1.2886,
+            "median_ms": 1.30985,
+            "max_ms": 3.547,
+            "mean_ms": 1.36048,
+            "std_ms": 0.31637
+          },
+          "bytes_transferred": 120000000,
+          "bandwidth_gbps": 155.74,
+          "bandwidth_gibps": 145.05,
+          "speedup_kernel": 1.676,
+          "speedup_e2e": 1.671
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.51712,
+            "median_ms": 0.52251,
+            "max_ms": 1.90048,
+            "mean_ms": 0.55803,
+            "std_ms": 0.19442
+          },
+          "custom_e2e": {
+            "min_ms": 0.5285,
+            "median_ms": 0.5366,
+            "max_ms": 1.9841,
+            "mean_ms": 0.57939,
+            "std_ms": 0.20457
+          },
+          "ref_kernel": {
+            "min_ms": 0.51619,
+            "median_ms": 0.51998,
+            "max_ms": 1.91078,
+            "mean_ms": 0.55382,
+            "std_ms": 0.19635
+          },
+          "ref_e2e": {
+            "min_ms": 0.5274,
+            "median_ms": 0.532,
+            "max_ms": 1.9998,
+            "mean_ms": 0.57023,
+            "std_ms": 0.20745
+          },
+          "bytes_transferred": 80000000,
+          "bandwidth_gbps": 153.11,
+          "bandwidth_gibps": 142.59,
+          "speedup_kernel": 0.995,
+          "speedup_e2e": 0.991
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.51693,
+            "median_ms": 0.52088,
+            "max_ms": 1.94435,
+            "mean_ms": 0.55356,
+            "std_ms": 0.20099
+          },
+          "custom_e2e": {
+            "min_ms": 0.5283,
+            "median_ms": 0.53345,
+            "max_ms": 2.0534,
+            "mean_ms": 0.57179,
+            "std_ms": 0.21494
+          },
+          "ref_kernel": {
+            "min_ms": 0.51712,
+            "median_ms": 0.52107,
+            "max_ms": 1.97427,
+            "mean_ms": 0.55379,
+            "std_ms": 0.20523
+          },
+          "ref_e2e": {
+            "min_ms": 0.5284,
+            "median_ms": 0.53455,
+            "max_ms": 2.0894,
+            "mean_ms": 0.5723,
+            "std_ms": 0.21981
+          },
+          "bytes_transferred": 80000000,
+          "bandwidth_gbps": 153.59,
+          "bandwidth_gibps": 143.04,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 1.002
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.51885,
+            "median_ms": 0.52826,
+            "max_ms": 5.8511,
+            "mean_ms": 0.64118,
+            "std_ms": 0.75205
+          },
+          "custom_e2e": {
+            "min_ms": 0.532,
+            "median_ms": 0.54885,
+            "max_ms": 6.006,
+            "mean_ms": 0.67111,
+            "std_ms": 0.77073
+          },
+          "ref_kernel": {
+            "min_ms": 0.51712,
+            "median_ms": 0.5271,
+            "max_ms": 2.0695,
+            "mean_ms": 0.56372,
+            "std_ms": 0.21872
+          },
+          "ref_e2e": {
+            "min_ms": 0.5293,
+            "median_ms": 0.5423,
+            "max_ms": 2.2758,
+            "mean_ms": 0.59158,
+            "std_ms": 0.24847
+          },
+          "bytes_transferred": 80000000,
+          "bandwidth_gbps": 151.44,
+          "bandwidth_gibps": 141.04,
+          "speedup_kernel": 0.998,
+          "speedup_e2e": 0.988
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.26419,
+            "median_ms": 0.29267,
+            "max_ms": 0.55786,
+            "mean_ms": 0.29951,
+            "std_ms": 0.04586
+          },
+          "custom_e2e": {
+            "min_ms": 0.2763,
+            "median_ms": 0.31725,
+            "max_ms": 0.6678,
+            "mean_ms": 0.32936,
+            "std_ms": 0.06494
+          },
+          "ref_kernel": {
+            "min_ms": 0.26006,
+            "median_ms": 0.26262,
+            "max_ms": 0.53542,
+            "mean_ms": 0.2734,
+            "std_ms": 0.04206
+          },
+          "ref_e2e": {
+            "min_ms": 0.2706,
+            "median_ms": 0.27425,
+            "max_ms": 0.626,
+            "mean_ms": 0.28801,
+            "std_ms": 0.0541
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 136.67,
+          "bandwidth_gibps": 127.29,
+          "speedup_kernel": 0.897,
+          "speedup_e2e": 0.864
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.2567,
+            "median_ms": 0.26931,
+            "max_ms": 0.54579,
+            "mean_ms": 0.2781,
+            "std_ms": 0.04061
+          },
+          "custom_e2e": {
+            "min_ms": 0.2675,
+            "median_ms": 0.28335,
+            "max_ms": 0.6307,
+            "mean_ms": 0.30186,
+            "std_ms": 0.05359
+          },
+          "ref_kernel": {
+            "min_ms": 0.26112,
+            "median_ms": 0.30714,
+            "max_ms": 0.56397,
+            "mean_ms": 0.31135,
+            "std_ms": 0.04244
+          },
+          "ref_e2e": {
+            "min_ms": 0.2719,
+            "median_ms": 0.3389,
+            "max_ms": 0.6719,
+            "mean_ms": 0.34482,
+            "std_ms": 0.05691
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 148.53,
+          "bandwidth_gibps": 138.33,
+          "speedup_kernel": 1.14,
+          "speedup_e2e": 1.196
+        }
+      }
+    },
+    "fp16": {
+      "100000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.00378,
+            "median_ms": 0.01995,
+            "max_ms": 0.09011,
+            "mean_ms": 0.02533,
+            "std_ms": 0.01611
+          },
+          "custom_e2e": {
+            "min_ms": 0.0256,
+            "median_ms": 0.03595,
+            "max_ms": 0.2343,
+            "mean_ms": 0.04251,
+            "std_ms": 0.03242
+          },
+          "ref_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.02518,
+            "max_ms": 0.13603,
+            "mean_ms": 0.03181,
+            "std_ms": 0.02065
+          },
+          "ref_e2e": {
+            "min_ms": 0.0257,
+            "median_ms": 0.04,
+            "max_ms": 0.2117,
+            "mean_ms": 0.05105,
+            "std_ms": 0.03734
+          },
+          "bytes_transferred": 600000,
+          "bandwidth_gbps": 30.08,
+          "bandwidth_gibps": 28.01,
+          "speedup_kernel": 1.262,
+          "speedup_e2e": 1.113
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.00496,
+            "median_ms": 0.01592,
+            "max_ms": 0.07917,
+            "mean_ms": 0.02845,
+            "std_ms": 0.01989
+          },
+          "custom_e2e": {
+            "min_ms": 0.0249,
+            "median_ms": 0.02765,
+            "max_ms": 0.238,
+            "mean_ms": 0.04878,
+            "std_ms": 0.04134
+          },
+          "ref_kernel": {
+            "min_ms": 0.02275,
+            "median_ms": 0.06349,
+            "max_ms": 0.15053,
+            "mean_ms": 0.06626,
+            "std_ms": 0.0173
+          },
+          "ref_e2e": {
+            "min_ms": 0.0352,
+            "median_ms": 0.0971,
+            "max_ms": 0.3217,
+            "mean_ms": 0.10196,
+            "std_ms": 0.03539
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 25.13,
+          "bandwidth_gibps": 23.4,
+          "speedup_kernel": 3.988,
+          "speedup_e2e": 3.512
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01698,
+            "max_ms": 0.07491,
+            "mean_ms": 0.02144,
+            "std_ms": 0.0101
+          },
+          "custom_e2e": {
+            "min_ms": 0.0253,
+            "median_ms": 0.0324,
+            "max_ms": 0.2092,
+            "mean_ms": 0.03776,
+            "std_ms": 0.02596
+          },
+          "ref_kernel": {
+            "min_ms": 0.01843,
+            "median_ms": 0.03061,
+            "max_ms": 0.09014,
+            "mean_ms": 0.03317,
+            "std_ms": 0.01205
+          },
+          "ref_e2e": {
+            "min_ms": 0.034,
+            "median_ms": 0.0473,
+            "max_ms": 0.2581,
+            "mean_ms": 0.05073,
+            "std_ms": 0.03129
+          },
+          "bytes_transferred": 600000,
+          "bandwidth_gbps": 35.34,
+          "bandwidth_gibps": 32.91,
+          "speedup_kernel": 1.803,
+          "speedup_e2e": 1.46
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.0169,
+            "max_ms": 0.11242,
+            "mean_ms": 0.02758,
+            "std_ms": 0.02419
+          },
+          "custom_e2e": {
+            "min_ms": 0.0247,
+            "median_ms": 0.0329,
+            "max_ms": 0.2267,
+            "mean_ms": 0.04764,
+            "std_ms": 0.04451
+          },
+          "ref_kernel": {
+            "min_ms": 0.01526,
+            "median_ms": 0.02048,
+            "max_ms": 0.1024,
+            "mean_ms": 0.02556,
+            "std_ms": 0.01408
+          },
+          "ref_e2e": {
+            "min_ms": 0.0254,
+            "median_ms": 0.0355,
+            "max_ms": 0.2271,
+            "mean_ms": 0.04039,
+            "std_ms": 0.02846
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 23.67,
+          "bandwidth_gibps": 22.04,
+          "speedup_kernel": 1.212,
+          "speedup_e2e": 1.079
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.0041,
+            "median_ms": 0.01958,
+            "max_ms": 0.07475,
+            "mean_ms": 0.02347,
+            "std_ms": 0.01232
+          },
+          "custom_e2e": {
+            "min_ms": 0.0251,
+            "median_ms": 0.03555,
+            "max_ms": 0.2047,
+            "mean_ms": 0.04118,
+            "std_ms": 0.02748
+          },
+          "ref_kernel": {
+            "min_ms": 0.0137,
+            "median_ms": 0.01536,
+            "max_ms": 0.10752,
+            "mean_ms": 0.02297,
+            "std_ms": 0.0156
+          },
+          "ref_e2e": {
+            "min_ms": 0.0245,
+            "median_ms": 0.0264,
+            "max_ms": 0.3035,
+            "mean_ms": 0.03883,
+            "std_ms": 0.03958
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 20.43,
+          "bandwidth_gibps": 19.03,
+          "speedup_kernel": 0.784,
+          "speedup_e2e": 0.743
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.0041,
+            "median_ms": 0.01749,
+            "max_ms": 0.14538,
+            "mean_ms": 0.02329,
+            "std_ms": 0.01937
+          },
+          "custom_e2e": {
+            "min_ms": 0.0251,
+            "median_ms": 0.03365,
+            "max_ms": 0.2771,
+            "mean_ms": 0.03968,
+            "std_ms": 0.03535
+          },
+          "ref_kernel": {
+            "min_ms": 0.0144,
+            "median_ms": 0.01677,
+            "max_ms": 0.21414,
+            "mean_ms": 0.029,
+            "std_ms": 0.03096
+          },
+          "ref_e2e": {
+            "min_ms": 0.025,
+            "median_ms": 0.03435,
+            "max_ms": 0.2809,
+            "mean_ms": 0.04679,
+            "std_ms": 0.04478
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 22.87,
+          "bandwidth_gibps": 21.3,
+          "speedup_kernel": 0.959,
+          "speedup_e2e": 1.021
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.02592,
+            "median_ms": 0.03891,
+            "max_ms": 0.128,
+            "mean_ms": 0.04135,
+            "std_ms": 0.01627
+          },
+          "custom_e2e": {
+            "min_ms": 0.0369,
+            "median_ms": 0.05345,
+            "max_ms": 0.2519,
+            "mean_ms": 0.05698,
+            "std_ms": 0.02982
+          },
+          "ref_kernel": {
+            "min_ms": 0.01536,
+            "median_ms": 0.01723,
+            "max_ms": 0.12218,
+            "mean_ms": 0.02858,
+            "std_ms": 0.0246
+          },
+          "ref_e2e": {
+            "min_ms": 0.0259,
+            "median_ms": 0.0317,
+            "max_ms": 0.2207,
+            "mean_ms": 0.0483,
+            "std_ms": 0.04156
+          },
+          "bytes_transferred": 200000,
+          "bandwidth_gbps": 5.14,
+          "bandwidth_gibps": 4.79,
+          "speedup_kernel": 0.443,
+          "speedup_e2e": 0.593
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.00694,
+            "median_ms": 0.02131,
+            "max_ms": 0.08192,
+            "mean_ms": 0.02543,
+            "std_ms": 0.01205
+          },
+          "custom_e2e": {
+            "min_ms": 0.0298,
+            "median_ms": 0.03825,
+            "max_ms": 0.216,
+            "mean_ms": 0.04246,
+            "std_ms": 0.0265
+          },
+          "ref_kernel": {
+            "min_ms": 0.01843,
+            "median_ms": 0.02827,
+            "max_ms": 0.31568,
+            "mean_ms": 0.04102,
+            "std_ms": 0.04605
+          },
+          "ref_e2e": {
+            "min_ms": 0.0286,
+            "median_ms": 0.04935,
+            "max_ms": 0.5287,
+            "mean_ms": 0.06247,
+            "std_ms": 0.07424
+          },
+          "bytes_transferred": 200000,
+          "bandwidth_gbps": 9.39,
+          "bandwidth_gibps": 8.74,
+          "speedup_kernel": 1.327,
+          "speedup_e2e": 1.29
+        }
+      },
+      "1000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.04506,
+            "median_ms": 0.04608,
+            "max_ms": 0.10342,
+            "mean_ms": 0.04778,
+            "std_ms": 0.00828
+          },
+          "custom_e2e": {
+            "min_ms": 0.055,
+            "median_ms": 0.0564,
+            "max_ms": 0.2861,
+            "mean_ms": 0.06153,
+            "std_ms": 0.03252
+          },
+          "ref_kernel": {
+            "min_ms": 0.04589,
+            "median_ms": 0.04706,
+            "max_ms": 0.0809,
+            "mean_ms": 0.04877,
+            "std_ms": 0.00693
+          },
+          "ref_e2e": {
+            "min_ms": 0.056,
+            "median_ms": 0.05715,
+            "max_ms": 0.2071,
+            "mean_ms": 0.06226,
+            "std_ms": 0.02349
+          },
+          "bytes_transferred": 6000000,
+          "bandwidth_gbps": 130.21,
+          "bandwidth_gibps": 121.27,
+          "speedup_kernel": 1.021,
+          "speedup_e2e": 1.013
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.03994,
+            "median_ms": 0.05734,
+            "max_ms": 0.18256,
+            "mean_ms": 0.0621,
+            "std_ms": 0.02
+          },
+          "custom_e2e": {
+            "min_ms": 0.0515,
+            "median_ms": 0.0893,
+            "max_ms": 0.3638,
+            "mean_ms": 0.09544,
+            "std_ms": 0.04045
+          },
+          "ref_kernel": {
+            "min_ms": 0.03482,
+            "median_ms": 0.05837,
+            "max_ms": 0.20173,
+            "mean_ms": 0.06103,
+            "std_ms": 0.02154
+          },
+          "ref_e2e": {
+            "min_ms": 0.0453,
+            "median_ms": 0.08975,
+            "max_ms": 0.3598,
+            "mean_ms": 0.09339,
+            "std_ms": 0.04016
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 69.76,
+          "bandwidth_gibps": 64.97,
+          "speedup_kernel": 1.018,
+          "speedup_e2e": 1.005
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.04506,
+            "median_ms": 0.04686,
+            "max_ms": 0.11274,
+            "mean_ms": 0.05052,
+            "std_ms": 0.01105
+          },
+          "custom_e2e": {
+            "min_ms": 0.0556,
+            "median_ms": 0.0571,
+            "max_ms": 0.2505,
+            "mean_ms": 0.06388,
+            "std_ms": 0.02801
+          },
+          "ref_kernel": {
+            "min_ms": 0.07347,
+            "median_ms": 0.07576,
+            "max_ms": 0.20272,
+            "mean_ms": 0.08293,
+            "std_ms": 0.01962
+          },
+          "ref_e2e": {
+            "min_ms": 0.0838,
+            "median_ms": 0.0867,
+            "max_ms": 0.3569,
+            "mean_ms": 0.10072,
+            "std_ms": 0.04237
+          },
+          "bytes_transferred": 6000000,
+          "bandwidth_gbps": 128.04,
+          "bandwidth_gibps": 119.25,
+          "speedup_kernel": 1.617,
+          "speedup_e2e": 1.518
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.02947,
+            "median_ms": 0.03378,
+            "max_ms": 0.05014,
+            "mean_ms": 0.03425,
+            "std_ms": 0.00341
+          },
+          "custom_e2e": {
+            "min_ms": 0.0428,
+            "median_ms": 0.04385,
+            "max_ms": 0.2039,
+            "mean_ms": 0.04796,
+            "std_ms": 0.02282
+          },
+          "ref_kernel": {
+            "min_ms": 0.0336,
+            "median_ms": 0.03453,
+            "max_ms": 0.15974,
+            "mean_ms": 0.03804,
+            "std_ms": 0.01834
+          },
+          "ref_e2e": {
+            "min_ms": 0.0433,
+            "median_ms": 0.0445,
+            "max_ms": 0.3051,
+            "mean_ms": 0.05181,
+            "std_ms": 0.03784
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 118.41,
+          "bandwidth_gibps": 110.28,
+          "speedup_kernel": 1.022,
+          "speedup_e2e": 1.015
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.03277,
+            "median_ms": 0.03438,
+            "max_ms": 0.14019,
+            "mean_ms": 0.0375,
+            "std_ms": 0.0154
+          },
+          "custom_e2e": {
+            "min_ms": 0.0427,
+            "median_ms": 0.0444,
+            "max_ms": 0.2643,
+            "mean_ms": 0.05005,
+            "std_ms": 0.03131
+          },
+          "ref_kernel": {
+            "min_ms": 0.03344,
+            "median_ms": 0.03458,
+            "max_ms": 0.08403,
+            "mean_ms": 0.03554,
+            "std_ms": 0.00707
+          },
+          "ref_e2e": {
+            "min_ms": 0.0436,
+            "median_ms": 0.04475,
+            "max_ms": 0.233,
+            "mean_ms": 0.0492,
+            "std_ms": 0.02664
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 116.35,
+          "bandwidth_gibps": 108.36,
+          "speedup_kernel": 1.006,
+          "speedup_e2e": 1.008
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.03245,
+            "median_ms": 0.03379,
+            "max_ms": 0.1345,
+            "mean_ms": 0.04093,
+            "std_ms": 0.01876
+          },
+          "custom_e2e": {
+            "min_ms": 0.0427,
+            "median_ms": 0.04395,
+            "max_ms": 0.2192,
+            "mean_ms": 0.05644,
+            "std_ms": 0.03595
+          },
+          "ref_kernel": {
+            "min_ms": 0.03296,
+            "median_ms": 0.03478,
+            "max_ms": 0.07386,
+            "mean_ms": 0.03729,
+            "std_ms": 0.00726
+          },
+          "ref_e2e": {
+            "min_ms": 0.0433,
+            "median_ms": 0.0446,
+            "max_ms": 0.2083,
+            "mean_ms": 0.0501,
+            "std_ms": 0.02344
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 118.38,
+          "bandwidth_gibps": 110.25,
+          "speedup_kernel": 1.029,
+          "speedup_e2e": 1.015
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.03066,
+            "median_ms": 0.04096,
+            "max_ms": 0.43827,
+            "mean_ms": 0.05204,
+            "std_ms": 0.06005
+          },
+          "custom_e2e": {
+            "min_ms": 0.0404,
+            "median_ms": 0.0513,
+            "max_ms": 0.6148,
+            "mean_ms": 0.06819,
+            "std_ms": 0.08435
+          },
+          "ref_kernel": {
+            "min_ms": 0.02765,
+            "median_ms": 0.02933,
+            "max_ms": 0.32461,
+            "mean_ms": 0.03647,
+            "std_ms": 0.04179
+          },
+          "ref_e2e": {
+            "min_ms": 0.0382,
+            "median_ms": 0.0393,
+            "max_ms": 0.4189,
+            "mean_ms": 0.04895,
+            "std_ms": 0.05363
+          },
+          "bytes_transferred": 2000000,
+          "bandwidth_gbps": 48.83,
+          "bandwidth_gibps": 45.47,
+          "speedup_kernel": 0.716,
+          "speedup_e2e": 0.766
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.02419,
+            "median_ms": 0.03667,
+            "max_ms": 0.41574,
+            "mean_ms": 0.04379,
+            "std_ms": 0.05405
+          },
+          "custom_e2e": {
+            "min_ms": 0.0339,
+            "median_ms": 0.0465,
+            "max_ms": 0.5193,
+            "mean_ms": 0.05689,
+            "std_ms": 0.06728
+          },
+          "ref_kernel": {
+            "min_ms": 0.02963,
+            "median_ms": 0.04702,
+            "max_ms": 0.31539,
+            "mean_ms": 0.06294,
+            "std_ms": 0.04632
+          },
+          "ref_e2e": {
+            "min_ms": 0.04,
+            "median_ms": 0.06705,
+            "max_ms": 0.407,
+            "mean_ms": 0.08615,
+            "std_ms": 0.06114
+          },
+          "bytes_transferred": 2000000,
+          "bandwidth_gbps": 54.54,
+          "bandwidth_gibps": 50.79,
+          "speedup_kernel": 1.282,
+          "speedup_e2e": 1.442
+        }
+      },
+      "10000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.38605,
+            "median_ms": 0.4096,
+            "max_ms": 1.24723,
+            "mean_ms": 0.42179,
+            "std_ms": 0.11995
+          },
+          "custom_e2e": {
+            "min_ms": 0.3979,
+            "median_ms": 0.441,
+            "max_ms": 1.361,
+            "mean_ms": 0.4508,
+            "std_ms": 0.13475
+          },
+          "ref_kernel": {
+            "min_ms": 0.38707,
+            "median_ms": 0.39014,
+            "max_ms": 1.18784,
+            "mean_ms": 0.4093,
+            "std_ms": 0.11268
+          },
+          "ref_e2e": {
+            "min_ms": 0.3988,
+            "median_ms": 0.4021,
+            "max_ms": 1.2794,
+            "mean_ms": 0.42544,
+            "std_ms": 0.12428
+          },
+          "bytes_transferred": 60000000,
+          "bandwidth_gbps": 146.48,
+          "bandwidth_gibps": 136.42,
+          "speedup_kernel": 0.952,
+          "speedup_e2e": 0.912
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.26214,
+            "median_ms": 0.2656,
+            "max_ms": 1.2247,
+            "mean_ms": 0.29088,
+            "std_ms": 0.13524
+          },
+          "custom_e2e": {
+            "min_ms": 0.2732,
+            "median_ms": 0.27705,
+            "max_ms": 1.3178,
+            "mean_ms": 0.3076,
+            "std_ms": 0.14727
+          },
+          "ref_kernel": {
+            "min_ms": 0.26419,
+            "median_ms": 0.28928,
+            "max_ms": 1.25235,
+            "mean_ms": 0.29982,
+            "std_ms": 0.13807
+          },
+          "ref_e2e": {
+            "min_ms": 0.2754,
+            "median_ms": 0.32155,
+            "max_ms": 1.3594,
+            "mean_ms": 0.3238,
+            "std_ms": 0.15135
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 150.6,
+          "bandwidth_gibps": 140.26,
+          "speedup_kernel": 1.089,
+          "speedup_e2e": 1.161
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.38675,
+            "median_ms": 0.3911,
+            "max_ms": 1.33427,
+            "mean_ms": 0.42136,
+            "std_ms": 0.1338
+          },
+          "custom_e2e": {
+            "min_ms": 0.3984,
+            "median_ms": 0.4048,
+            "max_ms": 1.4522,
+            "mean_ms": 0.44433,
+            "std_ms": 0.1492
+          },
+          "ref_kernel": {
+            "min_ms": 0.64899,
+            "median_ms": 0.65384,
+            "max_ms": 1.98963,
+            "mean_ms": 0.68729,
+            "std_ms": 0.18838
+          },
+          "ref_e2e": {
+            "min_ms": 0.66,
+            "median_ms": 0.6748,
+            "max_ms": 2.0945,
+            "mean_ms": 0.70835,
+            "std_ms": 0.20125
+          },
+          "bytes_transferred": 60000000,
+          "bandwidth_gbps": 153.41,
+          "bandwidth_gibps": 142.88,
+          "speedup_kernel": 1.672,
+          "speedup_e2e": 1.667
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.26307,
+            "median_ms": 0.26664,
+            "max_ms": 1.36499,
+            "mean_ms": 0.29292,
+            "std_ms": 0.15505
+          },
+          "custom_e2e": {
+            "min_ms": 0.2737,
+            "median_ms": 0.27945,
+            "max_ms": 1.4753,
+            "mean_ms": 0.31015,
+            "std_ms": 0.16915
+          },
+          "ref_kernel": {
+            "min_ms": 0.26416,
+            "median_ms": 0.26776,
+            "max_ms": 1.33206,
+            "mean_ms": 0.29377,
+            "std_ms": 0.15029
+          },
+          "ref_e2e": {
+            "min_ms": 0.2742,
+            "median_ms": 0.28115,
+            "max_ms": 1.4856,
+            "mean_ms": 0.3142,
+            "std_ms": 0.17121
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 150.02,
+          "bandwidth_gibps": 139.71,
+          "speedup_kernel": 1.004,
+          "speedup_e2e": 1.006
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.26317,
+            "median_ms": 0.26829,
+            "max_ms": 1.30662,
+            "mean_ms": 0.29283,
+            "std_ms": 0.14668
+          },
+          "custom_e2e": {
+            "min_ms": 0.2746,
+            "median_ms": 0.28345,
+            "max_ms": 1.3968,
+            "mean_ms": 0.31111,
+            "std_ms": 0.15765
+          },
+          "ref_kernel": {
+            "min_ms": 0.26515,
+            "median_ms": 0.28386,
+            "max_ms": 1.50938,
+            "mean_ms": 0.30746,
+            "std_ms": 0.17414
+          },
+          "ref_e2e": {
+            "min_ms": 0.276,
+            "median_ms": 0.29635,
+            "max_ms": 1.6121,
+            "mean_ms": 0.33256,
+            "std_ms": 0.18659
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 149.09,
+          "bandwidth_gibps": 138.85,
+          "speedup_kernel": 1.058,
+          "speedup_e2e": 1.046
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.26214,
+            "median_ms": 0.26624,
+            "max_ms": 1.23392,
+            "mean_ms": 0.29343,
+            "std_ms": 0.13951
+          },
+          "custom_e2e": {
+            "min_ms": 0.2725,
+            "median_ms": 0.2797,
+            "max_ms": 1.3428,
+            "mean_ms": 0.31039,
+            "std_ms": 0.15327
+          },
+          "ref_kernel": {
+            "min_ms": 0.26419,
+            "median_ms": 0.28877,
+            "max_ms": 1.22573,
+            "mean_ms": 0.30817,
+            "std_ms": 0.13286
+          },
+          "ref_e2e": {
+            "min_ms": 0.2763,
+            "median_ms": 0.3211,
+            "max_ms": 1.3151,
+            "mean_ms": 0.34262,
+            "std_ms": 0.14172
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 150.24,
+          "bandwidth_gibps": 139.92,
+          "speedup_kernel": 1.085,
+          "speedup_e2e": 1.148
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.14512,
+            "median_ms": 0.15667,
+            "max_ms": 0.43517,
+            "mean_ms": 0.16067,
+            "std_ms": 0.04032
+          },
+          "custom_e2e": {
+            "min_ms": 0.1555,
+            "median_ms": 0.1674,
+            "max_ms": 0.5179,
+            "mean_ms": 0.17581,
+            "std_ms": 0.05147
+          },
+          "ref_kernel": {
+            "min_ms": 0.14336,
+            "median_ms": 0.14933,
+            "max_ms": 0.43008,
+            "mean_ms": 0.15982,
+            "std_ms": 0.04058
+          },
+          "ref_e2e": {
+            "min_ms": 0.1543,
+            "median_ms": 0.1608,
+            "max_ms": 0.5155,
+            "mean_ms": 0.17451,
+            "std_ms": 0.05188
+          },
+          "bytes_transferred": 20000000,
+          "bandwidth_gbps": 127.66,
+          "bandwidth_gibps": 118.89,
+          "speedup_kernel": 0.953,
+          "speedup_e2e": 0.961
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.13808,
+            "median_ms": 0.15053,
+            "max_ms": 0.46387,
+            "mean_ms": 0.15992,
+            "std_ms": 0.04888
+          },
+          "custom_e2e": {
+            "min_ms": 0.1491,
+            "median_ms": 0.16165,
+            "max_ms": 0.5592,
+            "mean_ms": 0.17778,
+            "std_ms": 0.06212
+          },
+          "ref_kernel": {
+            "min_ms": 0.14723,
+            "median_ms": 0.19149,
+            "max_ms": 0.47206,
+            "mean_ms": 0.18641,
+            "std_ms": 0.04681
+          },
+          "ref_e2e": {
+            "min_ms": 0.1579,
+            "median_ms": 0.22385,
+            "max_ms": 0.5829,
+            "mean_ms": 0.2146,
+            "std_ms": 0.06223
+          },
+          "bytes_transferred": 20000000,
+          "bandwidth_gbps": 132.86,
+          "bandwidth_gibps": 123.74,
+          "speedup_kernel": 1.272,
+          "speedup_e2e": 1.385
+        }
+      }
+    },
+    "bf16": {
+      "100000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.00499,
+            "median_ms": 0.01627,
+            "max_ms": 0.16896,
+            "mean_ms": 0.03067,
+            "std_ms": 0.03356
+          },
+          "custom_e2e": {
+            "min_ms": 0.025,
+            "median_ms": 0.03285,
+            "max_ms": 0.3327,
+            "mean_ms": 0.05156,
+            "std_ms": 0.05334
+          },
+          "ref_kernel": {
+            "min_ms": 0.00512,
+            "median_ms": 0.01638,
+            "max_ms": 0.10752,
+            "mean_ms": 0.02261,
+            "std_ms": 0.0171
+          },
+          "ref_e2e": {
+            "min_ms": 0.0248,
+            "median_ms": 0.02935,
+            "max_ms": 0.2166,
+            "mean_ms": 0.03809,
+            "std_ms": 0.02961
+          },
+          "bytes_transferred": 600000,
+          "bandwidth_gbps": 36.88,
+          "bandwidth_gibps": 34.35,
+          "speedup_kernel": 1.007,
+          "speedup_e2e": 0.893
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01997,
+            "max_ms": 0.09728,
+            "mean_ms": 0.02862,
+            "std_ms": 0.01892
+          },
+          "custom_e2e": {
+            "min_ms": 0.0248,
+            "median_ms": 0.03415,
+            "max_ms": 0.2239,
+            "mean_ms": 0.04492,
+            "std_ms": 0.03583
+          },
+          "ref_kernel": {
+            "min_ms": 0.01536,
+            "median_ms": 0.0215,
+            "max_ms": 0.21606,
+            "mean_ms": 0.02656,
+            "std_ms": 0.02885
+          },
+          "ref_e2e": {
+            "min_ms": 0.026,
+            "median_ms": 0.036,
+            "max_ms": 0.3505,
+            "mean_ms": 0.04209,
+            "std_ms": 0.04567
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 20.03,
+          "bandwidth_gibps": 18.65,
+          "speedup_kernel": 1.077,
+          "speedup_e2e": 1.054
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.00598,
+            "median_ms": 0.01539,
+            "max_ms": 0.10634,
+            "mean_ms": 0.02235,
+            "std_ms": 0.01529
+          },
+          "custom_e2e": {
+            "min_ms": 0.0245,
+            "median_ms": 0.0275,
+            "max_ms": 0.2544,
+            "mean_ms": 0.03777,
+            "std_ms": 0.03283
+          },
+          "ref_kernel": {
+            "min_ms": 0.00922,
+            "median_ms": 0.03021,
+            "max_ms": 0.19987,
+            "mean_ms": 0.04329,
+            "std_ms": 0.03526
+          },
+          "ref_e2e": {
+            "min_ms": 0.0332,
+            "median_ms": 0.0476,
+            "max_ms": 0.3675,
+            "mean_ms": 0.06452,
+            "std_ms": 0.05727
+          },
+          "bytes_transferred": 600000,
+          "bandwidth_gbps": 38.99,
+          "bandwidth_gibps": 36.31,
+          "speedup_kernel": 1.963,
+          "speedup_e2e": 1.731
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.01434,
+            "median_ms": 0.01536,
+            "max_ms": 0.04989,
+            "mean_ms": 0.02061,
+            "std_ms": 0.00893
+          },
+          "custom_e2e": {
+            "min_ms": 0.0245,
+            "median_ms": 0.03145,
+            "max_ms": 0.2061,
+            "mean_ms": 0.03728,
+            "std_ms": 0.02607
+          },
+          "ref_kernel": {
+            "min_ms": 0.00602,
+            "median_ms": 0.01637,
+            "max_ms": 0.09933,
+            "mean_ms": 0.02222,
+            "std_ms": 0.01459
+          },
+          "ref_e2e": {
+            "min_ms": 0.0253,
+            "median_ms": 0.0279,
+            "max_ms": 0.2256,
+            "mean_ms": 0.03767,
+            "std_ms": 0.02881
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 26.04,
+          "bandwidth_gibps": 24.25,
+          "speedup_kernel": 1.066,
+          "speedup_e2e": 0.887
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.00717,
+            "median_ms": 0.01536,
+            "max_ms": 0.14029,
+            "mean_ms": 0.02243,
+            "std_ms": 0.01984
+          },
+          "custom_e2e": {
+            "min_ms": 0.0247,
+            "median_ms": 0.0328,
+            "max_ms": 0.3021,
+            "mean_ms": 0.04028,
+            "std_ms": 0.04017
+          },
+          "ref_kernel": {
+            "min_ms": 0.00614,
+            "median_ms": 0.01536,
+            "max_ms": 0.08499,
+            "mean_ms": 0.02131,
+            "std_ms": 0.01422
+          },
+          "ref_e2e": {
+            "min_ms": 0.0247,
+            "median_ms": 0.02655,
+            "max_ms": 0.2112,
+            "mean_ms": 0.03659,
+            "std_ms": 0.02748
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 26.04,
+          "bandwidth_gibps": 24.25,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 0.809
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.00614,
+            "median_ms": 0.01843,
+            "max_ms": 0.16976,
+            "mean_ms": 0.03094,
+            "std_ms": 0.02917
+          },
+          "custom_e2e": {
+            "min_ms": 0.0252,
+            "median_ms": 0.035,
+            "max_ms": 0.3439,
+            "mean_ms": 0.05145,
+            "std_ms": 0.04993
+          },
+          "ref_kernel": {
+            "min_ms": 0.00704,
+            "median_ms": 0.016,
+            "max_ms": 0.14461,
+            "mean_ms": 0.03042,
+            "std_ms": 0.02844
+          },
+          "ref_e2e": {
+            "min_ms": 0.0248,
+            "median_ms": 0.031,
+            "max_ms": 0.3158,
+            "mean_ms": 0.0518,
+            "std_ms": 0.05079
+          },
+          "bytes_transferred": 400000,
+          "bandwidth_gbps": 21.7,
+          "bandwidth_gibps": 20.21,
+          "speedup_kernel": 0.868,
+          "speedup_e2e": 0.886
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.02579,
+            "median_ms": 0.03578,
+            "max_ms": 0.0983,
+            "mean_ms": 0.04009,
+            "std_ms": 0.01588
+          },
+          "custom_e2e": {
+            "min_ms": 0.0371,
+            "median_ms": 0.05175,
+            "max_ms": 0.2506,
+            "mean_ms": 0.05739,
+            "std_ms": 0.03471
+          },
+          "ref_kernel": {
+            "min_ms": 0.0215,
+            "median_ms": 0.02458,
+            "max_ms": 0.0983,
+            "mean_ms": 0.03069,
+            "std_ms": 0.01265
+          },
+          "ref_e2e": {
+            "min_ms": 0.0331,
+            "median_ms": 0.03585,
+            "max_ms": 0.2321,
+            "mean_ms": 0.04494,
+            "std_ms": 0.02825
+          },
+          "bytes_transferred": 200000,
+          "bandwidth_gbps": 5.59,
+          "bandwidth_gibps": 5.21,
+          "speedup_kernel": 0.687,
+          "speedup_e2e": 0.693
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.01114,
+            "median_ms": 0.02509,
+            "max_ms": 0.16579,
+            "mean_ms": 0.03636,
+            "std_ms": 0.03083
+          },
+          "custom_e2e": {
+            "min_ms": 0.0302,
+            "median_ms": 0.04405,
+            "max_ms": 0.2249,
+            "mean_ms": 0.05584,
+            "std_ms": 0.04238
+          },
+          "ref_kernel": {
+            "min_ms": 0.02867,
+            "median_ms": 0.0297,
+            "max_ms": 0.0809,
+            "mean_ms": 0.03158,
+            "std_ms": 0.00737
+          },
+          "ref_e2e": {
+            "min_ms": 0.0402,
+            "median_ms": 0.04135,
+            "max_ms": 0.2142,
+            "mean_ms": 0.04693,
+            "std_ms": 0.02444
+          },
+          "bytes_transferred": 200000,
+          "bandwidth_gbps": 7.97,
+          "bandwidth_gibps": 7.42,
+          "speedup_kernel": 1.184,
+          "speedup_e2e": 0.939
+        }
+      },
+      "1000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.05632,
+            "median_ms": 0.05837,
+            "max_ms": 0.07158,
+            "mean_ms": 0.05856,
+            "std_ms": 0.00234
+          },
+          "custom_e2e": {
+            "min_ms": 0.0675,
+            "median_ms": 0.06905,
+            "max_ms": 0.2145,
+            "mean_ms": 0.07252,
+            "std_ms": 0.02066
+          },
+          "ref_kernel": {
+            "min_ms": 0.05734,
+            "median_ms": 0.05837,
+            "max_ms": 0.10547,
+            "mean_ms": 0.06201,
+            "std_ms": 0.0104
+          },
+          "ref_e2e": {
+            "min_ms": 0.0684,
+            "median_ms": 0.06975,
+            "max_ms": 0.2265,
+            "mean_ms": 0.07639,
+            "std_ms": 0.02509
+          },
+          "bytes_transferred": 6000000,
+          "bandwidth_gbps": 102.79,
+          "bandwidth_gibps": 95.73,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 1.01
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.04096,
+            "median_ms": 0.04198,
+            "max_ms": 0.08294,
+            "mean_ms": 0.04337,
+            "std_ms": 0.00628
+          },
+          "custom_e2e": {
+            "min_ms": 0.0512,
+            "median_ms": 0.05285,
+            "max_ms": 0.2158,
+            "mean_ms": 0.05694,
+            "std_ms": 0.0232
+          },
+          "ref_kernel": {
+            "min_ms": 0.04198,
+            "median_ms": 0.04301,
+            "max_ms": 0.08806,
+            "mean_ms": 0.04561,
+            "std_ms": 0.00747
+          },
+          "ref_e2e": {
+            "min_ms": 0.0521,
+            "median_ms": 0.0544,
+            "max_ms": 0.2237,
+            "mean_ms": 0.05925,
+            "std_ms": 0.02421
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 95.28,
+          "bandwidth_gibps": 88.74,
+          "speedup_kernel": 1.025,
+          "speedup_e2e": 1.029
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.05632,
+            "median_ms": 0.05837,
+            "max_ms": 0.10342,
+            "mean_ms": 0.06032,
+            "std_ms": 0.00764
+          },
+          "custom_e2e": {
+            "min_ms": 0.0677,
+            "median_ms": 0.0693,
+            "max_ms": 0.2173,
+            "mean_ms": 0.07357,
+            "std_ms": 0.02134
+          },
+          "ref_kernel": {
+            "min_ms": 0.09421,
+            "median_ms": 0.09626,
+            "max_ms": 0.18842,
+            "mean_ms": 0.10153,
+            "std_ms": 0.01513
+          },
+          "ref_e2e": {
+            "min_ms": 0.1063,
+            "median_ms": 0.1081,
+            "max_ms": 0.3016,
+            "mean_ms": 0.11723,
+            "std_ms": 0.03002
+          },
+          "bytes_transferred": 6000000,
+          "bandwidth_gbps": 102.79,
+          "bandwidth_gibps": 95.73,
+          "speedup_kernel": 1.649,
+          "speedup_e2e": 1.56
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.04096,
+            "median_ms": 0.04301,
+            "max_ms": 0.10637,
+            "mean_ms": 0.04826,
+            "std_ms": 0.0139
+          },
+          "custom_e2e": {
+            "min_ms": 0.0522,
+            "median_ms": 0.0536,
+            "max_ms": 0.2279,
+            "mean_ms": 0.06584,
+            "std_ms": 0.03177
+          },
+          "ref_kernel": {
+            "min_ms": 0.04198,
+            "median_ms": 0.04301,
+            "max_ms": 0.16384,
+            "mean_ms": 0.04642,
+            "std_ms": 0.0172
+          },
+          "ref_e2e": {
+            "min_ms": 0.053,
+            "median_ms": 0.0543,
+            "max_ms": 0.4562,
+            "mean_ms": 0.06333,
+            "std_ms": 0.05682
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 93.0,
+          "bandwidth_gibps": 86.61,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 1.013
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.04198,
+            "median_ms": 0.04387,
+            "max_ms": 0.16077,
+            "mean_ms": 0.0486,
+            "std_ms": 0.0187
+          },
+          "custom_e2e": {
+            "min_ms": 0.053,
+            "median_ms": 0.0547,
+            "max_ms": 0.218,
+            "mean_ms": 0.0637,
+            "std_ms": 0.03221
+          },
+          "ref_kernel": {
+            "min_ms": 0.06755,
+            "median_ms": 0.06861,
+            "max_ms": 0.12902,
+            "mean_ms": 0.0704,
+            "std_ms": 0.00871
+          },
+          "ref_e2e": {
+            "min_ms": 0.1014,
+            "median_ms": 0.1029,
+            "max_ms": 0.2945,
+            "mean_ms": 0.10728,
+            "std_ms": 0.02718
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 91.18,
+          "bandwidth_gibps": 84.92,
+          "speedup_kernel": 1.564,
+          "speedup_e2e": 1.881
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.04096,
+            "median_ms": 0.04294,
+            "max_ms": 0.12186,
+            "mean_ms": 0.04446,
+            "std_ms": 0.01125
+          },
+          "custom_e2e": {
+            "min_ms": 0.0529,
+            "median_ms": 0.0541,
+            "max_ms": 0.2535,
+            "mean_ms": 0.05853,
+            "std_ms": 0.02819
+          },
+          "ref_kernel": {
+            "min_ms": 0.04291,
+            "median_ms": 0.04403,
+            "max_ms": 0.11366,
+            "mean_ms": 0.0472,
+            "std_ms": 0.01195
+          },
+          "ref_e2e": {
+            "min_ms": 0.0535,
+            "median_ms": 0.0552,
+            "max_ms": 0.2393,
+            "mean_ms": 0.06196,
+            "std_ms": 0.02883
+          },
+          "bytes_transferred": 4000000,
+          "bandwidth_gbps": 93.15,
+          "bandwidth_gibps": 86.76,
+          "speedup_kernel": 1.025,
+          "speedup_e2e": 1.02
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.04198,
+            "median_ms": 0.04301,
+            "max_ms": 0.37888,
+            "mean_ms": 0.05614,
+            "std_ms": 0.04813
+          },
+          "custom_e2e": {
+            "min_ms": 0.053,
+            "median_ms": 0.05535,
+            "max_ms": 0.4727,
+            "mean_ms": 0.07176,
+            "std_ms": 0.06021
+          },
+          "ref_kernel": {
+            "min_ms": 0.03686,
+            "median_ms": 0.03891,
+            "max_ms": 0.36659,
+            "mean_ms": 0.05466,
+            "std_ms": 0.05337
+          },
+          "ref_e2e": {
+            "min_ms": 0.0485,
+            "median_ms": 0.05025,
+            "max_ms": 0.4595,
+            "mean_ms": 0.06988,
+            "std_ms": 0.06492
+          },
+          "bytes_transferred": 2000000,
+          "bandwidth_gbps": 46.5,
+          "bandwidth_gibps": 43.31,
+          "speedup_kernel": 0.905,
+          "speedup_e2e": 0.908
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.03584,
+            "median_ms": 0.03781,
+            "max_ms": 0.55706,
+            "mean_ms": 0.05032,
+            "std_ms": 0.07335
+          },
+          "custom_e2e": {
+            "min_ms": 0.0469,
+            "median_ms": 0.0493,
+            "max_ms": 0.6567,
+            "mean_ms": 0.06577,
+            "std_ms": 0.08569
+          },
+          "ref_kernel": {
+            "min_ms": 0.04096,
+            "median_ms": 0.04198,
+            "max_ms": 0.36762,
+            "mean_ms": 0.05602,
+            "std_ms": 0.04717
+          },
+          "ref_e2e": {
+            "min_ms": 0.0521,
+            "median_ms": 0.0538,
+            "max_ms": 0.4574,
+            "mean_ms": 0.07218,
+            "std_ms": 0.05894
+          },
+          "bytes_transferred": 2000000,
+          "bandwidth_gbps": 52.9,
+          "bandwidth_gibps": 49.26,
+          "speedup_kernel": 1.11,
+          "speedup_e2e": 1.091
+        }
+      },
+      "10000000": {
+        "vector_add": {
+          "custom_kernel": {
+            "min_ms": 0.4905,
+            "median_ms": 0.49562,
+            "max_ms": 1.79302,
+            "mean_ms": 0.53073,
+            "std_ms": 0.183
+          },
+          "custom_e2e": {
+            "min_ms": 0.5039,
+            "median_ms": 0.5116,
+            "max_ms": 1.8892,
+            "mean_ms": 0.55499,
+            "std_ms": 0.19503
+          },
+          "ref_kernel": {
+            "min_ms": 0.49357,
+            "median_ms": 0.49818,
+            "max_ms": 1.81862,
+            "mean_ms": 0.52737,
+            "std_ms": 0.18653
+          },
+          "ref_e2e": {
+            "min_ms": 0.5062,
+            "median_ms": 0.51265,
+            "max_ms": 1.9294,
+            "mean_ms": 0.54605,
+            "std_ms": 0.20025
+          },
+          "bytes_transferred": 60000000,
+          "bandwidth_gbps": 121.06,
+          "bandwidth_gibps": 112.75,
+          "speedup_kernel": 1.005,
+          "speedup_e2e": 1.002
+        },
+        "vector_scale": {
+          "custom_kernel": {
+            "min_ms": 0.3328,
+            "median_ms": 0.33587,
+            "max_ms": 1.64352,
+            "mean_ms": 0.36315,
+            "std_ms": 0.18484
+          },
+          "custom_e2e": {
+            "min_ms": 0.3452,
+            "median_ms": 0.34855,
+            "max_ms": 1.7432,
+            "mean_ms": 0.37891,
+            "std_ms": 0.19713
+          },
+          "ref_kernel": {
+            "min_ms": 0.33587,
+            "median_ms": 0.33997,
+            "max_ms": 1.67834,
+            "mean_ms": 0.37159,
+            "std_ms": 0.18897
+          },
+          "ref_e2e": {
+            "min_ms": 0.3479,
+            "median_ms": 0.3545,
+            "max_ms": 1.7848,
+            "mean_ms": 0.39016,
+            "std_ms": 0.20237
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 119.09,
+          "bandwidth_gibps": 110.91,
+          "speedup_kernel": 1.012,
+          "speedup_e2e": 1.017
+        },
+        "fused_add_relu": {
+          "custom_kernel": {
+            "min_ms": 0.49152,
+            "median_ms": 0.49459,
+            "max_ms": 1.8688,
+            "mean_ms": 0.5268,
+            "std_ms": 0.19393
+          },
+          "custom_e2e": {
+            "min_ms": 0.5036,
+            "median_ms": 0.51025,
+            "max_ms": 1.9915,
+            "mean_ms": 0.54568,
+            "std_ms": 0.20933
+          },
+          "ref_kernel": {
+            "min_ms": 0.82522,
+            "median_ms": 0.83298,
+            "max_ms": 2.96038,
+            "mean_ms": 0.88437,
+            "std_ms": 0.30017
+          },
+          "ref_e2e": {
+            "min_ms": 0.8381,
+            "median_ms": 0.85355,
+            "max_ms": 3.0678,
+            "mean_ms": 0.90934,
+            "std_ms": 0.31295
+          },
+          "bytes_transferred": 60000000,
+          "bandwidth_gbps": 121.31,
+          "bandwidth_gibps": 112.98,
+          "speedup_kernel": 1.684,
+          "speedup_e2e": 1.673
+        },
+        "relu": {
+          "custom_kernel": {
+            "min_ms": 0.3328,
+            "median_ms": 0.3369,
+            "max_ms": 1.62918,
+            "mean_ms": 0.36597,
+            "std_ms": 0.18263
+          },
+          "custom_e2e": {
+            "min_ms": 0.3444,
+            "median_ms": 0.3499,
+            "max_ms": 1.7213,
+            "mean_ms": 0.38214,
+            "std_ms": 0.1939
+          },
+          "ref_kernel": {
+            "min_ms": 0.33485,
+            "median_ms": 0.3369,
+            "max_ms": 1.72442,
+            "mean_ms": 0.3679,
+            "std_ms": 0.19593
+          },
+          "ref_e2e": {
+            "min_ms": 0.346,
+            "median_ms": 0.3496,
+            "max_ms": 1.8366,
+            "mean_ms": 0.38465,
+            "std_ms": 0.21009
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 118.73,
+          "bandwidth_gibps": 110.58,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 0.999
+        },
+        "gelu": {
+          "custom_kernel": {
+            "min_ms": 0.33382,
+            "median_ms": 0.33685,
+            "max_ms": 1.74797,
+            "mean_ms": 0.37036,
+            "std_ms": 0.19932
+          },
+          "custom_e2e": {
+            "min_ms": 0.3451,
+            "median_ms": 0.34865,
+            "max_ms": 1.8727,
+            "mean_ms": 0.39108,
+            "std_ms": 0.21562
+          },
+          "ref_kernel": {
+            "min_ms": 0.33382,
+            "median_ms": 0.3369,
+            "max_ms": 1.63635,
+            "mean_ms": 0.36449,
+            "std_ms": 0.18364
+          },
+          "ref_e2e": {
+            "min_ms": 0.3458,
+            "median_ms": 0.34885,
+            "max_ms": 1.7274,
+            "mean_ms": 0.37974,
+            "std_ms": 0.19482
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 118.75,
+          "bandwidth_gibps": 110.59,
+          "speedup_kernel": 1.0,
+          "speedup_e2e": 1.001
+        },
+        "sigmoid": {
+          "custom_kernel": {
+            "min_ms": 0.3328,
+            "median_ms": 0.33485,
+            "max_ms": 1.59232,
+            "mean_ms": 0.36119,
+            "std_ms": 0.17771
+          },
+          "custom_e2e": {
+            "min_ms": 0.3449,
+            "median_ms": 0.34695,
+            "max_ms": 1.9439,
+            "mean_ms": 0.38067,
+            "std_ms": 0.22567
+          },
+          "ref_kernel": {
+            "min_ms": 0.33485,
+            "median_ms": 0.3388,
+            "max_ms": 10.70797,
+            "mean_ms": 0.55005,
+            "std_ms": 1.46589
+          },
+          "ref_e2e": {
+            "min_ms": 0.3461,
+            "median_ms": 0.3526,
+            "max_ms": 11.1506,
+            "mean_ms": 0.57421,
+            "std_ms": 1.52632
+          },
+          "bytes_transferred": 40000000,
+          "bandwidth_gbps": 119.46,
+          "bandwidth_gibps": 111.25,
+          "speedup_kernel": 1.012,
+          "speedup_e2e": 1.016
+        },
+        "reduce_sum": {
+          "custom_kernel": {
+            "min_ms": 0.18227,
+            "median_ms": 0.18637,
+            "max_ms": 0.33587,
+            "mean_ms": 0.19569,
+            "std_ms": 0.02542
+          },
+          "custom_e2e": {
+            "min_ms": 0.1951,
+            "median_ms": 0.19985,
+            "max_ms": 0.6838,
+            "mean_ms": 0.21817,
+            "std_ms": 0.07117
+          },
+          "ref_kernel": {
+            "min_ms": 0.18125,
+            "median_ms": 0.1833,
+            "max_ms": 0.26624,
+            "mean_ms": 0.19111,
+            "std_ms": 0.01973
+          },
+          "ref_e2e": {
+            "min_ms": 0.1929,
+            "median_ms": 0.1945,
+            "max_ms": 0.6033,
+            "mean_ms": 0.21371,
+            "std_ms": 0.06316
+          },
+          "bytes_transferred": 20000000,
+          "bandwidth_gbps": 107.31,
+          "bandwidth_gibps": 99.94,
+          "speedup_kernel": 0.984,
+          "speedup_e2e": 0.973
+        },
+        "reduce_max": {
+          "custom_kernel": {
+            "min_ms": 0.17613,
+            "median_ms": 0.1792,
+            "max_ms": 0.39731,
+            "mean_ms": 0.19286,
+            "std_ms": 0.03258
+          },
+          "custom_e2e": {
+            "min_ms": 0.1876,
+            "median_ms": 0.1908,
+            "max_ms": 0.7524,
+            "mean_ms": 0.22061,
+            "std_ms": 0.08116
+          },
+          "ref_kernel": {
+            "min_ms": 0.19251,
+            "median_ms": 0.19552,
+            "max_ms": 0.2857,
+            "mean_ms": 0.20136,
+            "std_ms": 0.01597
+          },
+          "ref_e2e": {
+            "min_ms": 0.2046,
+            "median_ms": 0.207,
+            "max_ms": 0.6302,
+            "mean_ms": 0.22144,
+            "std_ms": 0.06066
+          },
+          "bytes_transferred": 20000000,
+          "bandwidth_gbps": 111.61,
+          "bandwidth_gibps": 103.94,
+          "speedup_kernel": 1.091,
+          "speedup_e2e": 1.085
+        }
+      }
+    }
+  }
+}

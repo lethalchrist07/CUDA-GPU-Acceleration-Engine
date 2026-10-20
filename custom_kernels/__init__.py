@@ -3,10 +3,15 @@ Custom CUDA Kernel Library for CUDA GPU Acceleration Engine
 Target: NVIDIA GeForce RTX 3050 Laptop GPU (sm_86)
 Toolchain: CUDA 12.4.1 + MSVC 19.38
 
-STAGE 1 CONTRACT:
-All operations in this package are FORWARD-ONLY inference operators.
+STAGE 2 MILESTONE 1 CONTRACT:
+All operations in this package support mixed precision:
+- float32 (FP32)
+- float16 (FP16)
+- bfloat16 (BF16)
+
+All operations are FORWARD-ONLY inference operators in Milestone 1.
 They do not construct or attach PyTorch autograd computation graphs.
-Do not invoke these operators in backward training passes in Stage 1.
+Do not invoke these operators in backward training passes until Milestone 3.
 """
 from typing import Optional
 import torch
@@ -25,7 +30,7 @@ def vector_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
     Elementwise vector addition: c = a + b
     Forward-only operator. Does not attach autograd backward graph.
-    Inputs must be contiguous float32 CUDA tensors of identical shape.
+    Inputs must be contiguous CUDA tensors of identical shape and dtype (float32, float16, or bfloat16).
     """
     return _get_module().vector_add(a, b)
 
@@ -33,7 +38,7 @@ def scale(x: torch.Tensor, alpha: float) -> torch.Tensor:
     """
     Vector scaling: out = alpha * x
     Forward-only operator. Does not attach autograd backward graph.
-    Input must be a contiguous float32 CUDA tensor.
+    Input must be a contiguous CUDA tensor (float32, float16, or bfloat16).
     """
     return _get_module().vector_scale(x, float(alpha))
 
@@ -42,6 +47,7 @@ def fused_add_relu(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     Fused elementwise addition + ReLU: out = max(0, a + b)
     Forward-only operator. Does not attach autograd backward graph.
     Eliminates intermediate global memory roundtrip.
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().fused_add_relu(a, b)
 
@@ -52,6 +58,7 @@ def fused_bias_activation(x: torch.Tensor, bias: torch.Tensor, activation: str =
     x: 2D matrix (rows x cols)
     bias: 1D vector (cols)
     activation: 'relu', 'gelu', or 'none'
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().fused_bias_activation(x, bias, activation.lower())
 
@@ -59,6 +66,7 @@ def relu(x: torch.Tensor) -> torch.Tensor:
     """
     Rectified Linear Unit: out = max(0, x)
     Forward-only operator. Does not attach autograd backward graph.
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().relu(x)
 
@@ -67,6 +75,7 @@ def gelu(x: torch.Tensor) -> torch.Tensor:
     Gaussian Error Linear Unit (fast tanh approximation):
     out = 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
     Forward-only operator. Does not attach autograd backward graph.
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().gelu(x)
 
@@ -74,20 +83,28 @@ def sigmoid(x: torch.Tensor) -> torch.Tensor:
     """
     Sigmoid activation: out = 1 / (1 + exp(-x))
     Forward-only operator. Does not attach autograd backward graph.
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().sigmoid(x)
 
-def reduce_sum(x: torch.Tensor) -> torch.Tensor:
+def reduce_sum(x: torch.Tensor, output_fp32: Optional[bool] = None) -> torch.Tensor:
     """
     Sum reduction: returns scalar tensor containing sum of all elements.
     Forward-only operator. Does not attach autograd backward graph.
+    Accumulated in FP32 for numerical stability.
+    If output_fp32 is None: defaults to True for FP16/BF16 when numel > 65536 to prevent overflow,
+    otherwise matches input dtype.
+    Supports float32, float16, and bfloat16.
     """
-    return _get_module().reduce_sum(x)
+    if output_fp32 is None:
+        output_fp32 = (x.numel() > 65536 and x.dtype in (torch.float16, torch.bfloat16))
+    return _get_module().reduce_sum(x, bool(output_fp32))
 
 def reduce_max(x: torch.Tensor) -> torch.Tensor:
     """
     Max reduction: returns scalar tensor containing max of all elements.
     Forward-only operator. Does not attach autograd backward graph.
+    Supports float32, float16, and bfloat16.
     """
     return _get_module().reduce_max(x)
 
@@ -95,7 +112,7 @@ def matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
     2D Shared-Memory Tiled SGEMM: out = a @ b
     Forward-only operator. Does not attach autograd backward graph.
-    Supports arbitrary M x K and K x N dimensions.
+    Supports float32 contiguous matrices.
     """
     return _get_module().matmul_tiled(a, b)
 
