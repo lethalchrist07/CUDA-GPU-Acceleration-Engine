@@ -1,0 +1,139 @@
+{
+  "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "peak_theoretical_bandwidth_gb_s": 168.02,
+  "sm_count": 20,
+  "results": [
+    {
+      "operation": "vector_add (10M)",
+      "custom_kernel_ms": 0.9677,
+      "custom_e2e_ms": 0.9778,
+      "ref_kernel_ms": 0.9677,
+      "ref_e2e_ms": 1.0482,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 1.07,
+      "effective_bw_gb_s": 124.01,
+      "bw_efficiency_pct": 73.8,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "vector_scale (10M)",
+      "custom_kernel_ms": 0.6523,
+      "custom_e2e_ms": 0.6619,
+      "ref_kernel_ms": 0.6518,
+      "ref_e2e_ms": 0.6602,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 1.0,
+      "effective_bw_gb_s": 122.65,
+      "bw_efficiency_pct": 73.0,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "fused_add_relu (10M)",
+      "custom_kernel_ms": 0.9677,
+      "custom_e2e_ms": 0.9731,
+      "ref_kernel_ms": 1.6169,
+      "ref_e2e_ms": 1.6353,
+      "speedup_kernel": 1.67,
+      "speedup_e2e": 1.68,
+      "effective_bw_gb_s": 124.01,
+      "bw_efficiency_pct": 73.8,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "fused_bias_relu (4096x2048)",
+      "custom_kernel_ms": 0.5417,
+      "custom_e2e_ms": 0.5509,
+      "ref_kernel_ms": 1.0916,
+      "ref_e2e_ms": 1.0999,
+      "speedup_kernel": 2.02,
+      "speedup_e2e": 2.0,
+      "effective_bw_gb_s": 123.9,
+      "bw_efficiency_pct": 73.7,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "fused_bias_gelu (4096x2048)",
+      "custom_kernel_ms": 0.5437,
+      "custom_e2e_ms": 0.5524,
+      "ref_kernel_ms": 1.0916,
+      "ref_e2e_ms": 1.0999,
+      "speedup_kernel": 2.01,
+      "speedup_e2e": 1.99,
+      "effective_bw_gb_s": 123.44,
+      "bw_efficiency_pct": 73.5,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "relu (10M)",
+      "custom_kernel_ms": 0.6513,
+      "custom_e2e_ms": 0.6613,
+      "ref_kernel_ms": 0.6513,
+      "ref_e2e_ms": 0.6619,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 1.0,
+      "effective_bw_gb_s": 122.84,
+      "bw_efficiency_pct": 73.1,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "gelu_tanh (10M)",
+      "custom_kernel_ms": 0.6523,
+      "custom_e2e_ms": 0.6609,
+      "ref_kernel_ms": 0.6513,
+      "ref_e2e_ms": 0.6615,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 1.0,
+      "effective_bw_gb_s": 122.65,
+      "bw_efficiency_pct": 73.0,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "sigmoid (10M)",
+      "custom_kernel_ms": 0.6523,
+      "custom_e2e_ms": 2.5159,
+      "ref_kernel_ms": 0.6513,
+      "ref_e2e_ms": 0.6829,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 0.27,
+      "effective_bw_gb_s": 122.65,
+      "bw_efficiency_pct": 73.0,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "reduce_sum (10M)",
+      "custom_kernel_ms": 0.3215,
+      "custom_e2e_ms": 0.3643,
+      "ref_kernel_ms": 0.3195,
+      "ref_e2e_ms": 0.6703,
+      "speedup_kernel": 0.99,
+      "speedup_e2e": 1.84,
+      "effective_bw_gb_s": 124.4,
+      "bw_efficiency_pct": 74.0,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "reduce_max (10M)",
+      "custom_kernel_ms": 0.3195,
+      "custom_e2e_ms": 0.3711,
+      "ref_kernel_ms": 0.3195,
+      "ref_e2e_ms": 0.3279,
+      "speedup_kernel": 1.0,
+      "speedup_e2e": 0.88,
+      "effective_bw_gb_s": 125.2,
+      "bw_efficiency_pct": 74.5,
+      "throughput_tflops": null
+    },
+    {
+      "operation": "matmul_tiled (1024x1024)",
+      "custom_kernel_ms": 3.4258,
+      "custom_e2e_ms": 3.434,
+      "ref_kernel_ms": 0.4291,
+      "ref_e2e_ms": 0.4492,
+      "speedup_kernel": 0.13,
+      "speedup_e2e": 0.13,
+      "effective_bw_gb_s": 3.67,
+      "bw_efficiency_pct": 2.2,
+      "throughput_tflops": 0.627
+    }
+  ]
+}

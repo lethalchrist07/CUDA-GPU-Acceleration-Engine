@@ -1,0 +1,113 @@
+"""
+Custom CUDA Kernel Library for CUDA GPU Acceleration Engine
+Target: NVIDIA GeForce RTX 3050 Laptop GPU (sm_86)
+Toolchain: CUDA 12.4.1 + MSVC 19.38
+
+STAGE 1 CONTRACT:
+All operations in this package are FORWARD-ONLY inference operators.
+They do not construct or attach PyTorch autograd computation graphs.
+Do not invoke these operators in backward training passes in Stage 1.
+"""
+from typing import Optional
+import torch
+
+from .loader import load_custom_kernels_module
+
+_cuda_module = None
+
+def _get_module():
+    global _cuda_module
+    if _cuda_module is None:
+        _cuda_module = load_custom_kernels_module()
+    return _cuda_module
+
+def vector_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    """
+    Elementwise vector addition: c = a + b
+    Forward-only operator. Does not attach autograd backward graph.
+    Inputs must be contiguous float32 CUDA tensors of identical shape.
+    """
+    return _get_module().vector_add(a, b)
+
+def scale(x: torch.Tensor, alpha: float) -> torch.Tensor:
+    """
+    Vector scaling: out = alpha * x
+    Forward-only operator. Does not attach autograd backward graph.
+    Input must be a contiguous float32 CUDA tensor.
+    """
+    return _get_module().vector_scale(x, float(alpha))
+
+def fused_add_relu(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    """
+    Fused elementwise addition + ReLU: out = max(0, a + b)
+    Forward-only operator. Does not attach autograd backward graph.
+    Eliminates intermediate global memory roundtrip.
+    """
+    return _get_module().fused_add_relu(a, b)
+
+def fused_bias_activation(x: torch.Tensor, bias: torch.Tensor, activation: str = "relu") -> torch.Tensor:
+    """
+    Fused linear layer bias addition + activation: out = act(x + bias)
+    Forward-only operator. Does not attach autograd backward graph.
+    x: 2D matrix (rows x cols)
+    bias: 1D vector (cols)
+    activation: 'relu', 'gelu', or 'none'
+    """
+    return _get_module().fused_bias_activation(x, bias, activation.lower())
+
+def relu(x: torch.Tensor) -> torch.Tensor:
+    """
+    Rectified Linear Unit: out = max(0, x)
+    Forward-only operator. Does not attach autograd backward graph.
+    """
+    return _get_module().relu(x)
+
+def gelu(x: torch.Tensor) -> torch.Tensor:
+    """
+    Gaussian Error Linear Unit (fast tanh approximation):
+    out = 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
+    Forward-only operator. Does not attach autograd backward graph.
+    """
+    return _get_module().gelu(x)
+
+def sigmoid(x: torch.Tensor) -> torch.Tensor:
+    """
+    Sigmoid activation: out = 1 / (1 + exp(-x))
+    Forward-only operator. Does not attach autograd backward graph.
+    """
+    return _get_module().sigmoid(x)
+
+def reduce_sum(x: torch.Tensor) -> torch.Tensor:
+    """
+    Sum reduction: returns scalar tensor containing sum of all elements.
+    Forward-only operator. Does not attach autograd backward graph.
+    """
+    return _get_module().reduce_sum(x)
+
+def reduce_max(x: torch.Tensor) -> torch.Tensor:
+    """
+    Max reduction: returns scalar tensor containing max of all elements.
+    Forward-only operator. Does not attach autograd backward graph.
+    """
+    return _get_module().reduce_max(x)
+
+def matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    """
+    2D Shared-Memory Tiled SGEMM: out = a @ b
+    Forward-only operator. Does not attach autograd backward graph.
+    Supports arbitrary M x K and K x N dimensions.
+    """
+    return _get_module().matmul_tiled(a, b)
+
+__all__ = [
+    "vector_add",
+    "scale",
+    "fused_add_relu",
+    "fused_bias_activation",
+    "relu",
+    "gelu",
+    "sigmoid",
+    "reduce_sum",
+    "reduce_max",
+    "matmul",
+]
