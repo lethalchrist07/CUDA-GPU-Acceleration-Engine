@@ -7,6 +7,7 @@
 #include "include/activations.cuh"
 #include "include/reductions.cuh"
 #include "include/matmul_tiled.cuh"
+#include "include/matmul_wmma.cuh"
 
 // Helper macros for input validation
 #define CHECK_CUDA(x) TORCH_CHECK((x).is_cuda(), #x " must be a CUDA tensor")
@@ -371,6 +372,53 @@ torch::Tensor matmul_tiled_forward(const torch::Tensor& a, const torch::Tensor& 
     return out;
 }
 
+torch::Tensor matmul_wmma_forward(const torch::Tensor& a, const torch::Tensor& b, bool output_fp32) {
+    CHECK_CUDA(a);
+    CHECK_CUDA(b);
+    CHECK_CONTIGUOUS(a);
+    CHECK_CONTIGUOUS(b);
+    TORCH_CHECK(a.scalar_type() == at::kHalf, "matmul_wmma: Tensor a must be float16 (half)");
+    TORCH_CHECK(b.scalar_type() == at::kHalf, "matmul_wmma: Tensor b must be float16 (half)");
+    CHECK_SAME_DEVICE(a, b);
+
+    TORCH_CHECK(a.dim() == 2, "Tensor a must be a 2D matrix");
+    TORCH_CHECK(b.dim() == 2, "Tensor b must be a 2D matrix");
+    TORCH_CHECK(a.size(1) == b.size(0),
+                "Matrix dimension mismatch: a.shape[1] (" + std::to_string(a.size(1)) +
+                ") must match b.shape[0] (" + std::to_string(b.size(0)) + ")");
+
+    int M = static_cast<int>(a.size(0));
+    int K = static_cast<int>(a.size(1));
+    int N = static_cast<int>(b.size(1));
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(a));
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+
+    if (output_fp32) {
+        auto out = torch::empty({M, N}, a.options().dtype(torch::kFloat32));
+        if (M == 0 || N == 0) return out;
+        launch_wmma_matmul_fp32_out(
+            reinterpret_cast<const half*>(a.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(b.data_ptr<at::Half>()),
+            out.data_ptr<float>(),
+            M, K, N, stream
+        );
+        CUDA_KERNEL_CHECK();
+        return out;
+    } else {
+        auto out = torch::empty({M, N}, a.options());
+        if (M == 0 || N == 0) return out;
+        launch_wmma_matmul_fp16_out(
+            reinterpret_cast<const half*>(a.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(b.data_ptr<at::Half>()),
+            reinterpret_cast<half*>(out.data_ptr<at::Half>()),
+            M, K, N, stream
+        );
+        CUDA_KERNEL_CHECK();
+        return out;
+    }
+}
+
 // =========================================================================
 // PyBind11 Module Definition
 // =========================================================================
@@ -388,4 +436,5 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("reduce_sum", &reduce_sum_forward, py::arg("x"), py::arg("output_fp32") = false, "Sum reduction forward (CUDA)");
     m.def("reduce_max", &reduce_max_forward, "Max reduction forward (CUDA)");
     m.def("matmul_tiled", &matmul_tiled_forward, "2D Shared Memory Tiled SGEMM forward (CUDA)");
+    m.def("matmul_wmma", &matmul_wmma_forward, py::arg("a"), py::arg("b"), py::arg("output_fp32") = false, "Ampere Tensor Core WMMA matrix multiplication forward (CUDA)");
 }

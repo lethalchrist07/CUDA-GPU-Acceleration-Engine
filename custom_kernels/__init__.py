@@ -108,12 +108,25 @@ def reduce_max(x: torch.Tensor) -> torch.Tensor:
     """
     return _get_module().reduce_max(x)
 
+def matmul_wmma(a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> torch.Tensor:
+    """
+    Ampere Tensor Core accelerated matrix multiplication using CUDA WMMA: out = a @ b
+    Forward-only operator. Does not attach autograd backward graph.
+    Inputs must be contiguous 2D CUDA float16 tensors.
+    Accumulation is performed in FP32 registers.
+    If output_fp32 is True, returns float32 tensor; otherwise returns float16 tensor.
+    """
+    return _get_module().matmul_wmma(a, b, bool(output_fp32))
+
 def matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
-    2D Shared-Memory Tiled SGEMM: out = a @ b
+    Matrix multiplication operator: out = a @ b
     Forward-only operator. Does not attach autograd backward graph.
-    Supports float32 contiguous matrices.
+    - If inputs are float16: dispatches to Ampere Tensor Core WMMA kernel.
+    - If inputs are float32: dispatches to Shared-Memory Tiled SGEMM kernel.
     """
+    if a.dtype == torch.float16:
+        return _get_module().matmul_wmma(a, b, False)
     return _get_module().matmul_tiled(a, b)
 
 __all__ = [
@@ -127,4 +140,6 @@ __all__ = [
     "reduce_sum",
     "reduce_max",
     "matmul",
+    "matmul_wmma",
 ]
+
