@@ -84,6 +84,7 @@ class TestCUDAStreamIntegration:
         stream = torch.cuda.Stream()
         a = torch.randn(1024, device="cuda", dtype=torch.float32)
         b = torch.randn(1024, device="cuda", dtype=torch.float32)
+        torch.cuda.current_stream().synchronize()
 
         with torch.cuda.stream(stream):
             c = ck.vector_add(a, b)

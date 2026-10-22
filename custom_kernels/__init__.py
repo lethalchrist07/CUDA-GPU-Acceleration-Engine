@@ -3,15 +3,15 @@ Custom CUDA Kernel Library for CUDA GPU Acceleration Engine
 Target: NVIDIA GeForce RTX 3050 Laptop GPU (sm_86)
 Toolchain: CUDA 12.4.1 + MSVC 19.38
 
-STAGE 2 MILESTONE 1 CONTRACT:
 All operations in this package support mixed precision:
 - float32 (FP32)
 - float16 (FP16)
 - bfloat16 (BF16)
 
-All operations are FORWARD-ONLY inference operators in Milestone 1.
-They do not construct or attach PyTorch autograd computation graphs.
-Do not invoke these operators in backward training passes until Milestone 3.
+The top-level functional operators (e.g., custom_kernels.vector_add) are forward-only
+inference operators that do not attach PyTorch autograd computation graphs.
+For end-to-end PyTorch autograd training with backward gradient propagation, use
+custom_kernels.autograd (e.g., custom_kernels.autograd.vector_add, custom_kernels.autograd.matmul).
 """
 from typing import Optional
 import torch
@@ -141,5 +141,8 @@ __all__ = [
     "reduce_max",
     "matmul",
     "matmul_wmma",
+    "autograd",
 ]
+
+from . import autograd
 

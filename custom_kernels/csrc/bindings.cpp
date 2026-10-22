@@ -8,6 +8,7 @@
 #include "include/reductions.cuh"
 #include "include/matmul_tiled.cuh"
 #include "include/matmul_wmma.cuh"
+#include "include/backward.cuh"
 
 // Helper macros for input validation
 #define CHECK_CUDA(x) TORCH_CHECK((x).is_cuda(), #x " must be a CUDA tensor")
@@ -420,6 +421,289 @@ torch::Tensor matmul_wmma_forward(const torch::Tensor& a, const torch::Tensor& b
 }
 
 // =========================================================================
+// Backward Operations
+// =========================================================================
+
+std::vector<torch::Tensor> vector_add_backward_forward(
+    const torch::Tensor& grad_out, bool need_a, bool need_b
+) {
+    CHECK_INPUT(grad_out);
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    size_t n = grad_out.numel();
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+
+    torch::Tensor grad_a = need_a ? torch::empty_like(grad_out) : torch::Tensor();
+    torch::Tensor grad_b = need_b ? torch::empty_like(grad_out) : torch::Tensor();
+
+    if (n == 0 || (!need_a && !need_b)) return {grad_a, grad_b};
+
+    if (grad_out.scalar_type() == at::kFloat) {
+        launch_vector_add_backward(
+            grad_out.data_ptr<float>(),
+            need_a ? grad_a.data_ptr<float>() : nullptr,
+            need_b ? grad_b.data_ptr<float>() : nullptr,
+            n, need_a, need_b, stream
+        );
+    } else if (grad_out.scalar_type() == at::kHalf) {
+        launch_vector_add_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            need_a ? reinterpret_cast<half*>(grad_a.data_ptr<at::Half>()) : nullptr,
+            need_b ? reinterpret_cast<half*>(grad_b.data_ptr<at::Half>()) : nullptr,
+            n, need_a, need_b, stream
+        );
+    } else if (grad_out.scalar_type() == at::kBFloat16) {
+        launch_vector_add_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            need_a ? reinterpret_cast<__nv_bfloat16*>(grad_a.data_ptr<at::BFloat16>()) : nullptr,
+            need_b ? reinterpret_cast<__nv_bfloat16*>(grad_b.data_ptr<at::BFloat16>()) : nullptr,
+            n, need_a, need_b, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return {grad_a, grad_b};
+}
+
+torch::Tensor vector_scale_backward_forward(const torch::Tensor& grad_out, float alpha) {
+    CHECK_INPUT(grad_out);
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    auto grad_x = torch::empty_like(grad_out);
+    size_t n = grad_out.numel();
+    if (n == 0) return grad_x;
+
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+    if (grad_out.scalar_type() == at::kFloat) {
+        launch_vector_scale_backward(grad_out.data_ptr<float>(), grad_x.data_ptr<float>(), alpha, n, stream);
+    } else if (grad_out.scalar_type() == at::kHalf) {
+        launch_vector_scale_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<half*>(grad_x.data_ptr<at::Half>()),
+            alpha, n, stream
+        );
+    } else if (grad_out.scalar_type() == at::kBFloat16) {
+        launch_vector_scale_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<__nv_bfloat16*>(grad_x.data_ptr<at::BFloat16>()),
+            alpha, n, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return grad_x;
+}
+
+torch::Tensor relu_backward_forward(const torch::Tensor& grad_out, const torch::Tensor& x) {
+    CHECK_INPUT(grad_out);
+    CHECK_INPUT(x);
+    CHECK_SAME_DEVICE(grad_out, x);
+    CHECK_SAME_DTYPE(grad_out, x);
+    TORCH_CHECK(grad_out.sizes() == x.sizes(), "grad_out and x must have the same shape for relu_backward");
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    auto grad_x = torch::empty_like(x);
+    size_t n = x.numel();
+    if (n == 0) return grad_x;
+
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+    if (x.scalar_type() == at::kFloat) {
+        launch_relu_backward(grad_out.data_ptr<float>(), x.data_ptr<float>(), grad_x.data_ptr<float>(), n, stream);
+    } else if (x.scalar_type() == at::kHalf) {
+        launch_relu_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(x.data_ptr<at::Half>()),
+            reinterpret_cast<half*>(grad_x.data_ptr<at::Half>()),
+            n, stream
+        );
+    } else if (x.scalar_type() == at::kBFloat16) {
+        launch_relu_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(x.data_ptr<at::BFloat16>()),
+            reinterpret_cast<__nv_bfloat16*>(grad_x.data_ptr<at::BFloat16>()),
+            n, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return grad_x;
+}
+
+torch::Tensor sigmoid_backward_forward(const torch::Tensor& grad_out, const torch::Tensor& forward_out) {
+    CHECK_INPUT(grad_out);
+    CHECK_INPUT(forward_out);
+    CHECK_SAME_DEVICE(grad_out, forward_out);
+    CHECK_SAME_DTYPE(grad_out, forward_out);
+    TORCH_CHECK(grad_out.sizes() == forward_out.sizes(), "grad_out and forward_out must have the same shape for sigmoid_backward");
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    auto grad_x = torch::empty_like(forward_out);
+    size_t n = forward_out.numel();
+    if (n == 0) return grad_x;
+
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+    if (forward_out.scalar_type() == at::kFloat) {
+        launch_sigmoid_backward(grad_out.data_ptr<float>(), forward_out.data_ptr<float>(), grad_x.data_ptr<float>(), n, stream);
+    } else if (forward_out.scalar_type() == at::kHalf) {
+        launch_sigmoid_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(forward_out.data_ptr<at::Half>()),
+            reinterpret_cast<half*>(grad_x.data_ptr<at::Half>()),
+            n, stream
+        );
+    } else if (forward_out.scalar_type() == at::kBFloat16) {
+        launch_sigmoid_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(forward_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<__nv_bfloat16*>(grad_x.data_ptr<at::BFloat16>()),
+            n, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return grad_x;
+}
+
+torch::Tensor gelu_backward_forward(const torch::Tensor& grad_out, const torch::Tensor& x) {
+    CHECK_INPUT(grad_out);
+    CHECK_INPUT(x);
+    CHECK_SAME_DEVICE(grad_out, x);
+    CHECK_SAME_DTYPE(grad_out, x);
+    TORCH_CHECK(grad_out.sizes() == x.sizes(), "grad_out and x must have the same shape for gelu_backward");
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    auto grad_x = torch::empty_like(x);
+    size_t n = x.numel();
+    if (n == 0) return grad_x;
+
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+    if (x.scalar_type() == at::kFloat) {
+        launch_gelu_backward(grad_out.data_ptr<float>(), x.data_ptr<float>(), grad_x.data_ptr<float>(), n, stream);
+    } else if (x.scalar_type() == at::kHalf) {
+        launch_gelu_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(x.data_ptr<at::Half>()),
+            reinterpret_cast<half*>(grad_x.data_ptr<at::Half>()),
+            n, stream
+        );
+    } else if (x.scalar_type() == at::kBFloat16) {
+        launch_gelu_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(x.data_ptr<at::BFloat16>()),
+            reinterpret_cast<__nv_bfloat16*>(grad_x.data_ptr<at::BFloat16>()),
+            n, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return grad_x;
+}
+
+std::vector<torch::Tensor> fused_add_relu_backward_forward(
+    const torch::Tensor& grad_out, const torch::Tensor& forward_out, bool need_a, bool need_b
+) {
+    CHECK_INPUT(grad_out);
+    CHECK_INPUT(forward_out);
+    CHECK_SAME_DEVICE(grad_out, forward_out);
+    CHECK_SAME_DTYPE(grad_out, forward_out);
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    size_t n = grad_out.numel();
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+
+    torch::Tensor grad_a = need_a ? torch::empty_like(grad_out) : torch::Tensor();
+    torch::Tensor grad_b = need_b ? torch::empty_like(grad_out) : torch::Tensor();
+
+    if (n == 0 || (!need_a && !need_b)) return {grad_a, grad_b};
+
+    if (grad_out.scalar_type() == at::kFloat) {
+        launch_fused_add_relu_backward(
+            grad_out.data_ptr<float>(), forward_out.data_ptr<float>(),
+            need_a ? grad_a.data_ptr<float>() : nullptr,
+            need_b ? grad_b.data_ptr<float>() : nullptr,
+            n, need_a, need_b, stream
+        );
+    } else if (grad_out.scalar_type() == at::kHalf) {
+        launch_fused_add_relu_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(forward_out.data_ptr<at::Half>()),
+            need_a ? reinterpret_cast<half*>(grad_a.data_ptr<at::Half>()) : nullptr,
+            need_b ? reinterpret_cast<half*>(grad_b.data_ptr<at::Half>()) : nullptr,
+            n, need_a, need_b, stream
+        );
+    } else if (grad_out.scalar_type() == at::kBFloat16) {
+        launch_fused_add_relu_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(forward_out.data_ptr<at::BFloat16>()),
+            need_a ? reinterpret_cast<__nv_bfloat16*>(grad_a.data_ptr<at::BFloat16>()) : nullptr,
+            need_b ? reinterpret_cast<__nv_bfloat16*>(grad_b.data_ptr<at::BFloat16>()) : nullptr,
+            n, need_a, need_b, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return {grad_a, grad_b};
+}
+
+std::vector<torch::Tensor> fused_bias_activation_backward_forward(
+    const torch::Tensor& grad_out, const torch::Tensor& x, const torch::Tensor& bias,
+    const std::string& act_str, bool need_x, bool need_bias
+) {
+    CHECK_INPUT(grad_out);
+    CHECK_INPUT(x);
+    CHECK_INPUT(bias);
+    CHECK_SAME_DEVICE(grad_out, x);
+    CHECK_SAME_DEVICE(grad_out, bias);
+    CHECK_SAME_DTYPE(grad_out, x);
+    CHECK_SAME_DTYPE(grad_out, bias);
+
+    TORCH_CHECK(x.dim() == 2, "x must be a 2D matrix (M x N)");
+    TORCH_CHECK(grad_out.dim() == 2, "grad_out must be a 2D matrix (M x N)");
+    TORCH_CHECK(bias.dim() == 1, "bias must be a 1D vector (N)");
+    TORCH_CHECK(x.sizes() == grad_out.sizes(), "x and grad_out must have identical shapes");
+    TORCH_CHECK(bias.size(0) == x.size(1), "bias size must match x.shape[1]");
+
+    int M = static_cast<int>(x.size(0));
+    int N = static_cast<int>(x.size(1));
+
+    int act_type = 0; // None
+    if (act_str == "relu") act_type = 1;
+    else if (act_str == "gelu") act_type = 2;
+    else if (act_str != "none") {
+        TORCH_CHECK(false, "Unsupported activation type for fused_bias_activation_backward: " + act_str);
+    }
+
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(grad_out));
+    cudaStream_t stream = c10::cuda::getCurrentCUDAStream().stream();
+
+    torch::Tensor grad_x = need_x ? torch::empty_like(x) : torch::Tensor();
+    torch::Tensor grad_bias = need_bias ? torch::empty_like(bias) : torch::Tensor();
+
+    if (M == 0 || N == 0 || (!need_x && !need_bias)) return {grad_x, grad_bias};
+
+    if (x.scalar_type() == at::kFloat) {
+        launch_fused_bias_activation_backward(
+            grad_out.data_ptr<float>(), x.data_ptr<float>(), bias.data_ptr<float>(),
+            need_x ? grad_x.data_ptr<float>() : nullptr,
+            need_bias ? grad_bias.data_ptr<float>() : nullptr,
+            M, N, act_type, need_x, need_bias, stream
+        );
+    } else if (x.scalar_type() == at::kHalf) {
+        launch_fused_bias_activation_backward_fp16(
+            reinterpret_cast<const half*>(grad_out.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(x.data_ptr<at::Half>()),
+            reinterpret_cast<const half*>(bias.data_ptr<at::Half>()),
+            need_x ? reinterpret_cast<half*>(grad_x.data_ptr<at::Half>()) : nullptr,
+            need_bias ? reinterpret_cast<half*>(grad_bias.data_ptr<at::Half>()) : nullptr,
+            M, N, act_type, need_x, need_bias, stream
+        );
+    } else if (x.scalar_type() == at::kBFloat16) {
+        launch_fused_bias_activation_backward_bf16(
+            reinterpret_cast<const __nv_bfloat16*>(grad_out.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(x.data_ptr<at::BFloat16>()),
+            reinterpret_cast<const __nv_bfloat16*>(bias.data_ptr<at::BFloat16>()),
+            need_x ? reinterpret_cast<__nv_bfloat16*>(grad_x.data_ptr<at::BFloat16>()) : nullptr,
+            need_bias ? reinterpret_cast<__nv_bfloat16*>(grad_bias.data_ptr<at::BFloat16>()) : nullptr,
+            M, N, act_type, need_x, need_bias, stream
+        );
+    }
+    CUDA_KERNEL_CHECK();
+    return {grad_x, grad_bias};
+}
+
+// =========================================================================
 // PyBind11 Module Definition
 // =========================================================================
 
@@ -437,4 +721,14 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("reduce_max", &reduce_max_forward, "Max reduction forward (CUDA)");
     m.def("matmul_tiled", &matmul_tiled_forward, "2D Shared Memory Tiled SGEMM forward (CUDA)");
     m.def("matmul_wmma", &matmul_wmma_forward, py::arg("a"), py::arg("b"), py::arg("output_fp32") = false, "Ampere Tensor Core WMMA matrix multiplication forward (CUDA)");
+
+    // Backward operators
+    m.def("vector_add_backward", &vector_add_backward_forward, py::arg("grad_out"), py::arg("need_a") = true, py::arg("need_b") = true, "Vector addition backward (CUDA)");
+    m.def("vector_scale_backward", &vector_scale_backward_forward, py::arg("grad_out"), py::arg("alpha"), "Vector scale backward (CUDA)");
+    m.def("relu_backward", &relu_backward_forward, py::arg("grad_out"), py::arg("x"), "ReLU activation backward (CUDA)");
+    m.def("sigmoid_backward", &sigmoid_backward_forward, py::arg("grad_out"), py::arg("forward_out"), "Sigmoid activation backward (CUDA)");
+    m.def("gelu_backward", &gelu_backward_forward, py::arg("grad_out"), py::arg("x"), "Fast GELU activation backward (CUDA)");
+    m.def("fused_add_relu_backward", &fused_add_relu_backward_forward, py::arg("grad_out"), py::arg("forward_out"), py::arg("need_a") = true, py::arg("need_b") = true, "Fused add + ReLU backward (CUDA)");
+    m.def("fused_bias_activation_backward", &fused_bias_activation_backward_forward, py::arg("grad_out"), py::arg("x"), py::arg("bias"), py::arg("activation") = "relu", py::arg("need_x") = true, py::arg("need_bias") = true, "Fused bias + activation backward (CUDA)");
 }
+

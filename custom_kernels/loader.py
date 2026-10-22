@@ -76,6 +76,7 @@ def load_custom_kernels_module():
         str(csrc_dir / "cuda" / "reductions.cu"),
         str(csrc_dir / "cuda" / "matmul_tiled.cu"),
         str(csrc_dir / "cuda" / "matmul_wmma.cu"),
+        str(csrc_dir / "cuda" / "backward.cu"),
     ]
 
     include_dirs = [str(csrc_dir / "include")]
