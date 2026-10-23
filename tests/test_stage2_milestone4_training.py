@@ -104,7 +104,7 @@ class TestThreeBackendModelParity:
 class TestTrainingPilotAndDispatch:
     """Verifies training steps, gradient backprop, parameter updates, and kernel dispatch."""
 
-    def test_pilot_training_run_and_parameter_updates(self, sample_loaders):
+    def test_pilot_training_run_and_parameter_updates(self, sample_loaders, tmp_path):
         if not torch.cuda.is_available():
             pytest.skip("CUDA required")
 
@@ -123,6 +123,7 @@ class TestTrainingPilotAndDispatch:
             val_loader=val_loader,
             test_loader=test_loader,
             optimizer=opt_custom,
+            checkpoint_dir=tmp_path,
         )
 
         results = trainer.fit(epochs=2)

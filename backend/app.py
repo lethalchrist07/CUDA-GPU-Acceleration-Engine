@@ -13,6 +13,7 @@ from backend.data import (
     collect_hardware,
     utc_now,
 )
+from backend.routes.training import router as training_router
 from backend.serving import ModelServer
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -57,6 +58,9 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
         return response
 
     store = ArtifactStore(root)
+
+    # Mount Training Orchestration Router (Phase 10 Milestone 5)
+    app.include_router(training_router)
 
     # ---------------------------------------------------------
     # Core Historical & Telemetry Endpoints (Preserved 100%)

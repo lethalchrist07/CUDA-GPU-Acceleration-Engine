@@ -1,32 +1,38 @@
 """
-Phase 10 Stage 2 Milestone 4: Three-Backend CIFAR-10 Training Engine
+Phase 10 Stage 2 Milestone 5: Three-Backend CIFAR-10 Training Engine
 Implements unified training lifecycle for:
 1. CPU_NATIVE
 2. GPU_NATIVE
 3. GPU_CUSTOM
 
-Measures:
-- Step-by-step and epoch latencies (CUDA events and wall-clock)
-- Samples per second
-- Training loss and validation/test accuracy
-- Peak allocated and reserved CUDA VRAM
-- Custom CUDA kernel dispatch accounting via KernelDispatchTracker
-- Checkpoint atomic persistence
+Enhanced with:
+- Cooperative cancellation tokens (TrainingCancelledException)
+- Fine-grained progress callbacks for FastAPI background workers
+- Deterministic per-epoch seeding for 100% comparative fairness
+- Safe CUDA memory cleanup and atomic checkpoint management
 """
+import hashlib
 import logging
 import math
 import os
+import threading
 import time
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Callable
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from .dispatch_tracker import KernelDispatchTracker
+from .reproducibility import reset_dataloader_seed
 
 logger = logging.getLogger(__name__)
+
+
+class TrainingCancelledException(Exception):
+    """Raised when training is safely interrupted via a cancellation token."""
+    pass
 
 
 def compute_timing_stats(timings_ms: List[float]) -> Dict[str, float]:
@@ -49,7 +55,8 @@ def compute_timing_stats(timings_ms: List[float]) -> Dict[str, float]:
 class ThreeBackendTrainer:
     """
     Modular trainer executing identical training routines across CPU_NATIVE,
-    GPU_NATIVE, and GPU_CUSTOM backends with dispatch tracking and memory profiling.
+    GPU_NATIVE, and GPU_CUSTOM backends with dispatch tracking, memory profiling,
+    cancellation checking, and progress streaming.
     """
 
     def __init__(
@@ -62,7 +69,12 @@ class ThreeBackendTrainer:
         optimizer: torch.optim.Optimizer,
         criterion: Optional[nn.Module] = None,
         checkpoint_dir: Optional[Path] = None,
+        checkpoint_path: Optional[Path] = None,
         tracker: Optional[KernelDispatchTracker] = None,
+        seed: int = 42,
+        cancel_event: Optional[threading.Event] = None,
+        progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+        progress_interval_batches: int = 20,
     ):
         self.backend = backend.upper()
         self.model = model
@@ -73,7 +85,15 @@ class ThreeBackendTrainer:
         self.criterion = criterion or nn.CrossEntropyLoss()
         self.checkpoint_dir = Path(checkpoint_dir or "checkpoints/phase10_stage2_milestone4")
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.checkpoint_path = Path(checkpoint_path) if checkpoint_path else None
+        if self.checkpoint_path:
+            self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+
         self.tracker = tracker or KernelDispatchTracker()
+        self.seed = seed
+        self.cancel_event = cancel_event
+        self.progress_callback = progress_callback
+        self.progress_interval_batches = max(1, progress_interval_batches)
 
         # Determine target device
         if self.backend == "CPU_NATIVE":
@@ -86,17 +106,27 @@ class ThreeBackendTrainer:
         self.model.to(self.device)
         self.is_cuda = (self.device.type == "cuda")
 
-    def train_epoch(self, epoch: int) -> Tuple[float, float, List[float], int]:
+    def _check_cancellation(self):
+        if self.cancel_event is not None and self.cancel_event.is_set():
+            raise TrainingCancelledException("Training job cancellation requested by client.")
+
+    def train_epoch(self, epoch: int, total_epochs: int = 3, global_start_time: float = 0.0) -> Tuple[float, float, List[float], int]:
         self.model.train()
         total_loss = 0.0
         correct = 0
         total_samples = 0
         step_latencies: List[float] = []
+        total_batches = len(self.train_loader)
+
+        # 100% deterministic per-epoch batch order & stochastic augmentation
+        reset_dataloader_seed(self.train_loader, self.seed, epoch)
 
         if self.is_cuda:
             torch.cuda.synchronize()
 
-        for batch_idx, (data, targets) in enumerate(self.train_loader):
+        for batch_idx, (data, targets) in enumerate(self.train_loader, start=1):
+            self._check_cancellation()
+
             data = data.to(self.device, non_blocking=self.is_cuda)
             targets = targets.to(self.device, non_blocking=self.is_cuda)
             batch_size = data.size(0)
@@ -137,10 +167,35 @@ class ThreeBackendTrainer:
             step_latencies.append(step_latency_ms)
 
             # Accounting
-            total_loss += loss.item() * batch_size
+            loss_val = loss.item()
+            total_loss += loss_val * batch_size
             _, preds = outputs.max(1)
             correct += preds.eq(targets).sum().item()
             total_samples += batch_size
+
+            # Periodic batch progress emission
+            if self.progress_callback and (batch_idx % self.progress_interval_batches == 0 or batch_idx == total_batches):
+                current_time = time.perf_counter()
+                elapsed = current_time - (global_start_time if global_start_time > 0 else t0)
+                running_loss = total_loss / total_samples
+                running_acc = (correct / total_samples) * 100.0
+                vram_alloc = torch.cuda.memory_allocated(self.device) / (1024 * 1024) if self.is_cuda else 0.0
+                vram_res = torch.cuda.memory_reserved(self.device) / (1024 * 1024) if self.is_cuda else 0.0
+
+                self.progress_callback({
+                    "event": "batch_progress",
+                    "current_epoch": epoch,
+                    "total_epochs": total_epochs,
+                    "current_step": batch_idx,
+                    "total_steps": total_batches,
+                    "train_loss": round(running_loss, 4),
+                    "train_accuracy": round(running_acc, 2),
+                    "samples_processed": total_samples,
+                    "elapsed_time_sec": round(elapsed, 2),
+                    "step_latency_ms": round(step_latency_ms, 2),
+                    "peak_allocated_vram_mb": round(vram_alloc, 2),
+                    "peak_reserved_vram_mb": round(vram_res, 2),
+                })
 
         avg_loss = total_loss / total_samples
         accuracy = (correct / total_samples) * 100.0
@@ -154,6 +209,8 @@ class ThreeBackendTrainer:
 
         with torch.no_grad():
             for data, targets in loader:
+                self._check_cancellation()
+
                 data = data.to(self.device, non_blocking=self.is_cuda)
                 targets = targets.to(self.device, non_blocking=self.is_cuda)
                 batch_size = data.size(0)
@@ -185,17 +242,24 @@ class ThreeBackendTrainer:
         all_step_latencies: List[float] = []
         best_val_acc = 0.0
         total_train_samples = 0
+        best_checkpoint_saved: Optional[Path] = None
 
         start_wall_time = time.perf_counter()
 
         try:
             for epoch in range(1, epochs + 1):
+                self._check_cancellation()
                 t_ep_start = time.perf_counter()
 
-                train_loss, train_acc, step_times, samples_count = self.train_epoch(epoch)
+                train_loss, train_acc, step_times, samples_count = self.train_epoch(
+                    epoch=epoch,
+                    total_epochs=epochs,
+                    global_start_time=start_wall_time,
+                )
                 all_step_latencies.extend(step_times)
                 total_train_samples += samples_count
 
+                self._check_cancellation()
                 val_loss, val_acc = self.evaluate(self.val_loader)
                 t_ep_end = time.perf_counter()
                 epoch_sec = t_ep_end - t_ep_start
@@ -211,9 +275,33 @@ class ThreeBackendTrainer:
                 }
                 epoch_records.append(record)
 
-                if val_acc > best_val_acc:
+                if val_acc >= best_val_acc:
                     best_val_acc = val_acc
-                    self.save_checkpoint(f"{self.backend.lower()}_best.pt", epoch, best_val_acc)
+                    best_checkpoint_saved = self.save_checkpoint(f"{self.backend.lower()}_best.pt", epoch, best_val_acc)
+
+                # Emit epoch completion progress event
+                if self.progress_callback:
+                    elapsed = time.perf_counter() - start_wall_time
+                    sps = (total_train_samples / elapsed) if elapsed > 0 else 0.0
+                    vram_alloc = torch.cuda.max_memory_allocated(self.device) / (1024 * 1024) if self.is_cuda else 0.0
+                    vram_res = torch.cuda.max_memory_reserved(self.device) / (1024 * 1024) if self.is_cuda else 0.0
+
+                    self.progress_callback({
+                        "event": "epoch_completed",
+                        "current_epoch": epoch,
+                        "total_epochs": epochs,
+                        "train_loss": round(train_loss, 4),
+                        "train_accuracy": round(train_acc, 2),
+                        "val_loss": round(val_loss, 4),
+                        "val_accuracy": round(val_acc, 2),
+                        "best_val_accuracy": round(best_val_acc, 2),
+                        "epoch_time_sec": round(epoch_sec, 2),
+                        "elapsed_time_sec": round(elapsed, 2),
+                        "samples_processed": total_train_samples,
+                        "samples_per_sec": round(sps, 1),
+                        "peak_allocated_vram_mb": round(vram_alloc, 2),
+                        "peak_reserved_vram_mb": round(vram_res, 2),
+                    })
 
                 logger.info(
                     f"[{self.backend}] Epoch {epoch}/{epochs}: "
@@ -225,6 +313,8 @@ class ThreeBackendTrainer:
         finally:
             if self.backend == "GPU_CUSTOM":
                 self.tracker.stop()
+            if self.is_cuda:
+                torch.cuda.empty_cache()
 
         total_wall_time_sec = time.perf_counter() - start_wall_time
         test_loss, test_acc = self.evaluate(self.test_loader)
@@ -261,10 +351,16 @@ class ThreeBackendTrainer:
             "overall_step_stats": compute_timing_stats(all_step_latencies),
             "epoch_records": epoch_records,
             "dispatch_summary": dispatch_summary,
+            "checkpoint_path": str(best_checkpoint_saved) if best_checkpoint_saved else None,
         }
 
     def save_checkpoint(self, filename: str, epoch: int, accuracy: float) -> Path:
-        save_path = self.checkpoint_dir / filename
+        if self.checkpoint_path is not None:
+            save_path = self.checkpoint_path
+        else:
+            save_path = self.checkpoint_dir / filename
+
+        save_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(
             {
                 "backend": self.backend,
@@ -278,7 +374,7 @@ class ThreeBackendTrainer:
         return save_path
 
     def load_checkpoint(self, filename: str) -> Dict[str, Any]:
-        load_path = self.checkpoint_dir / filename
+        load_path = Path(filename) if Path(filename).is_file() else (self.checkpoint_dir / filename)
         checkpoint = torch.load(load_path, map_location=self.device)
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
