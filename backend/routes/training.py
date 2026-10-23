@@ -87,9 +87,10 @@ def list_training_jobs(
     backend: Optional[str] = Query(None, description="Filter by backend (CPU_NATIVE, GPU_NATIVE, GPU_CUSTOM)"),
     limit: int = Query(50, ge=1, le=200, description="Max jobs to return"),
 ):
-    """List recent training jobs with optional filtering by status or backend."""
     orchestrator = TrainingOrchestrator.get_instance()
-    jobs = orchestrator.list_jobs(status=job_status, backend=backend, limit=limit)
+    norm_status = None if (job_status and job_status.upper() == "ALL") else job_status
+    norm_backend = None if (backend and backend.upper() == "ALL") else backend
+    jobs = orchestrator.list_jobs(status=norm_status, backend=norm_backend, limit=limit)
     return TrainingJobListResponse(
         status="available",
         fetched_at=utc_now(),

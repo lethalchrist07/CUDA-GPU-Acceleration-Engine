@@ -17,7 +17,7 @@ import { WarningBanner } from './WarningBanner';
 interface OverviewSectionProps {
   data: OverviewResponse | null;
   loading: boolean;
-  onNavigateTab: (tab: 'benchmarks' | 'training' | 'inference' | 'hardware' | 'verification') => void;
+  onNavigateTab: (tab: 'benchmarks' | 'training' | 'training_studio' | 'inference' | 'hardware' | 'verification') => void;
 }
 
 export const OverviewSection: React.FC<OverviewSectionProps> = ({

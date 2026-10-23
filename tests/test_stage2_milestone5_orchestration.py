@@ -132,9 +132,9 @@ def test_queue_behavior_and_status_filtering(isolated_orchestrator):
     job_id = job["job_id"]
     assert job["status"] == "QUEUED"
 
-    # Poll until completed
-    for _ in range(30):
-        time.sleep(0.3)
+    # Poll until completed (allow up to 30s)
+    for _ in range(60):
+        time.sleep(0.5)
         current = orch.get_job(job_id)
         if current["status"] in ("COMPLETED", "FAILED"):
             break

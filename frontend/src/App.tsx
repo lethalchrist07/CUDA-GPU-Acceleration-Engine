@@ -3,6 +3,7 @@ import { Navbar, SectionTab } from './components/Navbar';
 import { OverviewSection } from './components/OverviewSection';
 import { BenchmarksSection } from './components/BenchmarksSection';
 import { TrainingSection } from './components/TrainingSection';
+import { TrainingStudio } from './components/training/TrainingStudio';
 import { InferenceSection } from './components/InferenceSection';
 import { HardwareSection } from './components/HardwareSection';
 import { VerificationSection } from './components/VerificationSection';
@@ -136,6 +137,10 @@ export const App: React.FC = () => {
             loading={overviewLoading}
             onNavigateTab={(tab) => setActiveTab(tab)}
           />
+        )}
+
+        {activeTab === 'training_studio' && (
+          <TrainingStudio />
         )}
 
         {activeTab === 'benchmarks' && (

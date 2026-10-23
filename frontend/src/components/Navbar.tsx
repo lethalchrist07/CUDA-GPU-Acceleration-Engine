@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { HealthResponse } from '../types/api';
 
-export type SectionTab = 'overview' | 'benchmarks' | 'training' | 'inference' | 'hardware' | 'verification';
+export type SectionTab = 'overview' | 'training_studio' | 'benchmarks' | 'training' | 'inference' | 'hardware' | 'verification';
 
 interface NavbarProps {
   activeTab: SectionTab;
@@ -28,8 +28,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const tabs: { id: SectionTab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Overview', icon: <Zap className="w-4 h-4" /> },
+    { id: 'training_studio', label: 'AI Training Studio', icon: <Flame className="w-4 h-4 text-[#76b900]" /> },
     { id: 'benchmarks', label: 'CUDA Benchmarks', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'training', label: 'PyTorch Training', icon: <Flame className="w-4 h-4" /> },
+    { id: 'training', label: 'Historical Benchmarks', icon: <Flame className="w-4 h-4 text-slate-400" /> },
     { id: 'inference', label: 'LLM Inference', icon: <Sparkles className="w-4 h-4" /> },
     { id: 'hardware', label: 'Live Telemetry', icon: <Activity className="w-4 h-4" /> },
     { id: 'verification', label: 'Verification & Manifest', icon: <ShieldCheck className="w-4 h-4" /> },
