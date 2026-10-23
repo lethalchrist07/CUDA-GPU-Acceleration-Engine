@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-22T22:36:00.201649",
+    "git_commit": "a77071c04875206d05d2d639bac6447758103b47",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "python_version": "3.11.9",
+    "pytorch_version": "2.6.0+cu124",
+    "cuda_version": "12.4",
+    "gpu_device": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "workload_config": {
+      "dataset": "CIFAR-10",
+      "epochs": 3,
+      "batch_size": 128,
+      "learning_rate": 0.01,
+      "max_train_samples": 10000,
+      "max_val_samples": 2000,
+      "max_test_samples": 2000,
+      "precision": "float32",
+      "architecture": "4-Layer Deep MLP (3072 -> 1024 -> 256 -> 64 -> 10)",
+      "model_parameters": 3426250
+    }
+  },
+  "backends": {
+    "CPU_NATIVE": {
+      "backend": "CPU_NATIVE",
+      "device": "cpu",
+      "gpu_name": "Host CPU",
+      "epochs": 3,
+      "total_wall_time_sec": 8.223,
+      "samples_per_sec": 3648.2,
+      "final_train_loss": 1.8335,
+      "best_val_acc": 39.05,
+      "test_accuracy": 39.45,
+      "test_loss": 1.7349,
+      "peak_allocated_vram_mb": 0.0,
+      "peak_reserved_vram_mb": 0.0,
+      "overall_step_stats": {
+        "median_ms": 15.5559,
+        "mean_ms": 15.7194,
+        "min_ms": 10.7922,
+        "max_ms": 22.0939,
+        "std_ms": 1.5012
+      },
+      "epoch_records": [
+        {
+          "epoch": 1,
+          "train_loss": 2.2012,
+          "train_acc": 19.61,
+          "val_loss": 2.0294,
+          "val_acc": 27.4,
+          "epoch_time_sec": 2.835,
+          "step_stats": {
+            "median_ms": 15.7813,
+            "mean_ms": 16.1241,
+            "min_ms": 10.7922,
+            "max_ms": 22.0939,
+            "std_ms": 1.6919
+          }
+        },
+        {
+          "epoch": 2,
+          "train_loss": 1.9642,
+          "train_acc": 29.42,
+          "val_loss": 1.8408,
+          "val_acc": 34.6,
+          "epoch_time_sec": 2.538,
+          "step_stats": {
+            "median_ms": 14.6509,
+            "mean_ms": 14.9355,
+            "min_ms": 11.0855,
+            "max_ms": 21.0193,
+            "std_ms": 1.3049
+          }
+        },
+        {
+          "epoch": 3,
+          "train_loss": 1.8335,
+          "train_acc": 34.62,
+          "val_loss": 1.727,
+          "val_acc": 39.05,
+          "epoch_time_sec": 2.793,
+          "step_stats": {
+            "median_ms": 15.9194,
+            "mean_ms": 16.0986,
+            "min_ms": 12.4478,
+            "max_ms": 19.6967,
+            "std_ms": 1.1485
+          }
+        }
+      ],
+      "dispatch_summary": {
+        "total_custom_dispatches": 0,
+        "custom_forward_dispatches": {},
+        "custom_backward_dispatches": {},
+        "is_custom_dispatched": false
+      },
+      "measured_total_wall_time_sec": 8.321,
+      "pre_host_rss_mb": 705.36,
+      "post_host_rss_mb": 839.93,
+      "pre_gpu_telemetry": {
+        "temperature_c": 51.0,
+        "graphics_clock_mhz": 1492.0,
+        "memory_clock_mhz": 7001.0,
+        "power_draw_w": 11.43
+      },
+      "post_gpu_telemetry": {
+        "temperature_c": 54.0,
+        "graphics_clock_mhz": 1492.0,
+        "memory_clock_mhz": 7001.0,
+        "power_draw_w": 11.64
+      },
+      "trainable_parameters": 3426250
+    },
+    "GPU_NATIVE": {
+      "backend": "GPU_NATIVE",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "epochs": 3,
+      "total_wall_time_sec": 5.345,
+      "samples_per_sec": 5612.7,
+      "final_train_loss": 1.8292,
+      "best_val_acc": 38.65,
+      "test_accuracy": 38.8,
+      "test_loss": 1.7356,
+      "peak_allocated_vram_mb": 71.97,
+      "peak_reserved_vram_mb": 82.0,
+      "overall_step_stats": {
+        "median_ms": 5.3311,
+        "mean_ms": 6.1526,
+        "min_ms": 3.6142,
+        "max_ms": 130.284,
+        "std_ms": 8.6826
+      },
+      "epoch_records": [
+        {
+          "epoch": 1,
+          "train_loss": 2.2009,
+          "train_acc": 19.39,
+          "val_loss": 2.0286,
+          "val_acc": 27.55,
+          "epoch_time_sec": 1.885,
+          "step_stats": {
+            "median_ms": 3.9757,
+            "mean_ms": 7.5192,
+            "min_ms": 3.6142,
+            "max_ms": 130.284,
+            "std_ms": 14.9511
+          }
+        },
+        {
+          "epoch": 2,
+          "train_loss": 1.9611,
+          "train_acc": 29.26,
+          "val_loss": 1.8385,
+          "val_acc": 34.25,
+          "epoch_time_sec": 1.655,
+          "step_stats": {
+            "median_ms": 5.0593,
+            "mean_ms": 4.8108,
+            "min_ms": 3.693,
+            "max_ms": 6.7111,
+            "std_ms": 0.8325
+          }
+        },
+        {
+          "epoch": 3,
+          "train_loss": 1.8292,
+          "train_acc": 34.34,
+          "val_loss": 1.7431,
+          "val_acc": 38.65,
+          "epoch_time_sec": 1.733,
+          "step_stats": {
+            "median_ms": 6.0314,
+            "mean_ms": 6.1278,
+            "min_ms": 5.3421,
+            "max_ms": 7.5117,
+            "std_ms": 0.3903
+          }
+        }
+      ],
+      "dispatch_summary": {
+        "total_custom_dispatches": 0,
+        "custom_forward_dispatches": {},
+        "custom_backward_dispatches": {},
+        "is_custom_dispatched": false
+      },
+      "measured_total_wall_time_sec": 5.421,
+      "pre_host_rss_mb": 838.79,
+      "post_host_rss_mb": 1158.02,
+      "pre_gpu_telemetry": {
+        "temperature_c": 54.0,
+        "graphics_clock_mhz": 1492.0,
+        "memory_clock_mhz": 7001.0,
+        "power_draw_w": 11.64
+      },
+      "post_gpu_telemetry": {
+        "temperature_c": 54.0,
+        "graphics_clock_mhz": 360.0,
+        "memory_clock_mhz": 5501.0,
+        "power_draw_w": 9.96
+      },
+      "trainable_parameters": 3426250
+    },
+    "GPU_CUSTOM": {
+      "backend": "GPU_CUSTOM",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "epochs": 3,
+      "total_wall_time_sec": 6.104,
+      "samples_per_sec": 4914.4,
+      "final_train_loss": 1.829,
+      "best_val_acc": 38.85,
+      "test_accuracy": 39.35,
+      "test_loss": 1.7309,
+      "peak_allocated_vram_mb": 71.97,
+      "peak_reserved_vram_mb": 84.0,
+      "overall_step_stats": {
+        "median_ms": 8.5745,
+        "mean_ms": 9.1957,
+        "min_ms": 4.6785,
+        "max_ms": 80.4924,
+        "std_ms": 6.6925
+      },
+      "epoch_records": [
+        {
+          "epoch": 1,
+          "train_loss": 2.1978,
+          "train_acc": 19.51,
+          "val_loss": 2.0222,
+          "val_acc": 28.05,
+          "epoch_time_sec": 2.018,
+          "step_stats": {
+            "median_ms": 7.3948,
+            "mean_ms": 9.4292,
+            "min_ms": 4.6785,
+            "max_ms": 80.4924,
+            "std_ms": 11.5825
+          }
+        },
+        {
+          "epoch": 2,
+          "train_loss": 1.9602,
+          "train_acc": 29.21,
+          "val_loss": 1.8378,
+          "val_acc": 34.05,
+          "epoch_time_sec": 1.981,
+          "step_stats": {
+            "median_ms": 8.4887,
+            "mean_ms": 8.6553,
+            "min_ms": 5.8451,
+            "max_ms": 10.2108,
+            "std_ms": 0.7315
+          }
+        },
+        {
+          "epoch": 3,
+          "train_loss": 1.829,
+          "train_acc": 34.57,
+          "val_loss": 1.7334,
+          "val_acc": 38.85,
+          "epoch_time_sec": 2.031,
+          "step_stats": {
+            "median_ms": 9.3709,
+            "mean_ms": 9.5025,
+            "min_ms": 6.1377,
+            "max_ms": 11.4522,
+            "std_ms": 0.6156
+          }
+        }
+      ],
+      "dispatch_summary": {
+        "custom_forward_dispatches": {
+          "fused_bias_activation": 1140,
+          "matmul_tiled": 2799
+        },
+        "custom_backward_dispatches": {
+          "fused_bias_activation_backward": 948
+        },
+        "total_custom_forward": 3939,
+        "total_custom_backward": 948,
+        "total_custom_dispatches": 4887,
+        "native_fallbacks": {
+          "cross_entropy_loss": 237,
+          "optimizer_step": 237
+        },
+        "is_custom_dispatched": true
+      },
+      "measured_total_wall_time_sec": 9.392,
+      "pre_host_rss_mb": 1158.67,
+      "post_host_rss_mb": 1189.27,
+      "pre_gpu_telemetry": {
+        "temperature_c": 54.0,
+        "graphics_clock_mhz": 360.0,
+        "memory_clock_mhz": 5501.0,
+        "power_draw_w": 9.96
+      },
+      "post_gpu_telemetry": {
+        "temperature_c": 56.0,
+        "graphics_clock_mhz": 967.0,
+        "memory_clock_mhz": 5501.0,
+        "power_draw_w": 12.36
+      },
+      "trainable_parameters": 3426250
+    }
+  },
+  "comparison_metrics": {
+    "gpu_native_speedup_vs_cpu": 1.538,
+    "gpu_custom_speedup_vs_cpu": 1.347,
+    "gpu_custom_speedup_vs_gpu_native": 0.876,
+    "is_custom_faster_than_cpu": true,
+    "is_custom_faster_than_gpu_native": false,
+    "step_latency_median_ms": {
+      "CPU_NATIVE": 15.5559,
+      "GPU_NATIVE": 5.3311,
+      "GPU_CUSTOM": 8.5745
+    },
+    "test_accuracy_pct": {
+      "CPU_NATIVE": 39.45,
+      "GPU_NATIVE": 38.8,
+      "GPU_CUSTOM": 39.35
+    }
+  }
+}
