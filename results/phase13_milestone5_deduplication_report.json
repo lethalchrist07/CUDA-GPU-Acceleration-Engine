@@ -1,0 +1,10 @@
+{
+  "pre_deduplication_documents": 36,
+  "post_deduplication_documents": 36,
+  "exact_duplicates_removed": 0,
+  "near_duplicates_removed": 0,
+  "minhash_num_perm": 64,
+  "minhash_ngram_size": 5,
+  "jaccard_similarity_threshold": 0.85,
+  "status": "PASSED_ZERO_UNINTENDED_DUPLICATION"
+}

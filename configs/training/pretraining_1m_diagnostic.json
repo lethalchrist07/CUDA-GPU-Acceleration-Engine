@@ -1,0 +1,59 @@
+{
+  "campaign_name": "pretraining_1m_diagnostic",
+  "version": "1.0.0",
+  "target_type": "diagnostic",
+  "status": "ready_for_execution",
+  "notes": "Preparation target only. Do not execute without explicit authorization.",
+  "target_tokens": 1000000,
+  "hardware": {
+    "device": "cuda:0",
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "vram_limit_mb": 6144,
+    "expected_peak_vram_mb": 1930.0,
+    "safety_headroom_mb": 4214.0
+  },
+  "architecture": {
+    "preset": "flagship_100m",
+    "total_parameters": 86825472,
+    "non_embedding_parameters": 85056000,
+    "layers": 12,
+    "heads": 12,
+    "hidden_dim": 768,
+    "ffn_dim": 3072,
+    "vocab_size": 2048,
+    "context_length": 256,
+    "tie_weights": true
+  },
+  "data": {
+    "train_tokens_bin": "data/text/pretraining_campaign/train_tokens.bin",
+    "val_tokens_bin": "data/text/pretraining_campaign/val_tokens.bin",
+    "manifest_path": "data/text/pretraining_campaign/dataset_manifest.json",
+    "microbatch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "effective_batch_tokens": 4096,
+    "estimated_epoch_count": 0.79,
+    "repeated_token_exposure": "None (sub-epoch, 0.79x corpus exposure)"
+  },
+  "optimizer": {
+    "type": "AdamW",
+    "learning_rate": 0.0005,
+    "min_learning_rate": 0.00005,
+    "weight_decay": 0.01,
+    "betas": [0.9, 0.95],
+    "eps": 1e-8,
+    "grad_clip": 1.0,
+    "scheduler": "cosine_with_warmup",
+    "warmup_steps": 25,
+    "total_optimizer_steps": 245
+  },
+  "runtime": {
+    "mixed_precision": "fp16",
+    "eval_interval_steps": 25,
+    "checkpoint_interval_steps": 50,
+    "estimated_throughput_tok_per_sec": 4414.5,
+    "estimated_duration_minutes": 3.8,
+    "checkpoint_retention_policy": "keep_top_2_and_latest",
+    "checkpoint_storage_per_file_gb": 1.042,
+    "estimated_max_checkpoint_storage_gb": 3.13
+  }
+}

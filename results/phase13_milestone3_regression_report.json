@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-10-25T13:53:01Z",
+  "all_passed": true,
+  "suites": [
+    {
+      "suite": "tests/test_milestone13_pretraining_diagnostic.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 33.34s"
+    },
+    {
+      "suite": "tests/test_milestone13_dataset_engineering.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "11 passed in 3.63s"
+    },
+    {
+      "suite": "tests/test_milestone12_pretraining_campaign.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "8 passed in 29.09s"
+    },
+    {
+      "suite": "tests/test_milestone11_platform_integration.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "21 passed, 1 warning in 232.66s (0:03:52)"
+    },
+    {
+      "suite": "tests/test_milestone10_flagship_transformer.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "12 passed in 40.34s"
+    },
+    {
+      "suite": "tests/test_milestone9_transformer.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "12 passed in 38.03s"
+    },
+    {
+      "suite": "tests/test_milestone8_training_reliability.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 29.49s"
+    },
+    {
+      "suite": "tests/test_stage2_milestone7_resnet.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "9 passed, 1 warning in 31.21s"
+    },
+    {
+      "suite": "tests/test_custom_kernels.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "104 passed in 9.63s"
+    }
+  ]
+}

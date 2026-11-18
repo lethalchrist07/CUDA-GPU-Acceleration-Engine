@@ -1,0 +1,74 @@
+{
+  "readiness_report_name": "Phase 13 Milestone 4 50M-Token Dataset Readiness Assessment",
+  "timestamp": "2026-10-25T15:10:45Z",
+  "current_corpus_profile": {
+    "train_tokens": 2114151,
+    "unique_bpe_tokens_used": 957,
+    "vocab_utilization_pct": 46.73,
+    "unigram_entropy_bits": 6.56,
+    "current_epochs_for_50m": 23.65
+  },
+  "readiness_verdict": {
+    "verdict": "CONDITIONAL_APPROVAL_UPON_EXPANSION",
+    "recommendation": "Do not train 50M tokens on the existing 2.11M corpus alone (23.6 epochs). Execute Configuration A: expand unique corpus to 10.0M tokens using public-domain Project Gutenberg and open-access scientific literature before launching the 50M campaign."
+  },
+  "configurations": [
+    {
+      "config_id": "config_a_balanced_multidomain",
+      "name": "Configuration A: Balanced Multi-Domain (Recommended)",
+      "rationale": "Balances high lexical diversity, legal provenance, and optimal 5-epoch replay.",
+      "target_training_tokens": 50000000,
+      "required_unique_corpus_tokens": 10000000,
+      "effective_corpus_epochs": 5.0,
+      "optimizer_steps": 12207,
+      "effective_batch_size_tokens": 4096,
+      "projected_wall_clock_hours": 3.73,
+      "projected_peak_vram_mb": 2248.0,
+      "checkpoint_disk_gb": 4.2,
+      "recommended_sources": [
+        "Existing Expanded Corpus (2.11M tokens)",
+        "Project Gutenberg Public Domain Classics (Melville, Swift, Defoe, Wells, Bronte - 4.5M tokens)",
+        "Open-Access Computing & Physics Papers (arXiv cs.DC, cs.AI, physics - 2.0M tokens)",
+        "Technical System Standards (IETF RFCs, Linux Kernel Documentation - 1.4M tokens)"
+      ],
+      "operational_risk": "Low. Minimal memorization risk with 5 epochs; high lexical diversity across technical and classical literature."
+    },
+    {
+      "config_id": "config_b_high_diversity_openscience",
+      "name": "Configuration B: High-Diversity Open-Science",
+      "rationale": "Prioritizes maximum out-of-distribution generalization with low epoch replay (3 epochs).",
+      "target_training_tokens": 50000000,
+      "required_unique_corpus_tokens": 16666667,
+      "effective_corpus_epochs": 3.0,
+      "optimizer_steps": 12207,
+      "effective_batch_size_tokens": 4096,
+      "projected_wall_clock_hours": 3.73,
+      "projected_peak_vram_mb": 2248.0,
+      "checkpoint_disk_gb": 4.2,
+      "recommended_sources": [
+        "Full Gutenberg Classical Literature Library (10.0M tokens)",
+        "Open Science & Mathematics Foundations (arXiv, Euler, Newton, Faraday, Maxwell - 4.5M tokens)",
+        "Open Source C/C++ System Code & Documentation (Linux, Git, SQLite - 2.2M tokens)"
+      ],
+      "operational_risk": "Very Low. 3 epochs avoids memorization; higher data preparation engineering effort."
+    },
+    {
+      "config_id": "config_c_compute_constrained_extended_replay",
+      "name": "Configuration C: Compute-Constrained Extended Replay",
+      "rationale": "Conservative corpus expansion for rapid deployment with moderate replay (9 epochs).",
+      "target_training_tokens": 50000000,
+      "required_unique_corpus_tokens": 5500000,
+      "effective_corpus_epochs": 9.09,
+      "optimizer_steps": 12207,
+      "effective_batch_size_tokens": 4096,
+      "projected_wall_clock_hours": 3.73,
+      "projected_peak_vram_mb": 2248.0,
+      "checkpoint_disk_gb": 4.2,
+      "recommended_sources": [
+        "Existing Expanded Corpus (2.11M tokens)",
+        "Targeted Public Domain Fiction (Melville, Hawthorne, Poe, Verne - 3.39M tokens)"
+      ],
+      "operational_risk": "Medium. 9 epochs on 5.5M corpus begins to exhibit early memorization on infrequent unigrams."
+    }
+  ]
+}

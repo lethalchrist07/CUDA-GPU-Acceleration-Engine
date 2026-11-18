@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-10-25T15:17:17Z",
+  "all_passed": true,
+  "suites": [
+    {
+      "suite": "tests/test_milestone13_milestone4_audit_readiness.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 10.87s"
+    },
+    {
+      "suite": "tests/test_milestone13_extended_pretraining.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 17.52s"
+    },
+    {
+      "suite": "tests/test_milestone13_pretraining_diagnostic.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 26.67s"
+    },
+    {
+      "suite": "tests/test_milestone13_dataset_engineering.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "11 passed in 4.14s"
+    },
+    {
+      "suite": "tests/test_milestone12_pretraining_campaign.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "8 passed in 22.24s"
+    },
+    {
+      "suite": "tests/test_milestone11_platform_integration.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "21 passed, 1 warning in 206.62s (0:03:26)"
+    },
+    {
+      "suite": "tests/test_milestone10_flagship_transformer.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "12 passed in 24.01s"
+    },
+    {
+      "suite": "tests/test_milestone9_transformer.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "12 passed in 23.00s"
+    },
+    {
+      "suite": "tests/test_milestone8_training_reliability.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "10 passed in 19.14s"
+    },
+    {
+      "suite": "tests/test_stage2_milestone7_resnet.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "9 passed, 1 warning in 22.01s"
+    },
+    {
+      "suite": "tests/test_custom_kernels.py",
+      "status": "PASSED",
+      "returncode": 0,
+      "summary": "104 passed in 8.67s"
+    }
+  ],
+  "total_tests_passed": 217,
+  "total_tests_failed": 0,
+  "total_tests_skipped": 0
+}

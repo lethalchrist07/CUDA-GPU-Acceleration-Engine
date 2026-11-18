@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-10-25T12:08:13Z",
+  "hardware": {
+    "device": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "sm_architecture": "Ampere SM 8.6",
+    "total_vram_mb": 6143.5
+  },
+  "profiling_parameters": {
+    "microbatch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "effective_batch_tokens": 4096,
+    "context_length": 256,
+    "profiling_steps": 10
+  },
+  "latencies": {
+    "dataloader_latency_ms": 0.865,
+    "host_to_device_latency_ms": 0.503,
+    "forward_pass_latency_ms": 61.32,
+    "backward_pass_latency_ms": 115.56,
+    "optimizer_step_latency_ms": 63.22,
+    "cuda_sync_overhead_ms": 0.1049,
+    "total_step_latency_ms": 780.14
+  },
+  "throughput": {
+    "tokens_per_second": 5250.4,
+    "effective_tokens_per_step": 4096
+  },
+  "memory_telemetry": {
+    "allocated_mb": 1018.16,
+    "reserved_mb": 2004.0,
+    "peak_allocated_mb": 1925.91,
+    "headroom_mb": 4217.59
+  },
+  "gpu_telemetry": {
+    "mean_gpu_utilization_pct": 42.7,
+    "mean_gpu_temperature_c": 56.1
+  }
+}

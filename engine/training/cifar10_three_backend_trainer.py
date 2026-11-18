@@ -26,6 +26,7 @@ from torch.utils.data import DataLoader
 
 from .dispatch_tracker import KernelDispatchTracker
 from .reproducibility import reset_dataloader_seed
+from engine.checkpointing.checkpoint_manager import CheckpointManager
 
 logger = logging.getLogger(__name__)
 
@@ -135,29 +136,46 @@ class ThreeBackendTrainer:
                 torch.cuda.synchronize()
             t0 = time.perf_counter()
 
-            # Forward pass
-            self.optimizer.zero_grad()
-            outputs = self.model(data)
+            try:
+                # Forward pass
+                self.optimizer.zero_grad()
+                outputs = self.model(data)
 
-            # Check output validity
-            if torch.isnan(outputs).any() or torch.isinf(outputs).any():
-                raise ValueError(f"NaN or Inf encountered in model outputs at epoch {epoch}, batch {batch_idx}")
+                # Check output validity
+                if torch.isnan(outputs).any() or torch.isinf(outputs).any():
+                    raise ValueError(f"NaN or Inf encountered in model outputs at epoch {epoch}, batch {batch_idx}")
 
-            loss = self.criterion(outputs, targets)
-            self.tracker.record_fallback("cross_entropy_loss", 1)
+                loss = self.criterion(outputs, targets)
+                self.tracker.record_fallback("cross_entropy_loss", 1)
 
-            # Backward pass
-            loss.backward()
+                # Backward pass
+                loss.backward()
 
-            # Check gradient validity
-            for name, param in self.model.named_parameters():
-                if param.grad is not None:
-                    if torch.isnan(param.grad).any() or torch.isinf(param.grad).any():
-                        raise ValueError(f"NaN or Inf encountered in gradient of {name} at epoch {epoch}")
+                # Check gradient validity
+                for name, param in self.model.named_parameters():
+                    if param.grad is not None:
+                        if torch.isnan(param.grad).any() or torch.isinf(param.grad).any():
+                            raise ValueError(f"NaN or Inf encountered in gradient of {name} at epoch {epoch}")
 
-            # Optimizer step
-            self.optimizer.step()
-            self.tracker.record_fallback("optimizer_step", 1)
+                # Optimizer step
+                self.optimizer.step()
+                self.tracker.record_fallback("optimizer_step", 1)
+
+            except torch.cuda.OutOfMemoryError as oom_err:
+                logger.warning(f"CUDA OutOfMemory in ThreeBackendTrainer at epoch {epoch}, batch {batch_idx}: {oom_err}")
+                if self.is_cuda:
+                    torch.cuda.empty_cache()
+                    torch.cuda.ipc_collect()
+                import gc
+                gc.collect()
+                if self.progress_callback:
+                    self.progress_callback({
+                        "event": "oom_alert",
+                        "epoch": epoch,
+                        "batch": batch_idx,
+                        "message": "CUDA OOM intercepted safely; memory cache flushed and checkpoints preserved intact.",
+                    })
+                raise
 
             if self.is_cuda:
                 torch.cuda.synchronize()
@@ -184,9 +202,12 @@ class ThreeBackendTrainer:
 
                 self.progress_callback({
                     "event": "batch_progress",
+                    "epoch": epoch,
                     "current_epoch": epoch,
                     "total_epochs": total_epochs,
+                    "batch": batch_idx,
                     "current_step": batch_idx,
+                    "total_batches": total_batches,
                     "total_steps": total_batches,
                     "train_loss": round(running_loss, 4),
                     "train_accuracy": round(running_acc, 2),
@@ -281,6 +302,7 @@ class ThreeBackendTrainer:
 
                 # Emit epoch completion progress event
                 if self.progress_callback:
+                    total_batches = len(self.train_loader)
                     elapsed = time.perf_counter() - start_wall_time
                     sps = (total_train_samples / elapsed) if elapsed > 0 else 0.0
                     vram_alloc = torch.cuda.max_memory_allocated(self.device) / (1024 * 1024) if self.is_cuda else 0.0
@@ -288,8 +310,13 @@ class ThreeBackendTrainer:
 
                     self.progress_callback({
                         "event": "epoch_completed",
+                        "epoch": epoch,
                         "current_epoch": epoch,
                         "total_epochs": epochs,
+                        "batch": total_batches,
+                        "current_step": total_batches,
+                        "total_batches": total_batches,
+                        "total_steps": total_batches,
                         "train_loss": round(train_loss, 4),
                         "train_accuracy": round(train_acc, 2),
                         "val_loss": round(val_loss, 4),
@@ -360,22 +387,27 @@ class ThreeBackendTrainer:
         else:
             save_path = self.checkpoint_dir / filename
 
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        torch.save(
-            {
-                "backend": self.backend,
-                "epoch": epoch,
-                "accuracy": accuracy,
-                "model_state_dict": self.model.state_dict(),
-                "optimizer_state_dict": self.optimizer.state_dict(),
-            },
-            save_path,
+        CheckpointManager.save_checkpoint(
+            model=self.model,
+            filepath=str(save_path),
+            optimizer=self.optimizer,
+            epoch=epoch,
+            metrics={"val_accuracy": accuracy, "best_val_acc": accuracy, "accuracy": accuracy},
+            metadata={"backend": self.backend, "device": str(self.device)},
         )
         return save_path
 
     def load_checkpoint(self, filename: str) -> Dict[str, Any]:
         load_path = Path(filename) if Path(filename).is_file() else (self.checkpoint_dir / filename)
-        checkpoint = torch.load(load_path, map_location=self.device)
-        self.model.load_state_dict(checkpoint["model_state_dict"])
-        self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        return checkpoint
+        res = CheckpointManager.load_checkpoint(
+            filepath=str(load_path),
+            model=self.model,
+            optimizer=self.optimizer,
+            map_location=self.device,
+            restore_rng=True,
+        )
+        if "metrics" in res and isinstance(res["metrics"], dict):
+            for k, v in res["metrics"].items():
+                if k not in res:
+                    res[k] = v
+        return res

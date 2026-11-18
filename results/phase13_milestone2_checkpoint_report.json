@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-10-25T12:12:15Z",
+  "checkpoints_verified": [
+    {
+      "name": "best_model.pt",
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_1m_diagnostic\\best_model.pt",
+      "size_bytes": 1042095762,
+      "sha256": "cb8a52e8bfd0a5188af92f7e10e8245529b3ef4f8f319841d025eb6c94d307bc",
+      "valid": true
+    },
+    {
+      "name": "final_model.pt",
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_1m_diagnostic\\final_model.pt",
+      "size_bytes": 1042096360,
+      "sha256": "31c78ea1a580d45c95589f4588920ca06580920a1b330cf0d7bcafc46b3f21e3",
+      "valid": true
+    }
+  ]
+}

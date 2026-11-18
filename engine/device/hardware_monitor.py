@@ -6,6 +6,7 @@ graceful OOM recovery with automatic batch size reduction, and emergency checkpo
 from __future__ import annotations
 
 import csv
+import ctypes
 import gc
 import io
 import logging
@@ -19,6 +20,76 @@ from typing import Any, Dict, List, Optional, Tuple
 import torch
 
 logger = logging.getLogger(__name__)
+
+
+class _NVMLUtilization(ctypes.Structure):
+    _fields_ = [
+        ("gpu", ctypes.c_uint),
+        ("memory", ctypes.c_uint),
+    ]
+
+
+class _NVMLMemory(ctypes.Structure):
+    _fields_ = [
+        ("total", ctypes.c_ulonglong),
+        ("free", ctypes.c_ulonglong),
+        ("used", ctypes.c_ulonglong),
+    ]
+
+
+_NVML_LIB = None
+_NVML_INIT_ATTEMPTED = False
+
+
+def _get_nvml_lib():
+    global _NVML_LIB, _NVML_INIT_ATTEMPTED
+    if _NVML_INIT_ATTEMPTED:
+        return _NVML_LIB
+    _NVML_INIT_ATTEMPTED = True
+    try:
+        lib_name = "nvml.dll" if os.name == "nt" else "libnvidia-ml.so.1"
+        lib = ctypes.CDLL(lib_name)
+        if lib.nvmlInit_v2() == 0:
+            _NVML_LIB = lib
+            return _NVML_LIB
+    except Exception:
+        pass
+    return None
+
+
+def get_fast_gpu_telemetry(device_id: int = 0) -> Optional[Dict[str, Any]]:
+    """
+    Zero-overhead direct NVML query (~2 microseconds) via Python standard ctypes.
+    Captures physical VRAM, GPU core utilization %, and die temperature in °C.
+    Returns None if NVML is unavailable or execution is CPU-only.
+    """
+    nvml = _get_nvml_lib()
+    if nvml is None:
+        return None
+    try:
+        handle = ctypes.c_void_p()
+        if nvml.nvmlDeviceGetHandleByIndex_v2(device_id, ctypes.byref(handle)) != 0:
+            return None
+
+        temp = ctypes.c_uint()
+        nvml.nvmlDeviceGetTemperature(handle, 0, ctypes.byref(temp))
+
+        util = _NVMLUtilization()
+        nvml.nvmlDeviceGetUtilizationRates(handle, ctypes.byref(util))
+
+        mem = _NVMLMemory()
+        nvml.nvmlDeviceGetMemoryInfo(handle, ctypes.byref(mem))
+
+        return {
+            "temperature_c": float(temp.value),
+            "utilization_gpu_pct": float(util.gpu),
+            "utilization_memory_pct": float(util.memory),
+            "physical_used_mb": round(mem.used / (1024.0 * 1024.0), 2),
+            "physical_total_mb": round(mem.total / (1024.0 * 1024.0), 2),
+            "physical_free_mb": round(mem.free / (1024.0 * 1024.0), 2),
+        }
+    except Exception:
+        return None
 
 
 class HardwareMonitor:
@@ -102,25 +173,34 @@ class HardwareMonitor:
         except Exception as exc:
             logger.debug(f"Could not read PyTorch memory stats: {exc}")
 
-        # Live NVIDIA SMI Stats
-        smi_fields = self._run_nvidia_smi("temperature.gpu,utilization.gpu,power.draw,power.limit")
-        if smi_fields and len(smi_fields) >= 4:
-            try:
-                telemetry["temperature_c"] = float(smi_fields[0])
-            except (ValueError, TypeError):
-                pass
-            try:
-                telemetry["utilization_gpu_pct"] = float(smi_fields[1])
-            except (ValueError, TypeError):
-                pass
-            try:
-                telemetry["power_draw_w"] = float(smi_fields[2])
-            except (ValueError, TypeError):
-                pass
-            try:
-                telemetry["power_limit_w"] = float(smi_fields[3])
-            except (ValueError, TypeError):
-                pass
+        # Fast direct NVML Stats
+        fast = get_fast_gpu_telemetry(self.device_id)
+        if fast is not None:
+            telemetry["temperature_c"] = fast.get("temperature_c")
+            telemetry["utilization_gpu_pct"] = fast.get("utilization_gpu_pct")
+            telemetry["vram_physical_used_mb"] = fast.get("physical_used_mb")
+            telemetry["vram_physical_total_mb"] = fast.get("physical_total_mb")
+            telemetry["vram_physical_free_mb"] = fast.get("physical_free_mb")
+        else:
+            # Live NVIDIA SMI Stats fallback
+            smi_fields = self._run_nvidia_smi("temperature.gpu,utilization.gpu,power.draw,power.limit")
+            if smi_fields and len(smi_fields) >= 4:
+                try:
+                    telemetry["temperature_c"] = float(smi_fields[0])
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    telemetry["utilization_gpu_pct"] = float(smi_fields[1])
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    telemetry["power_draw_w"] = float(smi_fields[2])
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    telemetry["power_limit_w"] = float(smi_fields[3])
+                except (ValueError, TypeError):
+                    pass
 
         return telemetry
 

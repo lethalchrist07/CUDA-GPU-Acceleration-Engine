@@ -1,0 +1,113 @@
+{
+  "milestone": "Phase 13 Milestone 8",
+  "timestamp": "2026-11-02T05:03:52.101004+00:00",
+  "audit_status": "PASSED",
+  "system_environment": {
+    "os": "Windows-10-10.0.26300-SP0",
+    "os_release": "10",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "python_version": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "python_executable": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\.venv\\Scripts\\python.exe"
+  },
+  "toolchain": {
+    "pytorch_version": "2.6.0+cu124",
+    "pytorch_cuda_version": "12.4",
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "compute_capability": "8.6",
+    "sm_count": 20,
+    "total_vram_mb": 6143.5,
+    "nvcc_path": "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.4\\bin\\nvcc.EXE",
+    "nvcc_version": "Build cuda_13.4.r13.4/compiler.38855100_0",
+    "cmake_available": false
+  },
+  "cuda_kernels": {
+    "module_path": "C:\\Users\\Jai akash\\AppData\\Local\\torch_extensions\\torch_extensions\\Cache\\py311_cu124\\custom_kernels_cuda\\custom_kernels_cuda.pyd",
+    "exported_functions_count": 18,
+    "exported_functions": [
+      "fused_add_relu",
+      "fused_add_relu_backward",
+      "fused_bias_activation",
+      "fused_bias_activation_backward",
+      "gelu",
+      "gelu_backward",
+      "matmul_tiled",
+      "matmul_wmma",
+      "reduce_max",
+      "reduce_sum",
+      "relu",
+      "relu_backward",
+      "sigmoid",
+      "sigmoid_backward",
+      "vector_add",
+      "vector_add_backward",
+      "vector_scale",
+      "vector_scale_backward"
+    ],
+    "status": "LOADED_SUCCESSFULLY"
+  },
+  "checkpoints_audit": {
+    "final_model": {
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\final_model.pt",
+      "exists": true,
+      "size_bytes": 1042091878,
+      "sha256": "ca6fe2a51d1b973f0c3e0fda04fa43ce5a8ca1e95f51ed9d99cc424c234e45bd",
+      "matches_manifest": true
+    },
+    "best_model": {
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\best_model.pt",
+      "exists": true,
+      "size_bytes": 1042091280,
+      "sha256": "abcd0fe7b305cd1cef7809359ca7128f0ac94bed592a188f8432329ca1406aac",
+      "matches_manifest": true
+    },
+    "vocab": {
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_campaign\\bpe_vocab.json",
+      "exists": true,
+      "sha256": "ffd4aac665204b09488cd84e5428a72aa93223e06708947520768c001c163841"
+    },
+    "historical_checkpoints": {
+      "pretraining_campaign_final": {
+        "exists": true,
+        "size_bytes": 1042094696
+      },
+      "pretraining_10m_extended_best": {
+        "exists": true,
+        "size_bytes": 1042095250
+      },
+      "pretraining_50m_diagnostic_final": {
+        "exists": true,
+        "size_bytes": 1042096360
+      },
+      "resnet18_cifar10_best": {
+        "exists": true,
+        "size_bytes": 134220210
+      }
+    },
+    "all_historical_intact": true
+  },
+  "gpu_vram_status": {
+    "total_vram_mb": 6143.5,
+    "allocated_mb": 0.0,
+    "reserved_mb": 0.0,
+    "free_vram_mb": 6143.5,
+    "sufficient_for_benchmarking": true
+  },
+  "identified_bottlenecks": {
+    "bottleneck_1_cublaslt_fused_epilogue": {
+      "impact_ms_per_step": 1.52,
+      "description": "cuBLASLt in Config B fuses bias into GEMM register tiles (1 memory pass). Config C uses unfused torch.matmul + separate elementwise kernel, incurring extra 25.17 MB DRAM round-trip write/read."
+    },
+    "bottleneck_2_python_autograd_dispatch": {
+      "impact_ms_per_step": 0.18,
+      "description": "torch.autograd.Function wrapper executes Python C-API interpreter calls for node allocation and tuple packaging across 12 layers forward and backward."
+    },
+    "bottleneck_3_tensor_view_conversions": {
+      "impact_ms_per_step": 0.05,
+      "description": "2D-to-3D view reshapes (view(-1, d_ff) and view(B, T, d_ff)) across 12 layers."
+    },
+    "total_overhead_differential_ms": 1.37,
+    "differential_pct": 0.52
+  }
+}

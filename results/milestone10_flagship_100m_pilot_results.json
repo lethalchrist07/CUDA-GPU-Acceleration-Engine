@@ -1,0 +1,51 @@
+{
+  "milestone": "Phase 12 \u2014 Milestone 10",
+  "target_model": "Flagship Transformer (~100M)",
+  "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "parameters": {
+    "total_parameters": 85547520,
+    "non_embedding_parameters": 85056000,
+    "tied_weights": true,
+    "d_model": 768,
+    "n_layer": 12,
+    "n_head": 12,
+    "vocab_size": 512,
+    "context_length": 128
+  },
+  "training_execution": {
+    "status": "COMPLETED",
+    "optimizer_steps_completed": 15,
+    "microbatches_processed": 45,
+    "effective_batch_size": 8,
+    "total_tokens_processed": 11520,
+    "total_wall_time_sec": 5.728,
+    "tokens_per_sec": 2488.5,
+    "final_train_loss": 5.3174,
+    "final_val_loss": 7.2475,
+    "final_val_perplexity": 1404.61,
+    "peak_vram_mb": 1653.8
+  },
+  "checkpoint_integrity": {
+    "checkpoint_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\flagship_100m_pilot\\best_model.pt",
+    "size_bytes": 1026758674,
+    "sha256": "f8b0b9f9d4fb2e9ce482aea9c619e2c588404caa7e5691606e9340f381932f9f",
+    "valid": true
+  },
+  "dataset_manifest": {
+    "dataset_name": "MultiDocumentCorpus",
+    "provenance": "Verified Local & Public Domain Text Corpus",
+    "license_type": "Public Domain / CC0 / Permissive",
+    "content_hash_sha256": "4f601005376ec4eef224fd7debdbc0c0230cb0d73646cf3ade3cbbc21aa789d2",
+    "total_documents": 3,
+    "train_documents": 2,
+    "val_documents": 1,
+    "total_tokens": 4029,
+    "train_tokens": 2536,
+    "val_tokens": 1493,
+    "vocab_size": 512,
+    "tokenizer_type": "BPETokenizer",
+    "context_length": 128,
+    "created_at": "2026-10-24T05:53:13.601473+00:00"
+  },
+  "generated_preview": "'Technical Foundations of GPU Computing:\\nvmvvle dm sees this II\ufffd\\x0c\ufffd\ufffd\ufffd\ufffd\\x0c\\x0c\u02a2\ufffd\ufffd'"
+}

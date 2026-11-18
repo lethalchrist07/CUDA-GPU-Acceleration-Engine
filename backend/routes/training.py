@@ -11,6 +11,9 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, status
 
 from backend.schemas.training import (
+    AdaptiveHardwareResponse,
+    AdaptiveRecommendationRequest,
+    AdaptiveRecommendationResponse,
     CancelJobResponse,
     ModelCapabilityInfo,
     TrainingJobCheckpointsResponse,
@@ -20,6 +23,7 @@ from backend.schemas.training import (
     TrainingJobResponse,
     TrainingModelsResponse,
 )
+from engine.training.adaptive_engine import AdaptiveTrainingEngine
 from engine.training.orchestrator import TrainingOrchestrator
 
 router = APIRouter(prefix="/api/training", tags=["training"])
@@ -50,26 +54,132 @@ def list_training_models():
     )
 
 
+@router.get("/adaptive/hardware", response_model=AdaptiveHardwareResponse)
+def get_adaptive_hardware():
+    """Inspect and return runtime hardware capability profile, VRAM headroom, and precision flags."""
+    engine = AdaptiveTrainingEngine()
+    hw = engine.get_hardware_profile()
+    return AdaptiveHardwareResponse(
+        status="available",
+        fetched_at=utc_now(),
+        device_name=hw.device_name,
+        device_type=hw.device_type,
+        compute_capability=[hw.major, hw.minor],
+        sm_count=hw.sm_count,
+        total_vram_mb=hw.total_vram_mb,
+        free_vram_mb=hw.free_vram_mb,
+        supports_ampere_tensor_cores=hw.supports_ampere_tensor_cores,
+        supports_fp16=hw.supports_fp16,
+        supports_bf16=hw.supports_bf16,
+        supports_custom_cuda=hw.supports_custom_cuda,
+        supports_cuda_graphs=hw.supports_cuda_graphs,
+        temperature_c=hw.temperature_c,
+        utilization_gpu_pct=hw.utilization_gpu_pct,
+    )
+
+
+@router.post("/adaptive/recommend", response_model=AdaptiveRecommendationResponse)
+def get_adaptive_recommendation(req: AdaptiveRecommendationRequest):
+    """
+    Evaluate training configuration and recommend optimal batch size, precision,
+    and gradient accumulation steps based on live GPU VRAM headroom.
+    """
+    engine = AdaptiveTrainingEngine()
+    try:
+        decision = engine.recommend_training_config(
+            model_name=req.model_name,
+            backend=req.backend,
+            requested_batch_size=req.batch_size,
+            requested_precision=req.precision,
+            seq_len=req.seq_len,
+            gradient_accumulation_steps=req.gradient_accumulation_steps,
+            target_vram_ratio=req.target_vram_ratio,
+        )
+        hw = engine.get_hardware_profile(force_cpu=(req.backend == "CPU_NATIVE"))
+        return AdaptiveRecommendationResponse(
+            status="available",
+            fetched_at=utc_now(),
+            model_name=decision.model_name,
+            device=decision.device,
+            applied_batch_size=decision.applied_batch_size,
+            applied_precision=decision.applied_precision,
+            gradient_accumulation_steps=decision.gradient_accumulation_steps,
+            effective_batch_size=decision.effective_batch_size,
+            execution_path=decision.execution_path,
+            estimated_peak_vram_mb=decision.estimated_peak_vram_mb,
+            available_vram_mb=decision.available_vram_mb,
+            safety_margin_mb=decision.safety_margin_mb,
+            vram_safety_ratio=decision.vram_safety_ratio,
+            is_safe=decision.is_safe,
+            rationale=decision.rationale,
+            adjustments_made=decision.adjustments_made,
+            hardware=hw.to_dict(),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to generate adaptive recommendation: {str(exc)}",
+        )
+
+
 @router.post("/jobs", response_model=TrainingJobResponse, status_code=status.HTTP_201_CREATED)
 def create_training_job(req: TrainingJobCreateRequest):
     """
     Register and queue a new training job across CPU_NATIVE, GPU_NATIVE, or GPU_CUSTOM.
-    Enforces GPU mutual exclusion and safety bounds.
+    Enforces GPU mutual exclusion and safety bounds. Applies adaptive recommendations if enabled.
     """
     orchestrator = TrainingOrchestrator.get_instance()
     try:
+        final_batch_size = req.batch_size
+        final_precision = req.precision
+        final_grad_accum = req.gradient_accumulation_steps
+        adaptive_metadata = None
+
+        if req.adaptive_mode or req.auto_batch_size:
+            engine = AdaptiveTrainingEngine()
+            rec = engine.recommend_training_config(
+                model_name=req.model_name,
+                backend=req.backend,
+                requested_batch_size=req.batch_size if not req.auto_batch_size else None,
+                requested_precision=req.precision,
+                seq_len=req.seq_len,
+                gradient_accumulation_steps=req.gradient_accumulation_steps,
+                target_vram_ratio=req.target_vram_ratio,
+            )
+            final_batch_size = rec.applied_batch_size
+            final_precision = rec.applied_precision
+            final_grad_accum = rec.gradient_accumulation_steps
+            adaptive_metadata = rec.to_dict()
+
         job = orchestrator.submit_job(
             model_name=req.model_name,
             backend=req.backend,
             dataset=req.dataset,
             epochs=req.epochs,
-            batch_size=req.batch_size,
+            batch_size=final_batch_size,
             learning_rate=req.learning_rate,
             seed=req.seed,
             max_train_samples=req.max_train_samples,
             max_val_samples=req.max_val_samples,
             max_test_samples=req.max_test_samples,
-            extra_config={"precision": req.precision},
+            extra_config={
+                "precision": final_precision,
+                "lr_scheduler": req.lr_scheduler,
+                "gradient_accumulation_steps": final_grad_accum,
+                "resume_checkpoint_path": req.resume_checkpoint_path,
+                "max_steps": req.max_steps,
+                "seq_len": req.seq_len,
+                "tokenizer_type": req.tokenizer_type,
+                "vocab_size": req.vocab_size,
+                "warmup_steps": req.warmup_steps,
+                "weight_decay": req.weight_decay,
+                "grad_clip": req.grad_clip,
+                "dataset_path": req.dataset_path,
+                "adaptive_mode": req.adaptive_mode,
+                "auto_batch_size": req.auto_batch_size,
+                "target_vram_ratio": req.target_vram_ratio,
+                "adaptive_decision": adaptive_metadata,
+            },
         )
         return TrainingJobResponse(**job)
     except ValueError as ve:

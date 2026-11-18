@@ -20,11 +20,44 @@ interface TrainingChartsProps {
 
 export const TrainingCharts: React.FC<TrainingChartsProps> = ({ job }) => {
   const metrics = (job.metrics || {}) as any;
+  const isTransformer =
+    job.model_name?.toLowerCase().includes('transformer') ||
+    job.model_name?.toLowerCase().includes('gpt') ||
+    job.config?.model_id?.toLowerCase().includes('transformer');
+
+  const stepList: any[] = metrics.step_records || metrics.step_history || [];
   const epochList: any[] = metrics.epoch_metrics || metrics.epoch_records || [];
 
-  // Build chart series from completed epoch records or metrics
+  // Build chart series from completed step records (transformer) or epoch records (vision)
   const chartData =
-    epochList.length > 0
+    isTransformer && stepList.length > 0
+      ? stepList.map((st: any, idx: number) => {
+          const isLast = idx === stepList.length - 1;
+          const hasStepVal = st.val_perplexity !== undefined && st.val_perplexity !== null && st.val_perplexity > 0;
+          const valPpl = hasStepVal
+            ? Number(Number(st.val_perplexity).toFixed(2))
+            : (isLast && metrics.final_val_perplexity !== undefined && metrics.final_val_perplexity !== null && metrics.final_val_perplexity > 0
+                ? Number(Number(metrics.final_val_perplexity).toFixed(2))
+                : undefined);
+          const hasStepValLoss = st.val_loss !== undefined && st.val_loss !== null && st.val_loss > 0;
+          const valLoss = hasStepValLoss
+            ? Number(Number(st.val_loss).toFixed(4))
+            : (isLast && metrics.final_val_loss !== undefined && metrics.final_val_loss !== null && metrics.final_val_loss > 0
+                ? Number(Number(metrics.final_val_loss).toFixed(4))
+                : undefined);
+
+          return {
+            name: `Step ${st.step}`,
+            step: st.step,
+            train_loss: Number((st.train_loss ?? 0).toFixed(4)),
+            val_loss: valLoss,
+            val_perplexity: valPpl,
+            is_final_eval: Boolean(st.is_final_eval || (isLast && !hasStepVal && valPpl !== undefined)),
+            duration_sec: Number((st.step_duration_sec ?? 0).toFixed(3)),
+            throughput: Math.round(st.tokens_per_sec ?? 0),
+          };
+        })
+      : epochList.length > 0
       ? epochList.map((em: any) => ({
           name: `Epoch ${em.epoch}`,
           epoch: em.epoch,
@@ -52,98 +85,103 @@ export const TrainingCharts: React.FC<TrainingChartsProps> = ({ job }) => {
 
   if (chartData.length === 0) {
     return (
-      <div className="glass-panel p-6 rounded-2xl border border-white/[0.07] text-center space-y-2">
-        <Activity className="w-8 h-8 text-slate-500 mx-auto animate-pulse" />
-        <h4 className="text-sm font-bold text-white">Awaiting Epoch Completion Telemetry</h4>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto">
-          Scientific loss and accuracy curves will render automatically as training epochs complete.
+      <div className="bg-[#171A1F] p-6 rounded-2xl border border-[#30353D] text-center space-y-2">
+        <Activity className="w-8 h-8 text-[#6B7280] mx-auto animate-pulse" />
+        <h4 className="text-sm font-bold text-[#F5F5F4] font-sans">
+          {isTransformer ? 'Awaiting Optimizer Step Telemetry' : 'Awaiting Epoch Completion Telemetry'}
+        </h4>
+        <p className="text-xs text-[#A6ADB7] font-sans max-w-sm mx-auto">
+          {isTransformer
+            ? 'Scientific loss, perplexity, and token throughput curves will render automatically as optimizer steps complete.'
+            : 'Scientific loss and accuracy curves will render automatically as training epochs complete.'}
         </p>
       </div>
     );
   }
 
+  const tooltipStyle = {
+    backgroundColor: '#0D0F12',
+    borderColor: '#30353D',
+    borderRadius: '0.5rem',
+    fontSize: '11px',
+    fontFamily: 'monospace',
+    color: '#F5F5F4',
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 1. Loss Curves Chart */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/[0.07] space-y-3">
+        <div className="bg-[#171A1F] p-5 rounded-2xl border border-[#30353D] space-y-3 interactive-card">
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-amber-400" />
-            <h4 className="text-sm font-bold text-white tracking-tight">
-              Loss Progression per Epoch
+            <Flame className="w-4 h-4 text-[#76B900]" />
+            <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
+              {isTransformer ? 'Loss Progression per Optimizer Step' : 'Loss Progression per Epoch'}
             </h4>
           </div>
           <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} domain={['auto', 'auto']} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0a0f1d',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '11px',
-                    fontFamily: 'monospace',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                <XAxis dataKey="name" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                <YAxis stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} domain={['auto', 'auto']} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px', fontFamily: 'monospace' }} />
                 <Line
                   type="monotone"
                   dataKey="train_loss"
                   name="Train Loss"
-                  stroke="#f59e0b"
+                  stroke="#76B900"
                   strokeWidth={2}
-                  dot={{ r: 4, fill: '#f59e0b' }}
+                  dot={{ r: 4, fill: '#76B900' }}
                   activeDot={{ r: 6 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="val_loss"
                   name="Val Loss"
-                  stroke="#ef4444"
+                  stroke="#FB7185"
                   strokeWidth={2}
                   strokeDasharray="4 4"
-                  dot={{ r: 3, fill: '#ef4444' }}
+                  dot={{ r: 3, fill: '#FB7185' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* 2. Validation Accuracy Curve */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/[0.07] space-y-3">
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-emerald-400" />
-            <h4 className="text-sm font-bold text-white tracking-tight">
-              Validation Accuracy Progression (%)
-            </h4>
+        {/* 2. Validation Accuracy or Perplexity Curve */}
+        <div className="bg-[#171A1F] p-5 rounded-2xl border border-[#30353D] space-y-3 interactive-card">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-[#70D6C2]" />
+              <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
+                {isTransformer ? 'Validation Perplexity Progression' : 'Validation Accuracy Progression (%)'}
+              </h4>
+            </div>
+            {isTransformer && metrics.final_val_perplexity !== undefined && (
+              <span className="text-[11px] font-mono text-[#70D6C2] bg-[#70D6C2]/10 px-2 py-0.5 rounded border border-[#70D6C2]/20">
+                Final: {Number(metrics.final_val_perplexity).toFixed(2)}
+              </span>
+            )}
           </div>
           <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0a0f1d',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '11px',
-                    fontFamily: 'monospace',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                <XAxis dataKey="name" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                <YAxis stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} domain={isTransformer ? ['auto', 'auto'] : [0, 100]} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px', fontFamily: 'monospace' }} />
                 <Line
                   type="monotone"
-                  dataKey="val_acc"
-                  name="Validation Accuracy (%)"
-                  stroke="#10b981"
+                  dataKey={isTransformer ? "val_perplexity" : "val_acc"}
+                  name={isTransformer ? "Val Perplexity" : "Validation Accuracy (%)"}
+                  stroke="#70D6C2"
                   strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#10b981' }}
-                  activeDot={{ r: 6 }}
+                  connectNulls={true}
+                  dot={{ r: 5, fill: '#70D6C2' }}
+                  activeDot={{ r: 7 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -152,88 +190,64 @@ export const TrainingCharts: React.FC<TrainingChartsProps> = ({ job }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 3. Epoch Duration Latency Bar Chart */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/[0.07] space-y-3">
+        {/* 3. Duration Latency Bar Chart */}
+        <div className="bg-[#171A1F] p-5 rounded-2xl border border-[#30353D] space-y-3 interactive-card">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-cyan-400" />
-            <h4 className="text-sm font-bold text-white tracking-tight">
-              Per-Epoch Duration (Seconds)
+            <Clock className="w-4 h-4 text-[#70D6C2]" />
+            <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
+              {isTransformer ? 'Per-Step Duration (Seconds)' : 'Per-Epoch Duration (Seconds)'}
             </h4>
           </div>
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0a0f1d',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '11px',
-                    fontFamily: 'monospace',
-                  }}
-                />
-                <Bar dataKey="duration_sec" name="Duration (s)" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                <XAxis dataKey="name" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                <YAxis stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="duration_sec" name="Duration (s)" fill="#70D6C2" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* 4. Custom CUDA Kernel Dispatches Breakdown (if applicable) */}
+        {/* 4. Custom CUDA Kernel Dispatches Breakdown (if applicable) or Throughput */}
         {hasDispatches ? (
-          <div className="glass-panel p-5 rounded-2xl border border-white/[0.07] space-y-3">
+          <div className="bg-[#171A1F] p-5 rounded-2xl border border-[#30353D] space-y-3 interactive-card">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-[#76b900]" />
-              <h4 className="text-sm font-bold text-white tracking-tight">
+              <Zap className="w-4 h-4 text-[#76B900]" />
+              <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
                 Verified Custom CUDA Kernel Invocations
               </h4>
             </div>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={dispatchData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis type="number" stroke="#64748b" tick={{ fontSize: 11 }} />
-                  <YAxis type="category" dataKey="kernel" stroke="#64748b" tick={{ fontSize: 10 }} width={90} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0a0f1d',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '0.75rem',
-                      fontSize: '11px',
-                      fontFamily: 'monospace',
-                    }}
-                  />
-                  <Bar dataKey="dispatches" name="Dispatches" fill="#76b900" radius={[0, 4, 4, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                  <XAxis type="number" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                  <YAxis type="category" dataKey="kernel" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 10, fontFamily: 'monospace' }} width={90} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar dataKey="dispatches" name="Dispatches" fill="#76B900" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         ) : (
-          <div className="glass-panel p-5 rounded-2xl border border-white/[0.07] space-y-3">
+          <div className="bg-[#171A1F] p-5 rounded-2xl border border-[#30353D] space-y-3 interactive-card">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-slate-400" />
-              <h4 className="text-sm font-bold text-white tracking-tight">
-                Training Throughput (Samples / Sec)
+              <Zap className="w-4 h-4 text-[#70D6C2]" />
+              <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
+                {isTransformer ? 'Training Throughput (Tokens / Sec)' : 'Training Throughput (Samples / Sec)'}
               </h4>
             </div>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0a0f1d',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '0.75rem',
-                      fontSize: '11px',
-                      fontFamily: 'monospace',
-                    }}
-                  />
-                  <Bar dataKey="throughput" name="Samples/s" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                  <XAxis dataKey="name" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                  <YAxis stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar dataKey="throughput" name={isTransformer ? "Tokens/s" : "Samples/s"} fill="#70D6C2" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

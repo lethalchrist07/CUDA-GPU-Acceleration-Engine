@@ -1,0 +1,121 @@
+{
+  "tokenizer_type": "BPETokenizer",
+  "vocab_size": 2048,
+  "merges_count": 1788,
+  "roundtrip_validation": {
+    "tested_texts_count": 4,
+    "passed": true,
+    "failure_count": 0,
+    "failures": []
+  },
+  "compression_efficiency": {
+    "overall_bytes_per_token": 1.533,
+    "overall_chars_per_token": 1.476,
+    "total_bytes_analyzed": 1050,
+    "total_tokens_generated": 685,
+    "domains": {
+      "classical_literature": {
+        "raw_bytes": 302,
+        "character_count": 302,
+        "token_count": 168,
+        "bytes_per_token": 1.798,
+        "chars_per_token": 1.798,
+        "compression_ratio": 0.899
+      },
+      "scientific_technical": {
+        "raw_bytes": 225,
+        "character_count": 225,
+        "token_count": 121,
+        "bytes_per_token": 1.86,
+        "chars_per_token": 1.86,
+        "compression_ratio": 0.93
+      },
+      "cuda_programming": {
+        "raw_bytes": 260,
+        "character_count": 260,
+        "token_count": 191,
+        "bytes_per_token": 1.361,
+        "chars_per_token": 1.361,
+        "compression_ratio": 0.681
+      },
+      "complex_unicode_and_symbols": {
+        "raw_bytes": 263,
+        "character_count": 224,
+        "token_count": 205,
+        "bytes_per_token": 1.283,
+        "chars_per_token": 1.093,
+        "compression_ratio": 0.641
+      }
+    }
+  },
+  "unknown_token_behavior": {
+    "all_lossless": true,
+    "oov_rate_percent": 0.0,
+    "samples_tested": [
+      {
+        "sample": "Emoji string: \ud83d\ude80 \u26a1 \ud83e\udd16 \ud83d\udd2c \ud83e\udde0 \ud83c\udf0c",
+        "token_count": 37,
+        "base_byte_tokens": 34,
+        "subword_tokens": 3,
+        "lossless": true
+      },
+      {
+        "sample": "Zero-width and non-breaking: Zero\u200bWidth\u00a0Space",
+        "token_count": 30,
+        "base_byte_tokens": 17,
+        "subword_tokens": 13,
+        "lossless": true
+      },
+      {
+        "sample": "CJK Ideographs: \u6df1\u5ea6\u5b66\u4e60 \u81ea\u7136\u8bed\u8a00\u5904\u7406 \u8ba1\u7b97\u673a\u89c6\u89c9",
+        "token_count": 60,
+        "base_byte_tokens": 57,
+        "subword_tokens": 3,
+        "lossless": true
+      },
+      {
+        "sample": "Arabic / Hebrew: \u0627\u0644\u0644\u063a\u0629 \u0627\u0644\u0639\u0631\u0628\u064a\u0629 / \u05e2\u05d1\u05e8\u05d9\u05ea",
+        "token_count": 51,
+        "base_byte_tokens": 47,
+        "subword_tokens": 4,
+        "lossless": true
+      },
+      {
+        "sample": "Combining diacritics: e\u0301 a\u0300 u\u0308",
+        "token_count": 23,
+        "base_byte_tokens": 16,
+        "subword_tokens": 7,
+        "lossless": true
+      }
+    ]
+  },
+  "throughput_benchmark": {
+    "benchmark_chars": 199980,
+    "benchmark_tokens": 126048,
+    "encode_time_sec": 0.0195,
+    "encode_tokens_per_sec": 6473461.2,
+    "encode_chars_per_sec": 10270395.2,
+    "encode_mb_per_sec": 9.79,
+    "decode_time_sec": 0.0143,
+    "decode_tokens_per_sec": 8818553.9,
+    "decode_chars_per_sec": 13990974.9,
+    "decode_mb_per_sec": 13.34
+  },
+  "checkpoint_compatibility": {
+    "compatible": true,
+    "checkpoint_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_campaign\\best_model.pt",
+    "tokenizer_vocab_size": 2048,
+    "model_config_vocab_size": 2048,
+    "embedding_matrix_shape": [
+      2048,
+      768
+    ],
+    "lm_head_shape": [
+      2048,
+      768
+    ],
+    "step": 125,
+    "val_loss": 3.7435,
+    "val_perplexity": 42.25
+  }
+}

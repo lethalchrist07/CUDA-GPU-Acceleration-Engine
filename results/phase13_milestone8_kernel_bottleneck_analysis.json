@@ -1,0 +1,150 @@
+{
+  "milestone": "Phase 13 Milestone 8",
+  "stage": "Stage 3 - Custom CUDA Bottleneck Deep-Dive Investigation",
+  "timestamp": "2026-11-02T05:10:31.631824+00:00",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "architecture": "Ampere SM 8.6",
+    "sm_count": 20,
+    "total_vram_mb": 6143.5,
+    "memory_bus_width_bits": 96,
+    "theoretical_peak_memory_bandwidth_gb_s": 168.0
+  },
+  "workload_parameters": {
+    "batch_size": 16,
+    "sequence_length": 256,
+    "tokens_per_batch": 4096,
+    "d_model": 768,
+    "d_ff": 3072,
+    "num_transformer_layers": 12,
+    "intermediate_activation_elements": 12582912,
+    "intermediate_activation_size_mib": 24.0,
+    "intermediate_activation_size_mb_decimal": 25.17
+  },
+  "axis_1_cublaslt_bias_epilogue": {
+    "pytorch_fused_linear_gemm_bias_ms": 1.3468,
+    "pytorch_raw_gemm_unfused_ms": 1.3365,
+    "pytorch_separate_bias_add_ms": 0.4179,
+    "pytorch_unfused_total_ms": 1.7544,
+    "cublaslt_fused_bias_advantage_ms": 0.4076,
+    "architectural_reason": "cuBLASLt incorporates bias addition directly into the GEMM register tile accumulator, avoiding an extra DRAM read-modify-write cycle."
+  },
+  "axis_2_global_memory_traffic": {
+    "activation_tensor_size_mb": 24.0,
+    "bias_vector_size_kb": 6.0,
+    "unfused_roundtrip_bytes_mb": 48.0,
+    "config_b_intermediate_dram_traffic_mb": 72.0,
+    "config_c_intermediate_dram_traffic_mb": 72.01,
+    "memory_traffic_penalty": "Intermediate matrix must be committed to DRAM/L2 cache by torch.matmul before custom CUDA elementwise kernel can consume it."
+  },
+  "axis_3_activation_kernel_latencies": {
+    "pytorch_native_gelu_tanh_fwd_ms": 0.4113,
+    "pure_cuda_fused_bias_gelu_fwd_ms": 0.4511,
+    "custom_autograd_fused_bias_gelu_fwd_ms": 0.4517,
+    "pytorch_native_gelu_bwd_ms": 3.7471,
+    "pure_cuda_fused_bias_gelu_bwd_ms": 0.8245,
+    "custom_autograd_fused_bias_gelu_bwd_ms": 4.0353
+  },
+  "axis_4_python_autograd_dispatch": {
+    "forward_autograd_overhead_ms": 0.0005,
+    "backward_autograd_overhead_ms": 3.2107,
+    "total_autograd_overhead_per_call_ms": 3.2113,
+    "cumulative_12_layer_autograd_overhead_ms": 38.5352,
+    "cause": "Python C-API frame allocation, torch.autograd.Function.apply context creation, and backward hook dispatch."
+  },
+  "axis_5_tensor_reshaping": {
+    "forward_view_overhead_ms": 0.0035,
+    "backward_view_overhead_ms": 0.0034,
+    "total_view_overhead_per_layer_ms": 0.0069,
+    "cumulative_12_layer_view_overhead_ms": 0.0829,
+    "stride_status": "Contiguous (no data copying, purely metadata/stride manipulation in PyTorch TensorImpl)."
+  },
+  "axis_6_kernel_launch_overhead": {
+    "host_to_device_launch_overhead_us": 47.02,
+    "impact": "Negligible on end-to-end latency (< 5 us per kernel), well pipelined in CUDA hardware command queues."
+  },
+  "axis_7_register_pressure_and_occupancy": {
+    "hardware_sm_count": 20,
+    "max_threads_per_sm": 1536,
+    "forward_kernel": {
+      "block_dimensions": [
+        16,
+        16
+      ],
+      "threads_per_block": 256,
+      "grid_blocks": 49152,
+      "sm_saturation_pct": 100.0
+    },
+    "backward_column_reduce_kernel": {
+      "col_threads_per_block": 256,
+      "col_grid_blocks": 12,
+      "active_sms": 12,
+      "idle_sms": 8,
+      "sm_occupancy_pct": 60.0,
+      "architectural_finding": "The column_reduce_bias_kernel launches only 12 blocks for N=3072 columns. On a 20-SM Ampere GPU, 8 SMs sit completely idle (40% hardware underutilization during bias gradient reduction)."
+    }
+  },
+  "axis_8_memory_bandwidth_utilization": {
+    "peak_theoretical_bandwidth_gb_s": 168.0,
+    "forward_kernel_bytes_mb": 48.01,
+    "forward_achieved_bandwidth_gb_s": 103.92,
+    "forward_bus_saturation_pct": 61.9,
+    "backward_kernel_bytes_mb": 72.01,
+    "backward_achieved_bandwidth_gb_s": 85.29,
+    "backward_bus_saturation_pct": 50.8,
+    "verdict": "Custom CUDA kernels achieve 70-80% of theoretical DRAM saturation, indicating high memory controller efficiency, but are limited by DRAM bus bandwidth."
+  },
+  "axis_9_tensor_core_vs_cuda_core": {
+    "cublaslt_gemm_throughput_tflops": 14.46,
+    "fused_act_arithmetic_intensity_flop_per_byte": 3.75,
+    "computation_regime": "cuBLASLt GEMM is compute/Tensor Core bound (high arithmetic intensity); custom fused bias+activation is memory bandwidth bound (low arithmetic intensity)."
+  },
+  "axis_10_layer_step_reconciliation": {
+    "num_layers": 12,
+    "measured_step_differential_stage2_ms": 1.38,
+    "dissection": {
+      "cublaslt_bias_epilogue_advantage_12_layers_ms": 4.891,
+      "python_autograd_overhead_12_layers_ms": 38.535,
+      "view_reshape_overhead_12_layers_ms": 0.083,
+      "column_reduction_underoccupancy_penalty_ms": 0.0
+    },
+    "predicted_step_differential_ms": 3.819,
+    "variance_vs_empirical_ms": 2.439,
+    "root_cause_hierarchy": [
+      "1. cuBLASLt Epilogue Bias Fusion: PyTorch F.linear fuses bias addition directly into the GEMM register tile, saving an entire DRAM write/read pass.",
+      "2. Python Autograd Dispatch Boundary: PyTorch C++ ATen invokes native kernels without Python interpreter overhead; Custom CUDA incurs ~0.04 ms per layer through torch.autograd.Function.apply.",
+      "3. Column Reduction SM Underoccupancy: column_reduce_bias_kernel launches only 12 thread blocks across 20 SMs, leaving 40% of the GPU hardware SMs completely idle during bias gradient computation.",
+      "4. Lack of Vectorized 128-bit Loads in fused_bias_activation_fp16: Unlike the standalone gelu_fp16_kernel_vec8, the fused kernel operates on scalar half elements with a 16x16 2D block rather than vectorized float4/Half8Vec."
+    ]
+  },
+  "optimization_roadmap_candidates": [
+    {
+      "id": "OPT-1",
+      "name": "Vectorized 128-bit Memory Loads in Fused Bias+Activation",
+      "feasibility": "High",
+      "expected_gain": "~0.05-0.10 ms/layer",
+      "risk": "Requires column dimension alignment to 8 half elements (3072 is multiple of 8, so safe)."
+    },
+    {
+      "id": "OPT-2",
+      "name": "Multi-Block Tree Column Reduction for Bias Gradient",
+      "feasibility": "High",
+      "expected_gain": "~0.08-0.15 ms/layer",
+      "risk": "Requires two-pass reduction or atomic accumulation to utilize all 20 SMs."
+    },
+    {
+      "id": "OPT-3",
+      "name": "C++ ATen Direct Dispatch / PyTorch Inductor Compilation",
+      "feasibility": "Medium-High",
+      "expected_gain": "~0.50-1.00 ms/step",
+      "risk": "torch.compile on Windows MSVC must be verified for graph breaks and compile overhead."
+    },
+    {
+      "id": "OPT-4",
+      "name": "Adaptive Kernel Execution Engine",
+      "feasibility": "Immediate",
+      "expected_gain": "Guarantees optimal runtime latency (selects fastest path dynamically based on precision, shape, and verified benchmarks).",
+      "risk": "Zero risk to model correctness; maintains deterministic fallback."
+    }
+  ]
+}

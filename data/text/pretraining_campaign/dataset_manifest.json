@@ -1,0 +1,28 @@
+{
+  "dataset_name": "Milestone12_PublicDomainPretrainingCorpus",
+  "provenance": "Verified Public Domain & Permissive Literature (Project Gutenberg & Shakespeare)",
+  "license": "Public Domain / CC0 / Permissive Open Documentation",
+  "content_hash_sha256": "1a7d1fe256f86c62438929a0fae0c85b9ebd5a2a23a700523faab13cf40278d4",
+  "total_documents": 6,
+  "train_documents": [
+    "Complete Shakespeare Dramatic Works & Poetry",
+    "Frankenstein; or, The Modern Prometheus",
+    "The Adventures of Sherlock Holmes",
+    "Parallel Computing Principles and Tensor Attention Mechanics",
+    "Philosophical & Mathematical Foundations of Analytical Engines"
+  ],
+  "val_documents": [
+    "The Time Machine"
+  ],
+  "train_tokens": 1259843,
+  "val_tokens": 104180,
+  "total_tokens": 1364023,
+  "vocab_size": 2048,
+  "tokenizer_path": "checkpoints/transformer/pretraining_campaign/tokenizer/bpe_vocab.json",
+  "train_bin_path": "data/text/pretraining_campaign/train_tokens.bin",
+  "val_bin_path": "data/text/pretraining_campaign/val_tokens.bin",
+  "context_length": 256,
+  "train_chunks_available": 4920,
+  "val_chunks_available": 405,
+  "created_at": "2026-10-24T07:29:40Z"
+}

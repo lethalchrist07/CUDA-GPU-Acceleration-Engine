@@ -1,0 +1,216 @@
+{
+  "validation_timestamp": "2026-10-28T18:00:50.049587+00:00",
+  "device": "cuda:0",
+  "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "cuda_version": "12.4",
+  "pytorch_version": "2.6.0+cu124",
+  "operators_validated": [
+    {
+      "operator": "vector_add",
+      "shape": [
+        1024,
+        768
+      ],
+      "forward_max_abs_err": 0.0,
+      "backward_max_abs_err_a": 0.0,
+      "backward_max_abs_err_b": 0.0,
+      "parity_status": "PASSED"
+    },
+    {
+      "operator": "scale",
+      "shape": [
+        1024,
+        768
+      ],
+      "alpha": 2.71828,
+      "forward_max_abs_err": 0.0,
+      "backward_max_abs_err": 0.0,
+      "parity_status": "PASSED"
+    },
+    {
+      "operator": "gelu_tanh",
+      "shape": [
+        1024,
+        768
+      ],
+      "forward_max_abs_err": 2.384185791015625e-07,
+      "backward_max_abs_err": 4.76837158203125e-07,
+      "parity_status": "PASSED"
+    },
+    {
+      "operator": "fused_bias_activation_gelu",
+      "shape": [
+        1024,
+        768
+      ],
+      "forward_max_abs_err": 2.384185791015625e-07,
+      "backward_max_abs_err_x": 4.76837158203125e-07,
+      "backward_max_abs_err_bias": 9.1552734375e-05,
+      "parity_status": "PASSED"
+    },
+    {
+      "operator": "fused_bias_activation_relu",
+      "shape": [
+        1024,
+        768
+      ],
+      "forward_max_abs_err": 0.0,
+      "backward_max_abs_err_x": 0.0,
+      "backward_max_abs_err_bias": 6.4849853515625e-05,
+      "parity_status": "PASSED"
+    },
+    {
+      "operator": "CustomLinear",
+      "shape": [
+        32,
+        768,
+        3072
+      ],
+      "forward_max_abs_err": 3.0994415283203125e-06,
+      "backward_max_abs_err_weight": 0.0,
+      "backward_max_abs_err_bias": 3.814697265625e-06,
+      "backward_max_abs_err_input": 9.775161743164062e-06,
+      "parity_status": "PASSED"
+    }
+  ],
+  "multi_step_optimization": {
+    "steps": 20,
+    "architecture": "MLP 768 -> 1536 (Fused Bias+GELU) -> 768",
+    "optimizer": "AdamW (lr=1e-3)",
+    "initial_loss_pytorch": 1.026641,
+    "initial_loss_custom_cuda": 1.026641,
+    "final_loss_pytorch": 1.057163,
+    "final_loss_custom_cuda": 1.057163,
+    "final_loss_abs_diff": 0.0,
+    "max_loss_abs_diff_across_run": 1.2e-07,
+    "final_param_max_diff": {
+      "fc1_weight": 3.721565008163452e-06,
+      "fc1_bias": 1.1920928955078125e-07,
+      "fc2_weight": 1.359451562166214e-05,
+      "fc2_bias": 2.7939677238464355e-08
+    },
+    "loss_trajectory": [
+      {
+        "step": 1,
+        "loss_pytorch": 1.026641,
+        "loss_custom_cuda": 1.026641,
+        "loss_abs_diff": 1.2e-07
+      },
+      {
+        "step": 2,
+        "loss_pytorch": 1.051936,
+        "loss_custom_cuda": 1.051936,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 3,
+        "loss_pytorch": 1.061793,
+        "loss_custom_cuda": 1.061793,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 4,
+        "loss_pytorch": 1.045494,
+        "loss_custom_cuda": 1.045494,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 5,
+        "loss_pytorch": 1.055456,
+        "loss_custom_cuda": 1.055456,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 6,
+        "loss_pytorch": 1.072191,
+        "loss_custom_cuda": 1.072191,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 7,
+        "loss_pytorch": 1.056057,
+        "loss_custom_cuda": 1.056058,
+        "loss_abs_diff": 1.2e-07
+      },
+      {
+        "step": 8,
+        "loss_pytorch": 1.050198,
+        "loss_custom_cuda": 1.050198,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 9,
+        "loss_pytorch": 1.056269,
+        "loss_custom_cuda": 1.05627,
+        "loss_abs_diff": 1.2e-07
+      },
+      {
+        "step": 10,
+        "loss_pytorch": 1.063819,
+        "loss_custom_cuda": 1.063819,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 11,
+        "loss_pytorch": 1.033443,
+        "loss_custom_cuda": 1.033443,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 12,
+        "loss_pytorch": 1.048815,
+        "loss_custom_cuda": 1.048815,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 13,
+        "loss_pytorch": 1.065672,
+        "loss_custom_cuda": 1.065672,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 14,
+        "loss_pytorch": 1.058227,
+        "loss_custom_cuda": 1.058227,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 15,
+        "loss_pytorch": 1.047314,
+        "loss_custom_cuda": 1.047314,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 16,
+        "loss_pytorch": 1.047785,
+        "loss_custom_cuda": 1.047785,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 17,
+        "loss_pytorch": 1.041747,
+        "loss_custom_cuda": 1.041747,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 18,
+        "loss_pytorch": 1.06407,
+        "loss_custom_cuda": 1.06407,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 19,
+        "loss_pytorch": 1.053771,
+        "loss_custom_cuda": 1.053771,
+        "loss_abs_diff": 0.0
+      },
+      {
+        "step": 20,
+        "loss_pytorch": 1.057163,
+        "loss_custom_cuda": 1.057163,
+        "loss_abs_diff": 0.0
+      }
+    ]
+  },
+  "status": "PASSED_STRICT_NUMERICAL_PARITY"
+}

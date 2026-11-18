@@ -1,0 +1,367 @@
+{
+  "audit_timestamp": "2026-10-28T17:55:09.764527+00:00",
+  "status": "100%_LEGALLY_VERIFIED_COMPLIANT",
+  "documents_audited": 36,
+  "licenses": [
+    {
+      "doc_id": "complete_shakespeare",
+      "title": "Complete Shakespeare Dramatic Works & Poetry",
+      "license": "Public Domain (Worldwide)",
+      "license_category": "Public Domain (Worldwide)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "frankenstein",
+      "title": "Frankenstein; or, The Modern Prometheus",
+      "license": "Public Domain (US / Project Gutenberg #84)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "sherlock_holmes",
+      "title": "The Adventures of Sherlock Holmes",
+      "license": "Public Domain (US / Project Gutenberg #1661)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "tale_of_two_cities",
+      "title": "A Tale of Two Cities",
+      "license": "Public Domain (US / Project Gutenberg #98)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "pride_and_prejudice",
+      "title": "Pride and Prejudice",
+      "license": "Public Domain (US / Project Gutenberg #1342)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "moby_dick",
+      "title": "Moby-Dick; or, The Whale",
+      "license": "Public Domain (US / Project Gutenberg #2701)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "count_of_monte_cristo",
+      "title": "The Count of Monte Cristo",
+      "license": "Public Domain (US / Project Gutenberg #1184)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "dracula",
+      "title": "Dracula",
+      "license": "Public Domain (US / Project Gutenberg #345)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "jane_eyre",
+      "title": "Jane Eyre: An Autobiography",
+      "license": "Public Domain (US / Project Gutenberg #1260)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "wuthering_heights",
+      "title": "Wuthering Heights",
+      "license": "Public Domain (US / Project Gutenberg #768)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "gullivers_travels",
+      "title": "Gulliver's Travels into Several Remote Nations of the World",
+      "license": "Public Domain (US / Project Gutenberg #829)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "robinson_crusoe",
+      "title": "The Life and Adventures of Robinson Crusoe",
+      "license": "Public Domain (US / Project Gutenberg #521)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "great_expectations",
+      "title": "Great Expectations",
+      "license": "Public Domain (US / Project Gutenberg #1400)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "war_of_the_worlds",
+      "title": "The War of the Worlds",
+      "license": "Public Domain (US / Project Gutenberg #36)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "the_invisible_man",
+      "title": "The Invisible Man: A Grotesque Romance",
+      "license": "Public Domain (US / Project Gutenberg #5230)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "twenty_thousand_leagues",
+      "title": "Twenty Thousand Leagues Under the Sea",
+      "license": "Public Domain (US / Project Gutenberg #164)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "treasure_island",
+      "title": "Treasure Island",
+      "license": "Public Domain (US / Project Gutenberg #120)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "huckleberry_finn",
+      "title": "Adventures of Huckleberry Finn",
+      "license": "Public Domain (US / Project Gutenberg #76)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "the_last_man",
+      "title": "The Last Man",
+      "license": "Public Domain (US / Project Gutenberg #18247)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "hound_of_the_baskervilles",
+      "title": "The Hound of the Baskervilles",
+      "license": "Public Domain (US / Project Gutenberg #2852)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "sign_of_the_four",
+      "title": "The Sign of the Four",
+      "license": "Public Domain (US / Project Gutenberg #2097)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "origin_of_species",
+      "title": "On the Origin of Species by Means of Natural Selection",
+      "license": "Public Domain (US / Project Gutenberg #1228)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "voyage_of_the_beagle",
+      "title": "Journal of Researches into the Natural History and Geology of the Countries Visited During the Voyage of H.M.S. Beagle",
+      "license": "Public Domain (US / Project Gutenberg #3704)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "faraday_researches_electricity",
+      "title": "Experimental Researches in Electricity (Volumes 1 & 2)",
+      "license": "Public Domain (US / Project Gutenberg #14986)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "poincare_value_of_science",
+      "title": "The Value of Science",
+      "license": "Public Domain (US / Project Gutenberg #39064)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "maxwell_matter_and_motion",
+      "title": "Matter and Motion",
+      "license": "Public Domain (US / Project Gutenberg #48433)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "galileo_two_new_sciences",
+      "title": "Dialogues Concerning Two New Sciences",
+      "license": "Public Domain (US / Project Gutenberg #37722)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "bacon_novum_organum",
+      "title": "Novum Organum; or, True Suggestions for the Interpretation of Nature",
+      "license": "Public Domain (US / Project Gutenberg #45988)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "rfc791_ipv4",
+      "title": "Internet Protocol: DARPA Internet Program Protocol Specification (RFC 791)",
+      "license": "IETF Open Standard / Public Domain",
+      "license_category": "IETF Open Standard",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "rfc793_tcp",
+      "title": "Transmission Control Protocol: DARPA Internet Program Protocol Specification (RFC 793)",
+      "license": "IETF Open Standard / Public Domain",
+      "license_category": "IETF Open Standard",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "rfc2616_http11",
+      "title": "Hypertext Transfer Protocol -- HTTP/1.1 (RFC 2616)",
+      "license": "IETF Open Standard / Public Domain",
+      "license_category": "IETF Open Standard",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "rfc1034_dns",
+      "title": "Domain Names - Concepts and Facilities (RFC 1034)",
+      "license": "IETF Open Standard / Public Domain",
+      "license_category": "IETF Open Standard",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "the_time_machine",
+      "title": "The Time Machine",
+      "license": "Public Domain (US / Project Gutenberg #35)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "isaac_newton_opticks",
+      "title": "Opticks: or, a Treatise of the Reflections, Refractions, Inflections and Colours of Light",
+      "license": "Public Domain (US / Project Gutenberg #33504)",
+      "license_category": "Public Domain (US / Project Gutenberg)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "computing_foundations",
+      "title": "Parallel Computing Principles",
+      "license": "CC0/MIT Permissive",
+      "license_category": "Permissive Open Documentation",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    },
+    {
+      "doc_id": "scientific_essays",
+      "title": "Philosophical Foundations of Analytical Engines",
+      "license": "Public Domain",
+      "license_category": "Public Domain (Worldwide)",
+      "commercial_usable": true,
+      "research_usable": true,
+      "redistribution_compliant": true,
+      "provenance_verified": true
+    }
+  ]
+}

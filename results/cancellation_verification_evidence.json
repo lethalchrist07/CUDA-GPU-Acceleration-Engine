@@ -1,0 +1,12 @@
+{
+  "job_id": "job_20261113_163458_619abc",
+  "initial_status": "QUEUED",
+  "cancel_response": {
+    "status": "cancel_requested",
+    "job_id": "job_20261113_163458_619abc",
+    "cancelled": true,
+    "message": "Cancellation signal transmitted. Job will terminate at next step boundary."
+  },
+  "final_status": "CANCELLED",
+  "cancelled_ok": true
+}

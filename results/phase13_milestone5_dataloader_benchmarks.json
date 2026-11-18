@@ -1,0 +1,85 @@
+{
+  "benchmark_timestamp": "2026-10-28T17:56:59.165239+00:00",
+  "device": "cuda:0",
+  "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "dataset_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\data\\text\\production_10m\\train_tokens.bin",
+  "total_tokens": 13215150,
+  "total_chunks": 51621,
+  "context_length": 256,
+  "instantiation_latency_ms": 4.133,
+  "pure_getitem_latency_us": 38.22,
+  "pure_getitem_throughput_tokens_per_sec": 6698335.5,
+  "batch_size_scaling": [
+    {
+      "batch_size": 4,
+      "tokens_per_batch": 1024,
+      "batches_evaluated": 50,
+      "tokens_evaluated": 51200,
+      "latency_per_batch_ms": 0.34,
+      "throughput_tokens_per_sec": 3008773.6
+    },
+    {
+      "batch_size": 8,
+      "tokens_per_batch": 2048,
+      "batches_evaluated": 50,
+      "tokens_evaluated": 102400,
+      "latency_per_batch_ms": 0.425,
+      "throughput_tokens_per_sec": 4820910.7
+    },
+    {
+      "batch_size": 16,
+      "tokens_per_batch": 4096,
+      "batches_evaluated": 50,
+      "tokens_evaluated": 204800,
+      "latency_per_batch_ms": 0.697,
+      "throughput_tokens_per_sec": 5875400.2
+    },
+    {
+      "batch_size": 32,
+      "tokens_per_batch": 8192,
+      "batches_evaluated": 50,
+      "tokens_evaluated": 409600,
+      "latency_per_batch_ms": 1.082,
+      "throughput_tokens_per_sec": 7572550.2
+    }
+  ],
+  "worker_scaling": [
+    {
+      "num_workers": 0,
+      "latency_ms": 0.607,
+      "throughput_tokens_per_sec": 6750721.0
+    },
+    {
+      "num_workers": 2,
+      "latency_ms": 1.106,
+      "throughput_tokens_per_sec": 3704147.5
+    }
+  ],
+  "pinned_memory_comparison": [
+    {
+      "pin_memory": false,
+      "latency_ms": 0.545,
+      "throughput_tokens_per_sec": 7520356.9
+    },
+    {
+      "pin_memory": true,
+      "latency_ms": 0.838,
+      "throughput_tokens_per_sec": 4887522.0
+    }
+  ],
+  "host_to_device_transfer": {
+    "tensor_shape": [
+      16,
+      256
+    ],
+    "dtype": "torch.int64",
+    "bytes_per_transfer": 32768,
+    "pageable_latency_us": 212.24,
+    "pageable_bandwidth_gb_s": 0.15,
+    "pinned_latency_us": 35.82,
+    "pinned_bandwidth_gb_s": 0.91,
+    "speedup_factor": 5.92
+  },
+  "reproducible_shuffling_verified": true,
+  "status": "PASSED_HIGH_THROUGHPUT_ZERO_COPY"
+}

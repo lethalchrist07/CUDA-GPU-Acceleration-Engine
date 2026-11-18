@@ -1,0 +1,192 @@
+{
+  "total_tokens": 13651126,
+  "train_tokens": 13215150,
+  "val_tokens": 104180,
+  "test_tokens": 331796,
+  "tokens_per_character": 0.5741,
+  "characters_per_token": 1.7418,
+  "domain_distribution": {
+    "Classical Literature": {
+      "documents": 21,
+      "chars": 16006081,
+      "words": 2862284,
+      "tokens": 9277686
+    },
+    "Scientific & Mathematical": {
+      "documents": 8,
+      "chars": 6312224,
+      "words": 1050878,
+      "tokens": 3501324
+    },
+    "Computer Science & Technical Standards": {
+      "documents": 5,
+      "chars": 707261,
+      "words": 108016,
+      "tokens": 436140
+    },
+    "Classical Literature (Held-out Validation)": {
+      "documents": 1,
+      "chars": 182089,
+      "words": 32454,
+      "tokens": 104180
+    },
+    "Scientific & Mathematical (Held-out Test)": {
+      "documents": 1,
+      "chars": 569642,
+      "words": 100801,
+      "tokens": 331796
+    }
+  },
+  "top_25_tokens_frequency": [
+    {
+      "token_id": 36,
+      "representation": "'<byte_20>'",
+      "sample_frequency": 541712,
+      "sample_percentage": 27.086
+    },
+    {
+      "token_id": 105,
+      "representation": "'<byte_65>'",
+      "sample_frequency": 54277,
+      "sample_percentage": 2.714
+    },
+    {
+      "token_id": 48,
+      "representation": "'<byte_2c>'",
+      "sample_frequency": 52723,
+      "sample_percentage": 2.636
+    },
+    {
+      "token_id": 266,
+      "representation": "'\\n\\n'",
+      "sample_frequency": 43412,
+      "sample_percentage": 2.171
+    },
+    {
+      "token_id": 119,
+      "representation": "'<byte_73>'",
+      "sample_frequency": 38792,
+      "sample_percentage": 1.94
+    },
+    {
+      "token_id": 387,
+      "representation": "'the'",
+      "sample_frequency": 29231,
+      "sample_percentage": 1.462
+    },
+    {
+      "token_id": 50,
+      "representation": "'<byte_2e>'",
+      "sample_frequency": 28269,
+      "sample_percentage": 1.413
+    },
+    {
+      "token_id": 125,
+      "representation": "'<byte_79>'",
+      "sample_frequency": 28252,
+      "sample_percentage": 1.413
+    },
+    {
+      "token_id": 104,
+      "representation": "'<byte_64>'",
+      "sample_frequency": 25826,
+      "sample_percentage": 1.291
+    },
+    {
+      "token_id": 14,
+      "representation": "'<byte_0a>'",
+      "sample_frequency": 25555,
+      "sample_percentage": 1.278
+    },
+    {
+      "token_id": 77,
+      "representation": "'<byte_49>'",
+      "sample_frequency": 20259,
+      "sample_percentage": 1.013
+    },
+    {
+      "token_id": 383,
+      "representation": "'and'",
+      "sample_frequency": 19411,
+      "sample_percentage": 0.971
+    },
+    {
+      "token_id": 325,
+      "representation": "'ed'",
+      "sample_frequency": 19281,
+      "sample_percentage": 0.964
+    },
+    {
+      "token_id": 428,
+      "representation": "'to'",
+      "sample_frequency": 16891,
+      "sample_percentage": 0.845
+    },
+    {
+      "token_id": 120,
+      "representation": "'<byte_74>'",
+      "sample_frequency": 16859,
+      "sample_percentage": 0.843
+    },
+    {
+      "token_id": 101,
+      "representation": "'<byte_61>'",
+      "sample_frequency": 15982,
+      "sample_percentage": 0.799
+    },
+    {
+      "token_id": 460,
+      "representation": "'of'",
+      "sample_frequency": 15672,
+      "sample_percentage": 0.784
+    },
+    {
+      "token_id": 265,
+      "representation": "'in'",
+      "sample_frequency": 15182,
+      "sample_percentage": 0.759
+    },
+    {
+      "token_id": 112,
+      "representation": "'<byte_6c>'",
+      "sample_frequency": 15039,
+      "sample_percentage": 0.752
+    },
+    {
+      "token_id": 261,
+      "representation": "'th'",
+      "sample_frequency": 14903,
+      "sample_percentage": 0.745
+    },
+    {
+      "token_id": 292,
+      "representation": "'ing'",
+      "sample_frequency": 13353,
+      "sample_percentage": 0.668
+    },
+    {
+      "token_id": 123,
+      "representation": "'<byte_77>'",
+      "sample_frequency": 13085,
+      "sample_percentage": 0.654
+    },
+    {
+      "token_id": 267,
+      "representation": "'er'",
+      "sample_frequency": 11281,
+      "sample_percentage": 0.564
+    },
+    {
+      "token_id": 307,
+      "representation": "'is'",
+      "sample_frequency": 10906,
+      "sample_percentage": 0.545
+    },
+    {
+      "token_id": 62,
+      "representation": "'<byte_3a>'",
+      "sample_frequency": 10873,
+      "sample_percentage": 0.544
+    }
+  ]
+}

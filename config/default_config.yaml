@@ -1,7 +1,7 @@
-﻿# CUDA AI Acceleration Engine - Default Configuration
+# CUDA AI Acceleration Engine - Default Configuration
 system:
   project_name: "CUDA AI Acceleration Engine"
-  version: "0.2.0-phase2"
+  version: "1.0.0-rc2"
   seed: 42
 
 hardware:

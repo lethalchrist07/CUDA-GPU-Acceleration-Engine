@@ -1,0 +1,140 @@
+{
+  "milestone": "Phase 13 Milestone 8",
+  "stage": "Stage 6 - Numerical Correctness & Training Validation",
+  "timestamp": "2026-11-02T05:17:43.135801+00:00",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "architecture": "Ampere SM 8.6",
+    "sm_count": 20
+  },
+  "model_architecture": {
+    "d_model": 768,
+    "d_ff": 3072,
+    "n_layer": 12,
+    "n_head": 12,
+    "vocab_size": 2048
+  },
+  "forward_parity_tests": [
+    {
+      "shape": [
+        16,
+        256,
+        768
+      ],
+      "tokens": 4096,
+      "fp32_tanh_max_diff": 1.19e-07,
+      "fp32_tanh_mean_diff": 2e-09,
+      "fp32_erf_max_diff": 0.000211,
+      "fp32_status": "PASS",
+      "fp16_max_diff": 0.000488,
+      "fp16_mean_diff": 7.2e-05,
+      "fp16_status": "PASS"
+    },
+    {
+      "shape": [
+        8,
+        512,
+        768
+      ],
+      "tokens": 4096,
+      "fp32_tanh_max_diff": 1.19e-07,
+      "fp32_tanh_mean_diff": 2e-09,
+      "fp32_erf_max_diff": 0.000198,
+      "fp32_status": "PASS",
+      "fp16_max_diff": 0.000977,
+      "fp16_mean_diff": 7.24e-05,
+      "fp16_status": "PASS"
+    },
+    {
+      "shape": [
+        32,
+        128,
+        768
+      ],
+      "tokens": 4096,
+      "fp32_tanh_max_diff": 1.19e-07,
+      "fp32_tanh_mean_diff": 3e-09,
+      "fp32_erf_max_diff": 0.000219,
+      "fp32_status": "PASS",
+      "fp16_max_diff": 0.000491,
+      "fp16_mean_diff": 7.25e-05,
+      "fp16_status": "PASS"
+    },
+    {
+      "shape": [
+        4,
+        1024,
+        768
+      ],
+      "tokens": 4096,
+      "fp32_tanh_max_diff": 1.19e-07,
+      "fp32_tanh_mean_diff": 3e-09,
+      "fp32_erf_max_diff": 0.000225,
+      "fp32_status": "PASS",
+      "fp16_max_diff": 0.000488,
+      "fp16_mean_diff": 7.22e-05,
+      "fp16_status": "PASS"
+    }
+  ],
+  "backward_gradient_parity": {
+    "gradient_differences": {
+      "input_grad_max_diff": 1.8e-07,
+      "c_fc_weight_grad_max_diff": 1.526e-05,
+      "c_fc_bias_grad_max_diff": 9.155e-05,
+      "c_proj_weight_grad_max_diff": 7.63e-06,
+      "c_proj_bias_grad_max_diff": 0.0
+    },
+    "all_gradients_finite": true,
+    "max_gradient_difference": 9.155e-05,
+    "status": "PASS"
+  },
+  "determinism_verification": {
+    "num_runs": 5,
+    "max_discrepancy": 0.0,
+    "status": "PASS"
+  },
+  "convergence_stability_10_steps": {
+    "config_a_losses": [
+      7.7757,
+      7.7841,
+      7.7497,
+      7.7275,
+      7.7207,
+      7.7182,
+      7.7027,
+      7.6801,
+      7.6646,
+      7.6658
+    ],
+    "config_b_losses": [
+      7.7754,
+      7.785,
+      7.7496,
+      7.7273,
+      7.7204,
+      7.7177,
+      7.7023,
+      7.6799,
+      7.6646,
+      7.6656
+    ],
+    "config_c_losses": [
+      7.7754,
+      7.785,
+      7.7497,
+      7.7273,
+      7.7204,
+      7.7177,
+      7.7023,
+      7.6799,
+      7.6646,
+      7.6656
+    ],
+    "loss_reduction_config_a": 0.11,
+    "loss_reduction_config_b": 0.1098,
+    "loss_reduction_config_c": 0.1098,
+    "all_finite": true,
+    "status": "PASS"
+  },
+  "overall_numerical_verdict": "CERTIFIED: All forward parity, backward gradient checks, determinism tests, and convergence stability experiments passed with zero numerical defects."
+}

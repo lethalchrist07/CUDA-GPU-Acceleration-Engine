@@ -1,0 +1,93 @@
+{
+  "benchmark": "ScalableMemmapDataset DataLoader Performance",
+  "dataset_file": "data/text/pretraining_campaign/train_tokens.bin",
+  "total_dataset_tokens": 1259843,
+  "dataset_file_size_bytes": 2519686,
+  "baseline_rss_mb": 410.34,
+  "configurations": [
+    {
+      "batch_size": 2,
+      "seq_len": 256,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0108,
+      "batches_per_second": 18510.1,
+      "sequences_per_second": 37020.2,
+      "tokens_per_second": 9477181.6,
+      "mb_per_second": 18.08,
+      "peak_rss_mb": 537.42,
+      "ram_delta_mb": 127.08,
+      "causal_target_alignment_verified": true
+    },
+    {
+      "batch_size": 4,
+      "seq_len": 256,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0137,
+      "batches_per_second": 14628.4,
+      "sequences_per_second": 58513.8,
+      "tokens_per_second": 14979520.2,
+      "mb_per_second": 28.57,
+      "peak_rss_mb": 537.99,
+      "ram_delta_mb": 127.66,
+      "causal_target_alignment_verified": true
+    },
+    {
+      "batch_size": 8,
+      "seq_len": 256,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0194,
+      "batches_per_second": 10318.2,
+      "sequences_per_second": 82545.3,
+      "tokens_per_second": 21131592.6,
+      "mb_per_second": 40.31,
+      "peak_rss_mb": 538.43,
+      "ram_delta_mb": 128.09,
+      "causal_target_alignment_verified": true
+    },
+    {
+      "batch_size": 16,
+      "seq_len": 256,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0309,
+      "batches_per_second": 6477.6,
+      "sequences_per_second": 103641.7,
+      "tokens_per_second": 26532277.9,
+      "mb_per_second": 50.61,
+      "peak_rss_mb": 538.6,
+      "ram_delta_mb": 128.26,
+      "causal_target_alignment_verified": true
+    },
+    {
+      "batch_size": 4,
+      "seq_len": 128,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0132,
+      "batches_per_second": 15147.0,
+      "sequences_per_second": 60588.2,
+      "tokens_per_second": 7755284.4,
+      "mb_per_second": 14.79,
+      "peak_rss_mb": 538.41,
+      "ram_delta_mb": 128.07,
+      "causal_target_alignment_verified": true
+    },
+    {
+      "batch_size": 4,
+      "seq_len": 512,
+      "num_workers": 0,
+      "batches_profiled": 200,
+      "duration_sec": 0.0139,
+      "batches_per_second": 14409.4,
+      "sequences_per_second": 57637.7,
+      "tokens_per_second": 29510511.7,
+      "mb_per_second": 56.29,
+      "peak_rss_mb": 538.75,
+      "ram_delta_mb": 128.42,
+      "causal_target_alignment_verified": true
+    }
+  ]
+}

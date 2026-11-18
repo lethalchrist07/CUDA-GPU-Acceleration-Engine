@@ -1,7 +1,7 @@
 """
 Custom CUDA Kernel Library for CUDA GPU Acceleration Engine
-Target: NVIDIA GeForce RTX 3050 Laptop GPU (sm_86)
-Toolchain: CUDA 12.4.1 + MSVC 19.38
+Target: NVIDIA GeForce RTX 3050 Laptop GPU (sm_86), Ada Lovelace (sm_89), Blackwell (sm_100/120)
+Toolchain: Portable CUDA + MSVC Toolchain Detection with Pure PyTorch Fallbacks
 
 All operations in this package support mixed precision:
 - float32 (FP32)
@@ -13,18 +13,50 @@ inference operators that do not attach PyTorch autograd computation graphs.
 For end-to-end PyTorch autograd training with backward gradient propagation, use
 custom_kernels.autograd (e.g., custom_kernels.autograd.vector_add, custom_kernels.autograd.matmul).
 """
-from typing import Optional
+from typing import Any, Dict, Optional
 import torch
 
-from .loader import load_custom_kernels_module
+from .loader import (
+    load_custom_kernels_module,
+    configure_process_toolchain,
+    get_toolchain_status,
+    reset_cached_module,
+)
 
 _cuda_module = None
 
-def _get_module():
+
+def _get_module(allow_fallback: bool = True):
     global _cuda_module
     if _cuda_module is None:
-        _cuda_module = load_custom_kernels_module()
+        _cuda_module = load_custom_kernels_module(allow_fallback=allow_fallback)
     return _cuda_module
+
+
+def is_native_available() -> bool:
+    """Return True if genuine compiled C++/CUDA kernels are loaded and active."""
+    mod = _get_module(allow_fallback=True)
+    return getattr(mod, "is_native", False)
+
+
+def is_fallback_active() -> bool:
+    """Return True if running under pure PyTorch / CPU fallback."""
+    mod = _get_module(allow_fallback=True)
+    return getattr(mod, "is_fallback", False)
+
+
+def get_backend_status() -> Dict[str, Any]:
+    """Return comprehensive toolchain, device, and kernel execution status."""
+    mod = _get_module(allow_fallback=True)
+    cuda_avail = torch.cuda.is_available()
+    return {
+        "is_native": getattr(mod, "is_native", False),
+        "is_fallback": getattr(mod, "is_fallback", False),
+        "cuda_available": cuda_avail,
+        "device_name": torch.cuda.get_device_name(0) if cuda_avail else "CPU",
+        "toolchain": get_toolchain_status(),
+    }
+
 
 def vector_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
@@ -34,6 +66,7 @@ def vector_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
     return _get_module().vector_add(a, b)
 
+
 def scale(x: torch.Tensor, alpha: float) -> torch.Tensor:
     """
     Vector scaling: out = alpha * x
@@ -41,6 +74,7 @@ def scale(x: torch.Tensor, alpha: float) -> torch.Tensor:
     Input must be a contiguous CUDA tensor (float32, float16, or bfloat16).
     """
     return _get_module().vector_scale(x, float(alpha))
+
 
 def fused_add_relu(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
@@ -50,6 +84,7 @@ def fused_add_relu(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     Supports float32, float16, and bfloat16.
     """
     return _get_module().fused_add_relu(a, b)
+
 
 def fused_bias_activation(x: torch.Tensor, bias: torch.Tensor, activation: str = "relu") -> torch.Tensor:
     """
@@ -62,6 +97,7 @@ def fused_bias_activation(x: torch.Tensor, bias: torch.Tensor, activation: str =
     """
     return _get_module().fused_bias_activation(x, bias, activation.lower())
 
+
 def relu(x: torch.Tensor) -> torch.Tensor:
     """
     Rectified Linear Unit: out = max(0, x)
@@ -69,6 +105,7 @@ def relu(x: torch.Tensor) -> torch.Tensor:
     Supports float32, float16, and bfloat16.
     """
     return _get_module().relu(x)
+
 
 def gelu(x: torch.Tensor) -> torch.Tensor:
     """
@@ -79,6 +116,7 @@ def gelu(x: torch.Tensor) -> torch.Tensor:
     """
     return _get_module().gelu(x)
 
+
 def sigmoid(x: torch.Tensor) -> torch.Tensor:
     """
     Sigmoid activation: out = 1 / (1 + exp(-x))
@@ -86,6 +124,7 @@ def sigmoid(x: torch.Tensor) -> torch.Tensor:
     Supports float32, float16, and bfloat16.
     """
     return _get_module().sigmoid(x)
+
 
 def reduce_sum(x: torch.Tensor, output_fp32: Optional[bool] = None) -> torch.Tensor:
     """
@@ -100,6 +139,7 @@ def reduce_sum(x: torch.Tensor, output_fp32: Optional[bool] = None) -> torch.Ten
         output_fp32 = (x.numel() > 65536 and x.dtype in (torch.float16, torch.bfloat16))
     return _get_module().reduce_sum(x, bool(output_fp32))
 
+
 def reduce_max(x: torch.Tensor) -> torch.Tensor:
     """
     Max reduction: returns scalar tensor containing max of all elements.
@@ -107,6 +147,7 @@ def reduce_max(x: torch.Tensor) -> torch.Tensor:
     Supports float32, float16, and bfloat16.
     """
     return _get_module().reduce_max(x)
+
 
 def matmul_wmma(a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> torch.Tensor:
     """
@@ -118,6 +159,7 @@ def matmul_wmma(a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> 
     """
     return _get_module().matmul_wmma(a, b, bool(output_fp32))
 
+
 def matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     """
     Matrix multiplication operator: out = a @ b
@@ -128,6 +170,7 @@ def matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     if a.dtype == torch.float16:
         return _get_module().matmul_wmma(a, b, False)
     return _get_module().matmul_tiled(a, b)
+
 
 __all__ = [
     "vector_add",
@@ -142,7 +185,12 @@ __all__ = [
     "matmul",
     "matmul_wmma",
     "autograd",
+    "is_native_available",
+    "is_fallback_active",
+    "get_backend_status",
+    "load_custom_kernels_module",
+    "configure_process_toolchain",
+    "reset_cached_module",
 ]
 
 from . import autograd
-

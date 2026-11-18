@@ -179,45 +179,45 @@ export const TrainingStudio: React.FC = () => {
   return (
     <div id="section-training-studio" className="space-y-6 animate-fadeIn">
       {/* Studio Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel rounded-2xl p-6 border border-white/[0.08]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#171A1F] rounded-2xl p-6 border border-[#30353D] shadow-sm">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#76b900] to-emerald-800 text-slate-950 font-bold border border-[#76b900]/40 shadow-md shadow-[#76b900]/20">
-              <Flame className="w-6 h-6 fill-current text-slate-950" />
+            <div className="p-2.5 rounded-xl bg-[#76B900]/10 text-[#76B900] border border-[#76B900]/30">
+              <Flame className="w-6 h-6 text-[#76B900]" />
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-[#F5F5F4] tracking-tight font-sans">
                 AI Training Studio
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Real PyTorch & Custom CUDA Training Orchestration • Laptop RTX 3050 6GB GPU
+              <p className="text-xs sm:text-sm text-[#A6ADB7] mt-0.5 font-sans">
+                Real PyTorch &amp; Custom CUDA Training Orchestration • Laptop RTX 3050 6GB GPU
               </p>
             </div>
           </div>
         </div>
 
         {/* Studio Sub-Navigation Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-obsidian-900 border border-white/[0.08] self-start sm:self-auto font-mono text-xs">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#121519] border border-[#30353D] self-start sm:self-auto font-sans text-xs">
           <button
             onClick={() => setActiveStudioTab('studio')}
             id="tab-studio-workspace"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
               activeStudioTab === 'studio'
-                ? 'bg-[#76b900]/20 text-[#76b900] border border-[#76b900]/40 shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[#76B900]/15 text-[#76B900] border border-[#76B900]/40 font-semibold'
+                : 'text-[#A6ADB7] hover:text-[#F5F5F4] hover:bg-[#20242A]'
             }`}
           >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            <span>Launch & Monitor</span>
+            <Play className="w-3.5 h-3.5 fill-current text-[#76B900]" />
+            <span>Launch &amp; Monitor</span>
           </button>
 
           <button
             onClick={() => setActiveStudioTab('history')}
             id="tab-studio-history"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
               activeStudioTab === 'history'
-                ? 'bg-[#76b900]/20 text-[#76b900] border border-[#76b900]/40 shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[#76B900]/15 text-[#76B900] border border-[#76B900]/40 font-semibold'
+                : 'text-[#A6ADB7] hover:text-[#F5F5F4] hover:bg-[#20242A]'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -227,10 +227,10 @@ export const TrainingStudio: React.FC = () => {
           <button
             onClick={() => setActiveStudioTab('comparison')}
             id="tab-studio-comparison"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
               activeStudioTab === 'comparison'
-                ? 'bg-[#76b900]/20 text-[#76b900] border border-[#76b900]/40 shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[#76B900]/15 text-[#76B900] border border-[#76B900]/40 font-semibold'
+                : 'text-[#A6ADB7] hover:text-[#F5F5F4] hover:bg-[#20242A]'
             }`}
           >
             <GitCompare className="w-3.5 h-3.5" />
@@ -241,11 +241,11 @@ export const TrainingStudio: React.FC = () => {
 
       {/* Error Alert Banner */}
       {submitError && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 animate-fadeIn">
-          <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-[#171A1F] border border-[#FB7185]/30 text-xs text-[#F5F5F4] animate-fadeIn">
+          <AlertCircle className="w-5 h-5 text-[#FB7185] flex-shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <span className="font-bold">Failed to Launch Training Job</span>
-            <p className="font-mono text-[11px] text-rose-200">{submitError}</p>
+            <span className="font-bold text-[#FB7185] font-sans">Failed to Launch Training Job</span>
+            <p className="font-mono text-[11px] text-[#FB7185]">{submitError}</p>
           </div>
         </div>
       )}
@@ -253,6 +253,52 @@ export const TrainingStudio: React.FC = () => {
       {/* TAB 1: STUDIO WORKSPACE (Launch & Active Monitor) */}
       {activeStudioTab === 'studio' && (
         <div className="space-y-6">
+          {/* 6-Step Workflow Stepper Banner */}
+          <div className="p-3.5 rounded-xl bg-[#121519] border border-[#30353D] overflow-x-auto scrollbar-none">
+            <div className="flex items-center min-w-[700px] justify-between text-xs font-sans">
+              {(() => {
+                const isJobRunning = activeJob && ['QUEUED', 'RUNNING', 'CANCEL_REQUESTED'].includes(activeJob.status);
+                const isJobTerminal = activeJob && ['COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED'].includes(activeJob.status);
+                return [
+                  { step: 1, label: 'Choose Model', active: !activeJob, completed: Boolean(activeJob) },
+                  { step: 2, label: 'Configure Training', active: !activeJob && Boolean(selectedModelId), completed: Boolean(activeJob) },
+                  { step: 3, label: 'Review Config', active: false, completed: Boolean(activeJob) },
+                  { step: 4, label: 'Launch', active: isSubmitting, completed: Boolean(activeJob) && !isSubmitting },
+                  { step: 5, label: 'Monitor', active: isJobRunning, completed: isJobTerminal },
+                  { step: 6, label: 'Inspect Results', active: isJobTerminal, completed: isJobTerminal && activeJob.status === 'COMPLETED' },
+                ];
+              })().map((item, idx, arr) => {
+                const isHighlighted = item.active || (item.completed && item.step === 6);
+                const isDone = item.completed && !item.active;
+                return (
+                  <React.Fragment key={item.step}>
+                    <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg transition-all ${
+                      isHighlighted
+                        ? 'bg-[#76B900]/10 text-[#F5F5F4] font-semibold border border-[#76B900]/30'
+                        : isDone
+                        ? 'bg-[#4ADE80]/5 text-[#A6ADB7] border border-[#4ADE80]/20'
+                        : 'text-[#6B7280] opacity-60'
+                    }`}>
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
+                        isHighlighted 
+                          ? 'bg-[#76B900] text-[#08090B]' 
+                          : isDone 
+                          ? 'bg-[#4ADE80]/20 text-[#4ADE80] border border-[#4ADE80]/40' 
+                          : 'bg-[#171A1F] text-[#A6ADB7] border border-[#30353D]'
+                      }`}>
+                        {isDone ? '✓' : item.step}
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+                    {idx < arr.length - 1 && (
+                      <span className="text-[#30353D] px-1 font-mono">→</span>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Active Job Live Monitor (If any active job) */}
           {activeJob && (
             <div className="space-y-4">
@@ -269,7 +315,7 @@ export const TrainingStudio: React.FC = () => {
           )}
 
           {/* Model Selection & Configuration Forms */}
-          <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-white/[0.07] space-y-6">
+          <div className="bg-[#171A1F] p-5 sm:p-6 rounded-2xl border border-[#30353D] space-y-6 interactive-card">
             <ModelSelector
               models={models}
               selectedModelId={selectedModelId}

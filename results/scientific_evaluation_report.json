@@ -1,0 +1,103 @@
+{
+  "evaluation_name": "Phase 13 Milestone 1 Scientific Evaluation",
+  "checkpoint_evaluated": "checkpoints/transformer/pretraining_campaign/best_model.pt",
+  "checkpoint_step": 125,
+  "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "validation_metrics": {
+    "loss": 3.7435,
+    "perplexity": 42.25,
+    "batches_evaluated": 102,
+    "tokens_evaluated": 103936,
+    "eval_duration_sec": 2.765,
+    "eval_tokens_per_sec": 37596.1
+  },
+  "divergence_metrics": {
+    "train_loss": 3.6237,
+    "val_loss": 3.8104,
+    "train_perplexity": 37.48,
+    "val_perplexity": 45.17,
+    "divergence_delta": 0.1867,
+    "generalization_gap_ratio": 1.052,
+    "status": "healthy_generalization"
+  },
+  "generation_metrics": {
+    "generation_parameters": {
+      "max_new_tokens": 40,
+      "temperature": 0.7,
+      "top_k": 15,
+      "top_p": 0.9,
+      "seed": 42
+    },
+    "aggregate_metrics": {
+      "mean_distinct_1": 0.22,
+      "mean_distinct_2": 0.395,
+      "mean_distinct_3": 0.637,
+      "mean_repetition_index": 0.521,
+      "degenerate_completions_detected": 3
+    },
+    "samples": [
+      {
+        "prompt": "The time traveler",
+        "continuation": "e the the my to the my the to and and a the of the a and a and I",
+        "full_text": "The time travelere the the my to the my the to and and a the of the a and a and I",
+        "generated_tokens_count": 40,
+        "distinct_1": 0.225,
+        "distinct_2": 0.385,
+        "distinct_3": 0.605,
+        "repetition_index_3gram": 0.605,
+        "is_degenerate_loop": true
+      },
+      {
+        "prompt": "To be or not to be",
+        "continuation": "and of and and the in of I of to my the the s to and and and to the",
+        "full_text": "To be or not to be and of and and the in of I of to my the the s to and and and to the",
+        "generated_tokens_count": 40,
+        "distinct_1": 0.225,
+        "distinct_2": 0.41,
+        "distinct_3": 0.658,
+        "repetition_index_3gram": 0.474,
+        "is_degenerate_loop": false
+      },
+      {
+        "prompt": "The mind of man",
+        "continuation": "and of and and the in of I of to my the the and to and and and to the",
+        "full_text": "The mind of man and of and and the in of I of to my the the and to and and and to the",
+        "generated_tokens_count": 40,
+        "distinct_1": 0.2,
+        "distinct_2": 0.359,
+        "distinct_3": 0.605,
+        "repetition_index_3gram": 0.553,
+        "is_degenerate_loop": true
+      },
+      {
+        "prompt": "In the beginning",
+        "continuation": "and of and and the in of I of to my the the and to and and and to the",
+        "full_text": "In the beginning and of and and the in of I of to my the the and to and and and to the",
+        "generated_tokens_count": 40,
+        "distinct_1": 0.2,
+        "distinct_2": 0.359,
+        "distinct_3": 0.605,
+        "repetition_index_3gram": 0.553,
+        "is_degenerate_loop": true
+      },
+      {
+        "prompt": "Parallel computing on GPU architecture",
+        "continuation": "and of and you the in of I of to my the the s to and and and to the",
+        "full_text": "Parallel computing on GPU architecture and of and you the in of I of to my the the s to and and and to the",
+        "generated_tokens_count": 40,
+        "distinct_1": 0.25,
+        "distinct_2": 0.462,
+        "distinct_3": 0.711,
+        "repetition_index_3gram": 0.421,
+        "is_degenerate_loop": false
+      }
+    ]
+  },
+  "inference_telemetry": {
+    "batch_size": 1,
+    "seq_len": 256,
+    "mean_forward_latency_ms": 13.13,
+    "inference_tokens_per_second": 19494.3,
+    "peak_vram_mb": 1347.06
+  }
+}

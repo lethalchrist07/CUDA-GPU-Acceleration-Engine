@@ -31,8 +31,126 @@ def read_json(path: Path) -> dict[str, Any]:
     return document
 
 
-def digest(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+# -----------------------------------------------------------------------------
+# Bounded In-Memory & Persistent Digest Cache for Checkpoint & Artifact Hashing
+# -----------------------------------------------------------------------------
+import threading
+from typing import Tuple
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_PERSISTENT_CACHE_FILE = PROJECT_ROOT / "results" / ".digest_cache.json"
+
+_DIGEST_CACHE: dict[Tuple[str, int, int], str] = {}
+_DIGEST_CACHE_LOCK = threading.RLock()
+_DIGEST_CACHE_MAX_ENTRIES = 2048
+_CACHE_STATS = {"hits": 0, "misses": 0, "invalidations": 0}
+
+_CATALOG_CACHE: dict[str, Any] | None = None
+_CATALOG_LOCK = threading.RLock()
+
+
+def _load_persistent_cache() -> None:
+    """Load pre-computed hashes from disk cache if present."""
+    if _PERSISTENT_CACHE_FILE.is_file():
+        try:
+            with open(_PERSISTENT_CACHE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            with _DIGEST_CACHE_LOCK:
+                for key_str, sha in data.items():
+                    parts = key_str.split("|")
+                    if len(parts) == 3:
+                        cache_key = (parts[0], int(parts[1]), int(parts[2]))
+                        _DIGEST_CACHE[cache_key] = sha
+        except Exception:
+            pass
+
+
+def _save_persistent_cache() -> None:
+    """Flush in-memory digest cache to disk."""
+    try:
+        data = {}
+        with _DIGEST_CACHE_LOCK:
+            for (p_str, sz, mt), sha in _DIGEST_CACHE.items():
+                data[f"{p_str}|{sz}|{mt}"] = sha
+        _PERSISTENT_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(_PERSISTENT_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+    except Exception:
+        pass
+
+
+# Auto-load on module import
+_load_persistent_cache()
+
+
+def clear_catalog_cache() -> None:
+    """Clear the cached catalog response."""
+    global _CATALOG_CACHE
+    with _CATALOG_LOCK:
+        _CATALOG_CACHE = None
+
+
+def get_digest_cache_stats() -> dict[str, int]:
+    """Return live metrics on cache utilization, hits, and misses."""
+    with _DIGEST_CACHE_LOCK:
+        return {
+            "cached_entries": len(_DIGEST_CACHE),
+            "hits": _CACHE_STATS["hits"],
+            "misses": _CACHE_STATS["misses"],
+            "invalidations": _CACHE_STATS["invalidations"],
+        }
+
+
+def clear_digest_cache(reload_persistent: bool = False) -> int:
+    """Explicitly clear the in-memory digest cache."""
+    with _DIGEST_CACHE_LOCK:
+        count = len(_DIGEST_CACHE)
+        _DIGEST_CACHE.clear()
+        _CACHE_STATS["invalidations"] += count
+        if reload_persistent:
+            _load_persistent_cache()
+        return count
+
+
+def digest(path: Path, force_recompute: bool = False) -> str:
+    """
+    Computes or retrieves cached SHA-256 digest of a file.
+    Uses (absolute_path, file_size, mtime_ns) as the cache key.
+    Reads file in 64 KiB chunks to avoid loading multi-gigabyte files into memory.
+    """
+    resolved_path = path.resolve()
+    stat = resolved_path.stat()
+    cache_key = (str(resolved_path), stat.st_size, getattr(stat, "st_mtime_ns", int(stat.st_mtime * 1e9)))
+
+    if not force_recompute:
+        with _DIGEST_CACHE_LOCK:
+            if cache_key in _DIGEST_CACHE:
+                _CACHE_STATS["hits"] += 1
+                return _DIGEST_CACHE[cache_key]
+            # If in-memory cache was cleared or key is missing, check persistent disk cache
+            if _PERSISTENT_CACHE_FILE.is_file():
+                _load_persistent_cache()
+                if cache_key in _DIGEST_CACHE:
+                    _CACHE_STATS["hits"] += 1
+                    return _DIGEST_CACHE[cache_key]
+            _CACHE_STATS["misses"] += 1
+
+    # Stream file in 64 KiB chunks to avoid RAM saturation
+    hasher = hashlib.sha256()
+    with open(resolved_path, "rb") as f:
+        while chunk := f.read(65536):
+            hasher.update(chunk)
+    result = hasher.hexdigest()
+
+    with _DIGEST_CACHE_LOCK:
+        if len(_DIGEST_CACHE) >= _DIGEST_CACHE_MAX_ENTRIES:
+            # Prune oldest 25% of entries when bound is reached
+            keys_to_remove = list(_DIGEST_CACHE.keys())[: _DIGEST_CACHE_MAX_ENTRIES // 4]
+            for k in keys_to_remove:
+                del _DIGEST_CACHE[k]
+        _DIGEST_CACHE[cache_key] = result
+
+    return result
 
 
 def _number(value: Any) -> float | None:
@@ -44,8 +162,8 @@ def _number(value: Any) -> float | None:
 
 
 class ArtifactStore:
-    def __init__(self, root: Path):
-        self.root = root.resolve()
+    def __init__(self, root: Union[Path, str]):
+        self.root = Path(root).resolve()
         self.results = self.root / "results"
 
     def phase2_directory(self) -> Path | None:
@@ -188,7 +306,13 @@ class ArtifactStore:
         except Exception as exc:
             return self._unavailable(f"Failed to read Phase 9 experiments: {exc}")
 
-    def checkpoints_catalog(self) -> dict[str, Any]:
+    def checkpoints_catalog(self, force_rehash: bool = False) -> dict[str, Any]:
+        global _CATALOG_CACHE
+        if not force_rehash:
+            with _CATALOG_LOCK:
+                if _CATALOG_CACHE is not None:
+                    return _CATALOG_CACHE
+
         checkpoints_root = self.root / "checkpoints"
         if not checkpoints_root.is_dir():
             return {"status": "unavailable", "checkpoints": []}
@@ -196,17 +320,59 @@ class ArtifactStore:
         for p in sorted(checkpoints_root.rglob("*.pt")):
             try:
                 rel = p.relative_to(self.root).as_posix()
+                if "transformer" in rel:
+                    model_type = "transformer"
+                    if "50m" in rel or "pretraining_50m" in rel:
+                        arch = "NEXORA GPT-86.8M (50M Campaign)"
+                        params = 86825472
+                        params_str = "86.83M (50M Pretrained)"
+                    elif "pretraining_campaign" in rel:
+                        arch = "NEXORA GPT-86.8M (10M Campaign)"
+                        params = 86825472
+                        params_str = "86.83M (Pretraining Campaign)"
+                    elif "flagship_100m" in rel:
+                        arch = "NEXORA GPT-100M"
+                        params = 85940736
+                        params_str = "85.94M (Pilot) / 92.13M (Preset)"
+                    elif "25m" in rel:
+                        arch = "FoundationTransformer25M"
+                        params = 23196160
+                        params_str = "23.20M"
+                    else:
+                        arch = "PilotTransformer1M"
+                        params = 1000000
+                        params_str = "1.00M"
+                elif "resnet18" in rel:
+                    model_type = "vision"
+                    arch = "ResNet-18"
+                    params = 11173962
+                    params_str = "11.17M"
+                else:
+                    model_type = "vision"
+                    arch = "CIFAR10MLP" if "job" in rel else "BaselineMLP"
+                    params = 3426250 if "job" in rel else 465172
+                    params_str = "3.43M" if "job" in rel else "465K"
+
                 items.append({
                     "id": p.stem,
                     "filename": p.name,
                     "path": rel,
+                    "model_type": model_type,
+                    "architecture": arch,
+                    "parameters": params,
+                    "parameters_display": params_str,
                     "size_bytes": p.stat().st_size,
-                    "sha256": digest(p),
+                    "sha256": digest(p, force_recompute=force_rehash),
                     "modified_at": datetime.fromtimestamp(p.stat().st_mtime, timezone.utc).isoformat(),
                 })
             except Exception:
                 continue
-        return {"status": "available", "fetched_at": utc_now(), "checkpoints": items}
+
+        _save_persistent_cache()
+        result = {"status": "available", "fetched_at": utc_now(), "checkpoints": items}
+        with _CATALOG_LOCK:
+            _CATALOG_CACHE = result
+        return result
 
     def verification(self) -> dict[str, Any]:
         directory = self.phase2_directory()

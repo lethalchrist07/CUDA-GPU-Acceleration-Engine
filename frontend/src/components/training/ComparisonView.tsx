@@ -41,9 +41,9 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
   const jobGpuCustom = completedJobs.find((j) => j.job_id === selectedGpuCustomId);
 
   const selectedRuns = [
-    { label: 'CPU Native', job: jobCpu, color: '#94a3b8' },
-    { label: 'GPU Native (cuBLAS)', job: jobGpuNative, color: '#10b981' },
-    { label: 'GPU Custom CUDA', job: jobGpuCustom, color: '#76b900' },
+    { label: 'CPU Native', job: jobCpu, color: '#A6ADB7' },
+    { label: 'GPU Native (cuBLAS)', job: jobGpuNative, color: '#70D6C2' },
+    { label: 'GPU Custom CUDA', job: jobGpuCustom, color: '#76B900' },
   ].filter((r) => r.job !== undefined) as {
     label: string;
     job: TrainingJobResponse;
@@ -120,16 +120,16 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
   });
 
   return (
-    <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-white/[0.07] space-y-6">
+    <div className="bg-[#171A1F] p-5 sm:p-6 rounded-2xl border border-[#30353D] space-y-6 interactive-card">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.06]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#30353D]">
         <div className="flex items-center gap-2.5">
-          <GitCompare className="w-5 h-5 text-[#76b900]" />
+          <GitCompare className="w-5 h-5 text-[#76B900]" />
           <div>
-            <h3 className="text-base font-bold text-white tracking-tight">
+            <h3 className="text-base font-bold text-[#F5F5F4] tracking-tight font-sans">
               Three-Backend Empirical Comparison
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#A6ADB7] font-sans mt-0.5">
               Side-by-side analysis of CPU_NATIVE, GPU_NATIVE (cuBLAS), and GPU_CUSTOM (CUDA Autograd)
             </p>
           </div>
@@ -140,14 +140,14 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* CPU Selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-mono font-semibold text-slate-300 flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-slate-400" />
+          <label className="text-xs font-sans font-semibold text-[#A6ADB7] flex items-center gap-1.5">
+            <Cpu className="w-3.5 h-3.5 text-[#A6ADB7]" />
             CPU Native Baseline Run
           </label>
           <select
             value={selectedCpuId}
             onChange={(e) => setSelectedCpuId(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-obsidian-900 border border-white/[0.08] text-xs font-mono text-white focus:outline-none cursor-pointer"
+            className="w-full px-3 py-2 rounded-xl bg-[#121519] border border-[#30353D] text-xs font-mono text-[#F5F5F4] focus:outline-none cursor-pointer"
           >
             <option value="">Select CPU Run...</option>
             {completedJobs
@@ -162,14 +162,14 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
 
         {/* GPU Native Selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-mono font-semibold text-slate-300 flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-emerald-400" />
+          <label className="text-xs font-sans font-semibold text-[#A6ADB7] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#70D6C2]" />
             GPU Native (cuBLAS) Run
           </label>
           <select
             value={selectedGpuNativeId}
             onChange={(e) => setSelectedGpuNativeId(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-obsidian-900 border border-white/[0.08] text-xs font-mono text-white focus:outline-none cursor-pointer"
+            className="w-full px-3 py-2 rounded-xl bg-[#121519] border border-[#30353D] text-xs font-mono text-[#F5F5F4] focus:outline-none cursor-pointer"
           >
             <option value="">Select GPU Native Run...</option>
             {completedJobs
@@ -184,14 +184,14 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
 
         {/* GPU Custom Selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-mono font-semibold text-slate-300 flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-[#76b900]" />
+          <label className="text-xs font-sans font-semibold text-[#A6ADB7] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#76B900]" />
             GPU Custom CUDA Run
           </label>
           <select
             value={selectedGpuCustomId}
             onChange={(e) => setSelectedGpuCustomId(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-obsidian-900 border border-white/[0.08] text-xs font-mono text-white focus:outline-none cursor-pointer"
+            className="w-full px-3 py-2 rounded-xl bg-[#121519] border border-[#30353D] text-xs font-mono text-[#F5F5F4] focus:outline-none cursor-pointer"
           >
             <option value="">Select GPU Custom Run...</option>
             {completedJobs
@@ -207,27 +207,27 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
 
       {/* Explicit Comparison Limitation Notice */}
       {hasParityMismatch && (
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+        <div className="p-4 rounded-xl bg-[#171A1F] border border-[#FBBF24]/30 space-y-1.5">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#FBBF24] font-sans">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>Comparison Limitation Notice: Configuration Discrepancies Detected</span>
           </div>
-          <p className="text-[11px] text-slate-300 leading-relaxed">
+          <p className="text-[11px] text-[#A6ADB7] leading-relaxed font-sans">
             Strict scientific benchmarking requires identical model architecture, dataset, sample budgets, preprocessing, precision, optimizer, learning rate, epochs, batch size, and seed.
           </p>
-          <ul className="text-xs font-mono text-amber-200/90 list-disc list-inside space-y-0.5 pl-1">
+          <ul className="text-xs font-mono text-[#FBBF24]/90 list-disc list-inside space-y-0.5 pl-1">
             {parityWarnings.map((w, idx) => (
               <li key={idx}>{w}</li>
             ))}
           </ul>
-          <p className="text-[11px] text-amber-300 font-semibold pt-1">
+          <p className="text-[11px] text-[#FBBF24] font-medium font-sans pt-1">
             Definitive speedup claims are withheld until all hyperparameter dimensions match identically.
           </p>
         </div>
       )}
 
       {selectedRuns.length === 0 ? (
-        <div className="py-10 text-center text-slate-500 text-xs font-mono">
+        <div className="py-10 text-center text-[#A6ADB7] text-xs font-sans">
           Select completed training jobs above to generate comparative analysis.
         </div>
       ) : (
@@ -236,7 +236,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-white/[0.07] text-slate-400">
+                <tr className="border-b border-[#30353D] text-[#A6ADB7] font-sans">
                   <th className="py-2.5 px-3">Backend / Attribute</th>
                   {selectedRuns.map((r) => (
                     <th key={r.job.job_id} className="py-2.5 px-3">
@@ -247,45 +247,45 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-[#30353D]">
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Job ID</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Job ID</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-white">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#F5F5F4]">
                       {r.job.job_id}
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Target Device</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Target Device</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-slate-300">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#A6ADB7]">
                       {r.job.metrics?.device || 'cpu'}
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Total Wall Time</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Total Wall Time</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 font-bold text-white">
+                    <td key={r.job.job_id} className="py-2 px-3 font-bold text-[#F5F5F4]">
                       {(r.job.metrics?.total_wall_time_sec ?? 0).toFixed(2)}s
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Speedup vs CPU</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Speedup vs CPU</td>
                   {selectedRuns.map((r) => {
                     const wallSec = r.job.metrics?.total_wall_time_sec ?? 0;
                     if (r.job.backend === 'CPU_NATIVE') {
                       return (
-                        <td key={r.job.job_id} className="py-2 px-3 text-slate-400">
+                        <td key={r.job.job_id} className="py-2 px-3 text-[#A6ADB7]">
                           1.00× (Ref Baseline)
                         </td>
                       );
                     }
                     if (hasParityMismatch) {
                       return (
-                        <td key={r.job.job_id} className="py-2 px-3 text-amber-400/90 font-mono text-[11px]">
+                        <td key={r.job.job_id} className="py-2 px-3 text-[#FBBF24] font-mono text-[11px]">
                           Withheld (Parity Mismatch)
                         </td>
                       );
@@ -293,50 +293,50 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
                     if (cpuWallTime && cpuWallTime > 0 && wallSec > 0) {
                       const spd = cpuWallTime / wallSec;
                       return (
-                        <td key={r.job.job_id} className="py-2 px-3 font-bold text-[#76b900]">
+                        <td key={r.job.job_id} className="py-2 px-3 font-bold text-[#76B900]">
                           {spd.toFixed(2)}× Faster (Verified Parity)
                         </td>
                       );
                     }
-                    return <td key={r.job.job_id} className="py-2 px-3 text-slate-500">--</td>;
+                    return <td key={r.job.job_id} className="py-2 px-3 text-[#6B7280]">--</td>;
                   })}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Best Val Accuracy</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Best Val Accuracy</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-emerald-400 font-bold">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#70D6C2] font-bold">
                       {(r.job.metrics?.best_val_acc ?? 0).toFixed(2)}%
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Final Train Loss</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Final Train Loss</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-white">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#F5F5F4]">
                       {(r.job.metrics?.final_train_loss ?? 0).toFixed(4)}
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Mean Step Latency</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Mean Step Latency</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-slate-300">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#A6ADB7]">
                       {(r.job.metrics?.mean_step_latency_ms ?? 0).toFixed(2)} ms
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Throughput</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Throughput</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-slate-300">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#A6ADB7]">
                       {Math.round(r.job.metrics?.throughput_samples_per_sec ?? 0)} smp/s
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Peak VRAM</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Peak VRAM</td>
                   {selectedRuns.map((r) => (
-                    <td key={r.job.job_id} className="py-2 px-3 text-slate-300">
+                    <td key={r.job.job_id} className="py-2 px-3 text-[#A6ADB7]">
                       {r.job.backend === 'CPU_NATIVE'
                         ? '0.00 MB'
                         : `${(r.job.metrics?.peak_allocated_vram_mb ?? 0).toFixed(1)} MB`}
@@ -344,13 +344,13 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 text-slate-400">Custom CUDA Dispatches</td>
+                  <td className="py-2 px-3 text-[#A6ADB7] font-sans">Custom CUDA Dispatches</td>
                   {selectedRuns.map((r) => {
                     const dispatches = r.job.metrics?.custom_cuda_dispatches
                       ? Object.values(r.job.metrics.custom_cuda_dispatches).reduce((a, b) => a + b, 0)
                       : 0;
                     return (
-                      <td key={r.job.job_id} className="py-2 px-3 font-mono font-bold text-[#76b900]">
+                      <td key={r.job.job_id} className="py-2 px-3 font-mono font-bold text-[#76B900]">
                         {dispatches}
                       </td>
                     );
@@ -361,27 +361,28 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ jobs }) => {
           </div>
 
           {/* Wall-Time Comparison Bar Chart */}
-          <div className="pt-4 border-t border-white/[0.06] space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-mono">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="pt-4 border-t border-[#30353D] space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#A6ADB7] flex items-center gap-1.5 font-sans">
+              <Clock className="w-3.5 h-3.5 text-[#70D6C2]" />
               Total Training Duration Comparison (Seconds — Lower is Better)
             </h4>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timingChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#30353D" />
+                  <XAxis dataKey="name" stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
+                  <YAxis stroke="#5A6270" tick={{ fill: '#A6ADB7', fontSize: 11, fontFamily: 'monospace' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0a0f1d',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '0.75rem',
+                      backgroundColor: '#0D0F12',
+                      borderColor: '#30353D',
+                      borderRadius: '0.5rem',
                       fontSize: '11px',
                       fontFamily: 'monospace',
+                      color: '#F5F5F4',
                     }}
                   />
-                  <Bar dataKey="wall_time_sec" name="Wall Time (s)" fill="#76b900" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="wall_time_sec" name="Wall Time (s)" fill="#76B900" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

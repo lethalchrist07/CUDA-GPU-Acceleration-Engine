@@ -1,0 +1,324 @@
+{
+  "evaluation_name": "Phase 13 Milestone 3 3-Way Scientific Evaluation",
+  "timestamp": "2026-10-25T13:44:47Z",
+  "models_evaluated": [
+    {
+      "label": "Phase 12 Baseline (0.5M Tokens)",
+      "checkpoint_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_campaign\\best_model.pt",
+      "step": 125,
+      "cumulative_tokens": 512000,
+      "validation_metrics": {
+        "loss": 3.7435,
+        "perplexity": 42.25,
+        "batches_evaluated": 102,
+        "tokens_evaluated": 103936,
+        "eval_duration_sec": 4.846,
+        "eval_tokens_per_sec": 21446.9
+      },
+      "divergence_metrics": {
+        "train_loss": 3.6461,
+        "val_loss": 3.7725,
+        "train_perplexity": 38.32,
+        "val_perplexity": 43.49,
+        "divergence_delta": 0.1264,
+        "generalization_gap_ratio": 1.035,
+        "status": "healthy_generalization"
+      },
+      "generation_metrics": {
+        "generation_parameters": {
+          "max_new_tokens": 40,
+          "temperature": 0.7,
+          "top_k": 15,
+          "top_p": 0.9,
+          "seed": 42
+        },
+        "aggregate_metrics": {
+          "mean_distinct_1": 0.22,
+          "mean_distinct_2": 0.395,
+          "mean_distinct_3": 0.637,
+          "mean_repetition_index": 0.521,
+          "degenerate_completions_detected": 3
+        },
+        "samples": [
+          {
+            "prompt": "The time traveler",
+            "continuation": "e the the my to the my the to and and a the of the a and a and I",
+            "full_text": "The time travelere the the my to the my the to and and a the of the a and a and I",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.225,
+            "distinct_2": 0.385,
+            "distinct_3": 0.605,
+            "repetition_index_3gram": 0.605,
+            "is_degenerate_loop": true
+          },
+          {
+            "prompt": "To be or not to be",
+            "continuation": "and of and and the in of I of to my the the s to and and and to the",
+            "full_text": "To be or not to be and of and and the in of I of to my the the s to and and and to the",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.225,
+            "distinct_2": 0.41,
+            "distinct_3": 0.658,
+            "repetition_index_3gram": 0.474,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "The mind of man",
+            "continuation": "and of and and the in of I of to my the the and to and and and to the",
+            "full_text": "The mind of man and of and and the in of I of to my the the and to and and and to the",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.2,
+            "distinct_2": 0.359,
+            "distinct_3": 0.605,
+            "repetition_index_3gram": 0.553,
+            "is_degenerate_loop": true
+          },
+          {
+            "prompt": "In the beginning",
+            "continuation": "and of and and the in of I of to my the the and to and and and to the",
+            "full_text": "In the beginning and of and and the in of I of to my the the and to and and and to the",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.2,
+            "distinct_2": 0.359,
+            "distinct_3": 0.605,
+            "repetition_index_3gram": 0.553,
+            "is_degenerate_loop": true
+          },
+          {
+            "prompt": "Parallel computing on GPU architecture",
+            "continuation": "and of and you the in of I of to my the the s to and and and to the",
+            "full_text": "Parallel computing on GPU architecture and of and you the in of I of to my the the s to and and and to the",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.25,
+            "distinct_2": 0.462,
+            "distinct_3": 0.711,
+            "repetition_index_3gram": 0.421,
+            "is_degenerate_loop": false
+          }
+        ]
+      },
+      "inference_telemetry": {
+        "batch_size": 1,
+        "seq_len": 256,
+        "mean_forward_latency_ms": 39.42,
+        "inference_tokens_per_second": 6494.2,
+        "peak_vram_mb": 1355.18
+      }
+    },
+    {
+      "label": "Phase 13 M2 Diagnostic (1.0M Tokens)",
+      "checkpoint_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_1m_diagnostic\\best_model.pt",
+      "step": 245,
+      "cumulative_tokens": 1003520,
+      "validation_metrics": {
+        "loss": 3.5308,
+        "perplexity": 34.15,
+        "batches_evaluated": 102,
+        "tokens_evaluated": 103936,
+        "eval_duration_sec": 5.19,
+        "eval_tokens_per_sec": 20025.6
+      },
+      "divergence_metrics": {
+        "train_loss": 3.3069,
+        "val_loss": 3.5524,
+        "train_perplexity": 27.3,
+        "val_perplexity": 34.9,
+        "divergence_delta": 0.2455,
+        "generalization_gap_ratio": 1.074,
+        "status": "healthy_generalization"
+      },
+      "generation_metrics": {
+        "generation_parameters": {
+          "max_new_tokens": 40,
+          "temperature": 0.7,
+          "top_k": 15,
+          "top_p": 0.9,
+          "seed": 42
+        },
+        "aggregate_metrics": {
+          "mean_distinct_1": 0.35,
+          "mean_distinct_2": 0.564,
+          "mean_distinct_3": 0.763,
+          "mean_repetition_index": 0.395,
+          "degenerate_completions_detected": 0
+        },
+        "samples": [
+          {
+            "prompt": "The time traveler",
+            "continuation": "iver the of of the I the\n\n\u201cThall and a the of the a was was and that",
+            "full_text": "The time traveleriver the of of the I the\n\n\u201cThall and a the of the a was was and that",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.375,
+            "distinct_2": 0.564,
+            "distinct_3": 0.737,
+            "repetition_index_3gram": 0.447,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "To be or not to be",
+            "continuation": "and of and me. the I the\n\n\u201cThall and a the the the a was was and that",
+            "full_text": "To be or not to be and of and me. the I the\n\n\u201cThall and a the the the a was was and that",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.35,
+            "distinct_2": 0.564,
+            "distinct_3": 0.763,
+            "repetition_index_3gram": 0.368,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "The mind of man",
+            "continuation": "and of and me. the I the\n\n\u201cThall and a the the the a was was and that",
+            "full_text": "The mind of man and of and me. the I the\n\n\u201cThall and a the the the a was was and that",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.35,
+            "distinct_2": 0.564,
+            "distinct_3": 0.763,
+            "repetition_index_3gram": 0.368,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "In the beginning",
+            "continuation": "and of and the the a of I of to the\n\nthe the\n\n\u201cI a was was and that",
+            "full_text": "In the beginning and of and the the a of I of to the\n\nthe the\n\n\u201cI a was was and that",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.275,
+            "distinct_2": 0.513,
+            "distinct_3": 0.763,
+            "repetition_index_3gram": 0.421,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "Parallel computing on GPU architecture",
+            "continuation": "ifrom the my of the I the\n\n\u201cHe and a the of the a was was and that",
+            "full_text": "Parallel computing on GPU architectureifrom the my of the I the\n\n\u201cHe and a the of the a was was and that",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.4,
+            "distinct_2": 0.615,
+            "distinct_3": 0.789,
+            "repetition_index_3gram": 0.368,
+            "is_degenerate_loop": false
+          }
+        ]
+      },
+      "inference_telemetry": {
+        "batch_size": 1,
+        "seq_len": 256,
+        "mean_forward_latency_ms": 33.79,
+        "inference_tokens_per_second": 7575.2,
+        "peak_vram_mb": 1353.68
+      }
+    },
+    {
+      "label": "Phase 13 M3 Extended (10.0M Tokens)",
+      "checkpoint_path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_10m_extended\\best_model.pt",
+      "step": 2442,
+      "cumulative_tokens": 10002432,
+      "validation_metrics": {
+        "loss": 2.3976,
+        "perplexity": 11.0,
+        "batches_evaluated": 102,
+        "tokens_evaluated": 103936,
+        "eval_duration_sec": 5.682,
+        "eval_tokens_per_sec": 18292.4
+      },
+      "divergence_metrics": {
+        "train_loss": 2.104,
+        "val_loss": 2.4063,
+        "train_perplexity": 8.2,
+        "val_perplexity": 11.09,
+        "divergence_delta": 0.3023,
+        "generalization_gap_ratio": 1.144,
+        "status": "healthy_generalization"
+      },
+      "generation_metrics": {
+        "generation_parameters": {
+          "max_new_tokens": 40,
+          "temperature": 0.7,
+          "top_k": 15,
+          "top_p": 0.9,
+          "seed": 42
+        },
+        "aggregate_metrics": {
+          "mean_distinct_1": 0.555,
+          "mean_distinct_2": 0.774,
+          "mean_distinct_3": 0.863,
+          "mean_repetition_index": 0.226,
+          "degenerate_completions_detected": 0
+        },
+        "samples": [
+          {
+            "prompt": "The time traveler",
+            "continuation": "ation,\nAnd before the hope of thy rest,\nAnd the rest is a man of",
+            "full_text": "The time traveleration,\nAnd before the hope of thy rest,\nAnd the rest is a man of",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.5,
+            "distinct_2": 0.744,
+            "distinct_3": 0.868,
+            "repetition_index_3gram": 0.263,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "To be or not to be",
+            "continuation": "rested.\n\nPETRUCHIO:\nWhat hath the king? the tentrance of the king",
+            "full_text": "To be or not to be rested.\n\nPETRUCHIO:\nWhat hath the king? the tentrance of the king",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.725,
+            "distinct_2": 0.872,
+            "distinct_3": 0.921,
+            "repetition_index_3gram": 0.132,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "The mind of man",
+            "continuation": "y who had been the hope of the sun of the\n\npublic and the murder of",
+            "full_text": "The mind of many who had been the hope of the sun of the\n\npublic and the murder of",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.55,
+            "distinct_2": 0.795,
+            "distinct_3": 0.895,
+            "repetition_index_3gram": 0.184,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "In the beginning",
+            "continuation": "of the same music of the rest, and the sons of the room, the s",
+            "full_text": "In the beginning of the same music of the rest, and the sons of the room, the s",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.4,
+            "distinct_2": 0.615,
+            "distinct_3": 0.737,
+            "repetition_index_3gram": 0.368,
+            "is_degenerate_loop": false
+          },
+          {
+            "prompt": "Parallel computing on GPU architecture",
+            "continuation": "ss,\nAnd with this inn and leaves and the kings\nTo remember and the same",
+            "full_text": "Parallel computing on GPU architecturess,\nAnd with this inn and leaves and the kings\nTo remember and the same",
+            "generated_tokens_count": 40,
+            "distinct_1": 0.6,
+            "distinct_2": 0.846,
+            "distinct_3": 0.895,
+            "repetition_index_3gram": 0.184,
+            "is_degenerate_loop": false
+          }
+        ]
+      },
+      "inference_telemetry": {
+        "batch_size": 1,
+        "seq_len": 256,
+        "mean_forward_latency_ms": 34.46,
+        "inference_tokens_per_second": 7428.1,
+        "peak_vram_mb": 1355.05
+      }
+    }
+  ],
+  "three_way_deltas": {
+    "p12_to_m3_val_loss_delta": -1.3459,
+    "p12_to_m3_perplexity_reduction_ratio": 3.84,
+    "distinct_1_gain": 0.335,
+    "distinct_2_gain": 0.379,
+    "distinct_3_gain": 0.226,
+    "repetition_drop": -0.295,
+    "generalization_verdict": "Genuine Generalization with High Lexical Diversity"
+  }
+}

@@ -282,8 +282,9 @@ def test_real_gpu_native_training_smoke_job(isolated_orchestrator):
 # 7. Real Custom CUDA Training Smoke Job & Affirmative Dispatches (GPU_CUSTOM)
 # ============================================================================
 def test_real_gpu_custom_training_smoke_and_dispatches(isolated_orchestrator):
-    if not torch.cuda.is_available():
-        pytest.skip("CUDA required for GPU_CUSTOM test")
+    import custom_kernels
+    if not torch.cuda.is_available() or not custom_kernels.is_native_available():
+        pytest.skip("Native compiled custom CUDA kernels required for GPU_CUSTOM test (pure PyTorch fallback is active)")
 
     orch = isolated_orchestrator
     job = orch.submit_job(

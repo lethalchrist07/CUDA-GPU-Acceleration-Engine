@@ -11,6 +11,9 @@ import {
   TrainingJobMetricsResponse,
   TrainingJobCheckpointsResponse,
   CancelJobResponse,
+  AdaptiveHardwareInfo,
+  AdaptiveRecommendationRequest,
+  AdaptiveRecommendationResponse,
 } from '../types/training';
 
 const BASE_URL = '/api/training';
@@ -117,5 +120,22 @@ export const trainingApi = {
    */
   getJobCheckpoints: (jobId: string): Promise<TrainingJobCheckpointsResponse> => {
     return request<TrainingJobCheckpointsResponse>(`/jobs/${encodeURIComponent(jobId)}/checkpoints`);
+  },
+
+  /**
+   * Retrieve live adaptive hardware profile and VRAM headroom
+   */
+  getAdaptiveHardware: (): Promise<AdaptiveHardwareInfo> => {
+    return request<AdaptiveHardwareInfo>('/adaptive/hardware');
+  },
+
+  /**
+   * Request adaptive hyperparameter recommendation (batch size, precision, accum)
+   */
+  getAdaptiveRecommendation: (req: AdaptiveRecommendationRequest): Promise<AdaptiveRecommendationResponse> => {
+    return request<AdaptiveRecommendationResponse>('/adaptive/recommend', {
+      method: 'POST',
+      body: JSON.stringify(req),
+    });
   },
 };

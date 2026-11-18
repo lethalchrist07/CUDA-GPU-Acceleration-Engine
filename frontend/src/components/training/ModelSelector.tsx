@@ -32,19 +32,19 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       id: 'CPU_NATIVE',
       label: 'CPU Native',
       sublabel: 'PyTorch CPU Engine (Baseline Reference)',
-      icon: <Cpu className="w-4 h-4 text-slate-300" />,
+      icon: <Cpu className="w-4 h-4 text-[#A6ADB7]" />,
     },
     {
       id: 'GPU_NATIVE',
       label: 'GPU Native',
       sublabel: 'cuBLAS & cuDNN Hardware Acceleration',
-      icon: <Zap className="w-4 h-4 text-emerald-400" />,
+      icon: <Zap className="w-4 h-4 text-[#70D6C2]" />,
     },
     {
       id: 'GPU_CUSTOM',
       label: 'GPU Custom CUDA',
       sublabel: 'Handcrafted CUDA Autograd Kernels',
-      icon: <Zap className="w-4 h-4 text-[#76b900]" />,
+      icon: <Zap className="w-4 h-4 text-[#76B900]" />,
       requiresCustomCuda: true,
     },
   ];
@@ -53,7 +53,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     <div className="space-y-4">
       {/* 1. Model Architecture Selection */}
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[#A6ADB7] font-sans mb-2">
           1. Select Model Architecture
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -64,11 +64,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                 key={m.model_id}
                 onClick={() => !disabled && onSelectModel(m.model_id)}
                 className={`relative p-4 rounded-xl border transition-all cursor-pointer ${
-                  disabled ? 'opacity-60 cursor-not-allowed' : ''
+                  disabled ? 'opacity-50 cursor-not-allowed' : ''
                 } ${
                   isSelected
-                    ? 'bg-[#76b900]/10 border-[#76b900]/60 shadow-[0_0_20px_rgba(118,185,0,0.15)]'
-                    : 'bg-obsidian-900/90 hover:bg-obsidian-850 border-white/[0.07] hover:border-white/[0.15]'
+                    ? 'bg-[#76B900]/10 border-[#76B900]/40'
+                    : 'bg-[#121519] hover:bg-[#20242A] border-[#30353D] hover:border-[#76B900]/30'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -76,45 +76,47 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <div
                       className={`p-2 rounded-lg ${
                         isSelected
-                          ? 'bg-[#76b900]/20 text-[#76b900]'
-                          : 'bg-white/[0.05] text-slate-400'
+                          ? 'bg-[#76B900]/20 text-[#76B900]'
+                          : 'bg-[#171A1F] text-[#A6ADB7] border border-[#30353D]'
                       }`}
                     >
                       <Box className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-white tracking-tight">
+                      <h4 className="text-sm font-bold text-[#F5F5F4] tracking-tight font-sans">
                         {m.name}
                       </h4>
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="text-[11px] font-mono text-[#A6ADB7]">
                         {m.dataset}
                       </span>
                     </div>
                   </div>
                   {isSelected && (
-                    <CheckCircle2 className="w-4 h-4 text-[#76b900] flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
                   )}
                 </div>
 
-                <p className="text-xs text-slate-400 mt-2 line-clamp-2">
+                <p className="text-xs text-[#A6ADB7] font-sans mt-2 line-clamp-2">
                   {m.description}
                 </p>
 
                 {/* Specs Pill Summary */}
-                <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-2.5 border-t border-white/[0.05] text-[10px] font-mono">
-                  <span className="px-2 py-0.5 rounded bg-white/[0.05] text-slate-300 border border-white/[0.06]">
+                <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-2.5 border-t border-[#30353D] text-[10px] font-mono">
+                  <span className="px-2 py-0.5 rounded bg-[#171A1F] text-[#A6ADB7] border border-[#30353D]">
                     {(m.parameters / 1e6).toFixed(2)}M params
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-white/[0.05] text-slate-300 border border-white/[0.06]">
-                    {m.classes} classes
+                  <span className="px-2 py-0.5 rounded bg-[#171A1F] text-[#A6ADB7] border border-[#30353D]">
+                    {m.task === 'CausalLanguageModeling' || m.model_id.includes('transformer')
+                      ? '1,024 Vocab'
+                      : `${m.classes} classes`}
                   </span>
                   {m.custom_cuda_supported ? (
-                    <span className="px-2 py-0.5 rounded bg-[#76b900]/15 text-[#76b900] border border-[#76b900]/30 font-semibold">
+                    <span className="px-2 py-0.5 rounded bg-[#76B900]/10 text-[#76B900] border border-[#76B900]/30 font-medium">
                       Custom CUDA Ready
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      Standard PyTorch
+                    <span className="px-2 py-0.5 rounded bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/30 font-medium">
+                      Native PyTorch SDPA
                     </span>
                   )}
                 </div>
@@ -126,7 +128,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
       {/* 2. Execution Backend Selection */}
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[#A6ADB7] font-sans mb-2">
           2. Select Execution Engine
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -146,10 +148,10 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                 }}
                 className={`relative p-3.5 rounded-xl border transition-all cursor-pointer ${
                   !isSupported || disabled
-                    ? 'opacity-40 cursor-not-allowed bg-obsidian-950/60 border-white/[0.04]'
+                    ? 'opacity-40 cursor-not-allowed bg-[#08090B] border-[#30353D]'
                     : isSelected
-                    ? 'bg-[#76b900]/10 border-[#76b900]/60 shadow-[0_0_20px_rgba(118,185,0,0.12)]'
-                    : 'bg-obsidian-900/90 hover:bg-obsidian-850 border-white/[0.07] hover:border-white/[0.15]'
+                    ? 'bg-[#76B900]/10 border-[#76B900]/40'
+                    : 'bg-[#121519] hover:bg-[#20242A] border-[#30353D] hover:border-[#76B900]/30'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -157,32 +159,36 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <div
                       className={`p-1.5 rounded-lg ${
                         isSelected
-                          ? 'bg-[#76b900]/20 text-[#76b900]'
-                          : 'bg-white/[0.05] text-slate-400'
+                          ? 'bg-[#76B900]/20 text-[#76B900]'
+                          : 'bg-[#171A1F] text-[#A6ADB7] border border-[#30353D]'
                       }`}
                     >
                       {b.icon}
                     </div>
-                    <span className="text-sm font-bold text-white font-mono">
+                    <span className="text-sm font-bold text-[#F5F5F4] font-mono">
                       {b.id}
                     </span>
                   </div>
                   {isSelected && (
-                    <CheckCircle2 className="w-4 h-4 text-[#76b900] flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
                   )}
                 </div>
 
-                <div className="text-xs text-slate-400 mt-1.5 font-medium">
+                <div className="text-xs text-[#A6ADB7] font-sans mt-1.5 font-medium">
                   {b.label}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                <p className="text-[11px] text-[#6B7280] font-sans mt-0.5 line-clamp-1">
                   {b.sublabel}
                 </p>
 
                 {!isSupported && (
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-amber-400 font-mono">
+                  <div className="flex items-center gap-1 mt-2 text-[10px] text-[#FBBF24] font-mono">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                    <span>Unsupported on {currentModel?.name}</span>
+                    <span>
+                      {b.id === 'GPU_CUSTOM' && (currentModel?.model_id === 'resnet18' || currentModel?.model_id.includes('transformer'))
+                        ? 'Custom CUDA autograd GEMM implemented for MLP only'
+                        : `Unsupported on ${currentModel?.name}`}
+                    </span>
                   </div>
                 )}
               </div>

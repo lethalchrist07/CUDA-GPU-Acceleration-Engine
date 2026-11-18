@@ -1,0 +1,74 @@
+{
+  "release_version": "v1.0.0-rc4",
+  "release_date": "2026-11-07",
+  "platform": "CUDA GPU Acceleration Engine",
+  "hardware_target": "NVIDIA GeForce RTX 3050 Laptop GPU 6GB (Ampere SM 8.6)",
+  "models": [
+    {
+      "model_id": "transformer_50m",
+      "model_name": "NEXORA GPT-86.8M",
+      "role": "Certified Production Foundation Model",
+      "relative_path": "checkpoints/transformer/pretraining_50m_campaign/best_model.pt",
+      "size_bytes": 1042091280,
+      "size_mb": 993.82,
+      "sha256": "ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC",
+      "parameters_total": 86825472,
+      "raw_weights_size_mb": 337.21,
+      "architecture": {
+        "layers": 12,
+        "heads": 12,
+        "hidden_dim": 768,
+        "ffn_dim": 3072,
+        "vocab_size": 2048,
+        "context_length": 256,
+        "weight_tying": true
+      },
+      "training_metrics": {
+        "total_tokens": 50004608,
+        "optimizer_steps": 12208,
+        "validation_loss": 1.9383,
+        "validation_perplexity": 6.95,
+        "is_partially_trained": false
+      },
+      "inference_benchmarks": {
+        "tokens_per_second": "54.1 - 56.6",
+        "latency_ms_per_token": "17.68 - 18.49",
+        "vram_footprint_mb": 344.8
+      }
+    },
+    {
+      "model_id": "transformer_100m",
+      "model_name": "NEXORA GPT-100M Pilot",
+      "role": "Exploratory Architecture Pilot (Feasibility Prototype)",
+      "relative_path": "checkpoints/transformer/flagship_100m_pilot/best_model.pt",
+      "size_bytes": 1026758674,
+      "size_mb": 979.19,
+      "sha256": "F8B0B9F9D4FB2E9CE482AEA9C619E2C588404CAA7E5691606E9340F381932F9F",
+      "parameters_pilot_active": 85940736,
+      "parameters_preset_spec": 92133888,
+      "architecture": {
+        "layers": 12,
+        "heads": 12,
+        "hidden_dim": 768,
+        "ffn_dim": 3072,
+        "vocab_size_pilot": 512,
+        "vocab_size_preset": 8192,
+        "context_length_pilot": 128,
+        "context_length_preset": 1024,
+        "weight_tying": true
+      },
+      "training_metrics": {
+        "total_tokens": 7680,
+        "optimizer_steps": 15,
+        "step_loss": 5.3174,
+        "is_partially_trained": true
+      },
+      "inference_benchmarks": {
+        "tokens_per_second": "47.7",
+        "latency_ms_per_token": "20.95",
+        "vram_footprint_mb": 342.1
+      }
+    }
+  ]
+}
+

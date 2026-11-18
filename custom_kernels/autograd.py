@@ -1,6 +1,6 @@
 """
 PyTorch Autograd Integration for Custom CUDA Kernels
-Phase 10 — Stage 2 — Milestone 3
+Phase 10 — Stage 2 — Milestone 3 / November 15 Remediation (BLK-02)
 
 Provides torch.autograd.Function wrappers for custom CUDA kernels:
 - VectorAddFunction / vector_add
@@ -14,6 +14,7 @@ Provides torch.autograd.Function wrappers for custom CUDA kernels:
 - CustomLinear (nn.Module)
 
 Supports FP32, FP16, and BF16 with correct gradient propagation.
+Supports safe execution under both native compiled kernels and pure PyTorch CPU/CUDA fallbacks.
 """
 from typing import Optional, Tuple, Union
 import torch
@@ -22,14 +23,34 @@ import torch.nn as nn
 from . import _get_module
 
 
+def _validate_autograd_device(*tensors: Optional[torch.Tensor], name: str = "Input") -> None:
+    """
+    Validate device placement for autograd inputs:
+    - If CUDA device is available: strict requirement for CUDA tensors.
+    - If CUDA device is unavailable (CPU-only environment): allows CPU tensors safely.
+    """
+    if torch.cuda.is_available():
+        for t in tensors:
+            if t is not None and not t.is_cuda:
+                raise ValueError(f"{name} must be a CUDA tensor" if name.endswith("tensor") or name.endswith("tensors") else f"{name} must be a CUDA tensor")
+    else:
+        for t in tensors:
+            if t is not None and t.device.type != "cpu":
+                raise ValueError(f"{name} must be on CPU in CPU-only mode")
+
+
 # ============================================================================
 # 1. Vector Addition Autograd
 # ============================================================================
 class VectorAddFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
-        if not a.is_cuda or not b.is_cuda:
-            raise ValueError("All inputs must be CUDA tensors")
+        if torch.cuda.is_available():
+            if not a.is_cuda or not b.is_cuda:
+                raise ValueError("All inputs must be CUDA tensors")
+        else:
+            _validate_autograd_device(a, b, name="All inputs")
+
         if a.shape != b.shape or a.dtype != b.dtype:
             raise ValueError(f"Shape and dtype mismatch: {a.shape}/{a.dtype} vs {b.shape}/{b.dtype}")
         
@@ -40,8 +61,11 @@ class VectorAddFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         
         grad_output_contig = grad_output.contiguous()
         grad_a = None
@@ -68,8 +92,11 @@ def vector_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
 class VectorScaleFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor, alpha: Union[float, torch.Tensor]) -> torch.Tensor:
-        if not x.is_cuda:
-            raise ValueError("x must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not x.is_cuda:
+                raise ValueError("x must be a CUDA tensor")
+        else:
+            _validate_autograd_device(x, name="x")
         
         is_tensor_alpha = isinstance(alpha, torch.Tensor)
         alpha_val = float(alpha.item()) if is_tensor_alpha else float(alpha)
@@ -84,8 +111,11 @@ class VectorScaleFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         
         grad_output_contig = grad_output.contiguous()
         grad_x = None
@@ -112,8 +142,11 @@ def scale(x: torch.Tensor, alpha: Union[float, torch.Tensor]) -> torch.Tensor:
 class ReLUFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor) -> torch.Tensor:
-        if not x.is_cuda:
-            raise ValueError("x must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not x.is_cuda:
+                raise ValueError("x must be a CUDA tensor")
+        else:
+            _validate_autograd_device(x, name="x")
         x_contig = x.contiguous()
         ctx.save_for_backward(x_contig)
         return _get_module().relu(x_contig)
@@ -122,8 +155,11 @@ class ReLUFunction(torch.autograd.Function):
     def backward(ctx, grad_output: torch.Tensor) -> Optional[torch.Tensor]:
         if not ctx.needs_input_grad[0]:
             return None
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         (x,) = ctx.saved_tensors
         return _get_module().relu_backward(grad_output.contiguous(), x)
 
@@ -139,8 +175,11 @@ def relu(x: torch.Tensor) -> torch.Tensor:
 class SigmoidFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor) -> torch.Tensor:
-        if not x.is_cuda:
-            raise ValueError("x must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not x.is_cuda:
+                raise ValueError("x must be a CUDA tensor")
+        else:
+            _validate_autograd_device(x, name="x")
         out = _get_module().sigmoid(x.contiguous())
         # Numerically stable: save forward output Y, dX = dY * Y * (1 - Y)
         ctx.save_for_backward(out)
@@ -150,8 +189,11 @@ class SigmoidFunction(torch.autograd.Function):
     def backward(ctx, grad_output: torch.Tensor) -> Optional[torch.Tensor]:
         if not ctx.needs_input_grad[0]:
             return None
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         (out,) = ctx.saved_tensors
         return _get_module().sigmoid_backward(grad_output.contiguous(), out)
 
@@ -167,8 +209,11 @@ def sigmoid(x: torch.Tensor) -> torch.Tensor:
 class GELUFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor) -> torch.Tensor:
-        if not x.is_cuda:
-            raise ValueError("x must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not x.is_cuda:
+                raise ValueError("x must be a CUDA tensor")
+        else:
+            _validate_autograd_device(x, name="x")
         x_contig = x.contiguous()
         ctx.save_for_backward(x_contig)
         return _get_module().gelu(x_contig)
@@ -177,8 +222,11 @@ class GELUFunction(torch.autograd.Function):
     def backward(ctx, grad_output: torch.Tensor) -> Optional[torch.Tensor]:
         if not ctx.needs_input_grad[0]:
             return None
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         (x,) = ctx.saved_tensors
         return _get_module().gelu_backward(grad_output.contiguous(), x)
 
@@ -194,8 +242,12 @@ def gelu(x: torch.Tensor) -> torch.Tensor:
 class FusedAddReLUFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
-        if not a.is_cuda or not b.is_cuda:
-            raise ValueError("All inputs must be CUDA tensors")
+        if torch.cuda.is_available():
+            if not a.is_cuda or not b.is_cuda:
+                raise ValueError("All inputs must be CUDA tensors")
+        else:
+            _validate_autograd_device(a, b, name="All inputs")
+
         if a.shape != b.shape or a.dtype != b.dtype:
             raise ValueError(f"Shape/dtype mismatch: {a.shape}/{a.dtype} vs {b.shape}/{b.dtype}")
         
@@ -206,8 +258,11 @@ class FusedAddReLUFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         (out,) = ctx.saved_tensors
         grad_out_contig = grad_output.contiguous()
 
@@ -235,8 +290,12 @@ def fused_add_relu(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
 class FusedBiasActivationFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor, bias: torch.Tensor, activation: str = "relu") -> torch.Tensor:
-        if not x.is_cuda or not bias.is_cuda:
-            raise ValueError("All inputs must be CUDA tensors")
+        if torch.cuda.is_available():
+            if not x.is_cuda or not bias.is_cuda:
+                raise ValueError("All inputs must be CUDA tensors")
+        else:
+            _validate_autograd_device(x, bias, name="All inputs")
+
         if x.dim() != 2 or bias.dim() != 1 or x.size(1) != bias.size(0):
             raise ValueError(f"Dimension mismatch: x={x.shape}, bias={bias.shape}")
         
@@ -244,8 +303,9 @@ class FusedBiasActivationFunction(torch.autograd.Function):
         if act not in ("none", "relu", "gelu"):
             raise ValueError(f"Unsupported activation: {activation}")
 
+        ctx.bias_orig_dtype = bias.dtype
         x_contig = x.contiguous()
-        bias_contig = bias.contiguous()
+        bias_contig = bias.to(dtype=x.dtype).contiguous()
         out = _get_module().fused_bias_activation(x_contig, bias_contig, act)
 
         ctx.save_for_backward(x_contig, bias_contig)
@@ -254,8 +314,11 @@ class FusedBiasActivationFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor], None]:
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         x, bias = ctx.saved_tensors
         grad_out_contig = grad_output.contiguous()
 
@@ -265,6 +328,8 @@ class FusedBiasActivationFunction(torch.autograd.Function):
 
         res_x = grad_x if ctx.needs_input_grad[0] else None
         res_bias = grad_bias if ctx.needs_input_grad[1] else None
+        if res_bias is not None and res_bias.dtype != ctx.bias_orig_dtype:
+            res_bias = res_bias.to(dtype=ctx.bias_orig_dtype)
         return res_x, res_bias, None
 
 
@@ -279,8 +344,12 @@ def fused_bias_activation(x: torch.Tensor, bias: torch.Tensor, activation: str =
 class MatmulFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> torch.Tensor:
-        if not a.is_cuda or not b.is_cuda:
-            raise ValueError("Inputs must be CUDA tensors")
+        if torch.cuda.is_available():
+            if not a.is_cuda or not b.is_cuda:
+                raise ValueError("Inputs must be CUDA tensors")
+        else:
+            _validate_autograd_device(a, b, name="Inputs")
+
         if a.dim() != 2 or b.dim() != 2 or a.size(1) != b.size(0):
             raise ValueError(f"Incompatible matrix shapes: {a.shape} and {b.shape}")
         if a.dtype != b.dtype:
@@ -303,8 +372,11 @@ class MatmulFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor], None]:
-        if not grad_output.is_cuda:
-            raise ValueError("grad_output must be a CUDA tensor")
+        if torch.cuda.is_available():
+            if not grad_output.is_cuda:
+                raise ValueError("grad_output must be a CUDA tensor")
+        else:
+            _validate_autograd_device(grad_output, name="grad_output")
         a, b = ctx.saved_tensors
         dtype = ctx.dtype
         grad_out_contig = grad_output.contiguous()
@@ -316,16 +388,16 @@ class MatmulFunction(torch.autograd.Function):
         grad_a = None
         grad_b = None
 
-        # dA = dC @ B^T  (M x N) @ (N x K) -> (M x K)
         if ctx.needs_input_grad[0]:
+            # dL/dA = grad_output @ B^T
             b_t = b.t().contiguous()
             if dtype == torch.float16:
                 grad_a = _get_module().matmul_wmma(grad_out_contig, b_t, False)
             else:
                 grad_a = _get_module().matmul_tiled(grad_out_contig, b_t)
 
-        # dB = A^T @ dC  (K x M) @ (M x N) -> (K x N)
         if ctx.needs_input_grad[1]:
+            # dL/dB = A^T @ grad_output
             a_t = a.t().contiguous()
             if dtype == torch.float16:
                 grad_b = _get_module().matmul_wmma(a_t, grad_out_contig, False)
@@ -336,14 +408,7 @@ class MatmulFunction(torch.autograd.Function):
 
 
 def matmul(a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> torch.Tensor:
-    """Autograd-enabled custom CUDA matrix multiplication (Tiled SGEMM or WMMA)."""
-    return MatmulFunction.apply(a, b, output_fp32)
-
-
-def matmul_wmma(a: torch.Tensor, b: torch.Tensor, output_fp32: bool = False) -> torch.Tensor:
-    """Autograd-enabled Ampere Tensor Core WMMA matrix multiplication."""
-    if a.dtype != torch.float16 or b.dtype != torch.float16:
-        raise ValueError("matmul_wmma requires float16 inputs")
+    """Autograd-enabled custom CUDA matrix multiplication."""
     return MatmulFunction.apply(a, b, output_fp32)
 
 
@@ -373,9 +438,6 @@ class CustomLinear(nn.Module):
             raise ValueError(f"Unsupported activation: {activation}")
 
         factory_kwargs = {"device": device, "dtype": dtype}
-        # PyTorch Linear weight is (out_features, in_features). We store weight as (in_features, out_features)
-        # for direct matmul X @ W, or (out_features, in_features) for standard PyTorch weight compatibility.
-        # Let's use (out_features, in_features) to match standard nn.Linear parameter layout!
         self.weight = nn.Parameter(torch.empty((out_features, in_features), **factory_kwargs))
         if bias:
             self.bias = nn.Parameter(torch.empty(out_features, **factory_kwargs))
@@ -393,7 +455,6 @@ class CustomLinear(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x is (B, in_features). Weight is (out_features, in_features).
-        # We compute x @ W^T using custom matmul:
         w_t = self.weight.t().contiguous()
         y = matmul(x, w_t)
         if self.bias is not None:
@@ -426,6 +487,5 @@ __all__ = [
     "fused_bias_activation",
     "MatmulFunction",
     "matmul",
-    "matmul_wmma",
     "CustomLinear",
 ]

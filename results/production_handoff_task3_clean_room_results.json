@@ -1,0 +1,17 @@
+{
+  "archive_sha256_match": true,
+  "extracted_files_count": 271,
+  "hygiene_audit": "PASS",
+  "pip_check": "PASS",
+  "clean_prod_hash_match": true,
+  "clean_pilot_hash_match": true,
+  "health_endpoint": "PASS",
+  "reported_version": "1.0.0-rc2",
+  "hardware_telemetry": "PASS",
+  "registry_truthfulness": "PASS",
+  "model_load": "PASS",
+  "inference": "PASS",
+  "generated_text": "s is the connection that the data is\n not the ",
+  "tokens_per_sec": 4.9,
+  "cpu_fallback_load": "PASS"
+}

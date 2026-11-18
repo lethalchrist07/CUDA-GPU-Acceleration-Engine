@@ -1,0 +1,108 @@
+{
+  "plan_timestamp": "2026-10-28T18:23:30.660733+00:00",
+  "status": "READY_FOR_AUTHORIZATION",
+  "objective": "Controlled 50M-Token Pretraining Campaign Scaling",
+  "target_hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "compute_capability": "Ampere SM 8.6 (16 SMs, 2048 CUDA Cores)",
+    "total_vram_mb": 6143.5,
+    "system_ram_mb": 16384,
+    "os": "Windows 11",
+    "cuda_version": "12.4.1",
+    "pytorch_version": "2.6.0+cu124"
+  },
+  "model_architecture": {
+    "total_parameters": 86825472,
+    "layers": 12,
+    "heads": 12,
+    "d_model": 768,
+    "d_ff": 3072,
+    "vocab_size": 2048,
+    "max_seq_len": 256,
+    "weight_tying": true,
+    "activation": "GELU (approximate=tanh)",
+    "attention": "PyTorch Native Scaled Dot-Product Attention (SDPA)"
+  },
+  "dataset_configuration": {
+    "manifest_name": "Phase13_Milestone5_Production10MPretrainingCorpus",
+    "dataset_version": "3.0.0",
+    "dataset_fingerprint_sha256": "ba004fd1143fdc4e38045a15f79832411585ea20758cfba78dc0a0349010f5b1",
+    "train_tokens": 13215150,
+    "val_tokens": 104180,
+    "test_tokens": 331796,
+    "total_corpus_tokens": 13651126,
+    "domain_coverage": [
+      "Classical Literature (21 works, 9.28M tokens)",
+      "Scientific & Mathematical Treatises (8 works, 3.50M tokens)",
+      "Computer Science, Systems & RFC Standards (5 works, 0.44M tokens)"
+    ],
+    "held_out_validation_split": "The Time Machine (104,180 tokens - strictly isolated)",
+    "held_out_test_split": "Opticks by Sir Isaac Newton (331,796 tokens - strictly isolated)"
+  },
+  "training_mathematics": {
+    "baseline_cumulative_tokens": 10205184,
+    "baseline_global_step": 2492,
+    "target_cumulative_tokens": 50000000,
+    "remaining_token_budget": 39794816,
+    "effective_batch_size": 4096,
+    "batch_size": 16,
+    "context_length": 256,
+    "remaining_optimizer_steps": 9716,
+    "total_lifetime_steps": 12208,
+    "epochs_required": 3.01,
+    "steps_per_epoch": 3226
+  },
+  "hyperparameter_schedule": {
+    "optimizer": "AdamW",
+    "peak_learning_rate": 0.0003,
+    "min_learning_rate": 3e-05,
+    "weight_decay": 0.01,
+    "betas": [
+      0.9,
+      0.95
+    ],
+    "eps": 1e-08,
+    "grad_clip": 1.0,
+    "warmup_steps": 200,
+    "total_scheduler_steps": 9716,
+    "learning_rate_decay": "CosineAnnealingWithLinearWarmup",
+    "mixed_precision": "AMP FP16 (torch.amp.autocast + GradScaler)",
+    "fused_kernel_acceleration": "Custom CUDA Fused Bias+GELU"
+  },
+  "runtime_and_throughput_projections": {
+    "measured_step_latency_ms": 365.0,
+    "projected_step_throughput_tokens_per_sec": 11221.9,
+    "pure_compute_time_hours": 0.99,
+    "evaluation_overhead_minutes": 6.8,
+    "checkpoint_overhead_minutes": 1.4,
+    "total_estimated_wall_clock_minutes": 67.3,
+    "total_estimated_wall_clock_hours": 1.12
+  },
+  "vram_budget_and_thermal_safety": {
+    "total_hardware_vram_mb": 6143.5,
+    "projected_peak_vram_mb": 2723.0,
+    "available_headroom_mb": 3420.5,
+    "vram_headroom_percentage": 55.7,
+    "thermal_safety_threshold_celsius": 82.0,
+    "thermal_cooldown_pause_sec": 30.0,
+    "vram_exhaustion_risk": "NEGLIGIBLE (44.3% VRAM utilized, 55.7% free headroom)"
+  },
+  "checkpointing_and_reliability": {
+    "checkpoint_cadence_steps": 400,
+    "evaluation_cadence_steps": 200,
+    "checkpoint_directory": "checkpoints/transformer/pretraining_50m_campaign/",
+    "atomic_double_buffering": true,
+    "rng_state_restoration": true,
+    "protection_of_historical_checkpoints": [
+      "checkpoints/transformer/pretraining_campaign/ (Preserved)",
+      "checkpoints/transformer/pretraining_1m_diagnostic/ (Preserved)",
+      "checkpoints/transformer/pretraining_10m_extended/ (Preserved)",
+      "checkpoints/transformer/pretraining_50m_diagnostic/ (Preserved)"
+    ]
+  },
+  "guardrail_enforcement": {
+    "campaign_auto_launch": false,
+    "user_authorization_required": true,
+    "status": "AWAITING_EXPLICIT_USER_AUTHORIZATION"
+  }
+}

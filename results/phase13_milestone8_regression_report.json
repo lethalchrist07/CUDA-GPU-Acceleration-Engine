@@ -1,0 +1,149 @@
+{
+  "milestone": "Phase 13 Milestone 8",
+  "timestamp": "2026-11-02T16:13:40Z",
+  "summary": {
+    "total_suites": 15,
+    "total_passed": 256,
+    "total_failed": 1,
+    "total_skipped": 0,
+    "total_elapsed_seconds": 160.71,
+    "verdict": "FAILED"
+  },
+  "suites": [
+    {
+      "suite": "tests/test_milestone13_milestone8_adaptive_engine.py",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 10.38,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_milestone7_comparative_lab.py",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 7.23,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_milestone6_campaign_readiness.py",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 3.19,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_milestone5_production_readiness.py",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 10.66,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_milestone4_audit_readiness.py",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 6.64,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_extended_pretraining.py",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 11.3,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_pretraining_diagnostic.py",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 16.85,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone13_dataset_engineering.py",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 5.71,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone12_pretraining_campaign.py",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 12.19,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone11_platform_integration.py",
+      "passed": 20,
+      "failed": 1,
+      "skipped": 0,
+      "elapsed_seconds": 18.51,
+      "exit_code": 1,
+      "stdout": "============================= test session starts =============================\nplatform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\\Projects\\CUDA-GPU-Acceleration-Engine\\.venv\\Scripts\\python.exe\ncachedir: .pytest_cache\nrootdir: C:\\Projects\\CUDA-GPU-Acceleration-Engine\nplugins: anyio-4.15.1\ncollecting ... collected 21 items\n\ntests/test_milestone11_platform_integration.py::test_1_model_registry_integration FAILED [  4%]\ntests/test_milestone11_platform_integration.py::test_2_exact_parameter_metadata PASSED [  9%]\ntests/test_milestone11_platform_integration.py::test_3_configuration_validation_and_backend_rejection PASSED [ 14%]\ntests/test_milestone11_platform_integration.py::test_4_persistent_job_creation_and_status PASSED [ 19%]\ntests/test_milestone11_platform_integration.py::test_5_gpu_queue_concurrency_lock PASSED [ 23%]\ntests/test_milestone11_platform_integration.py::test_6_short_transformer_training_orchestration PASSED [ 28%]\ntests/test_milestone11_platform_integration.py::test_7_live_telemetry_persistence_and_metrics PASSED [ 33%]\ntests/test_milestone11_platform_integration.py::test_8_checkpoint_registration_and_integrity PASSED [ 38%]\ntests/test_milestone11_platform_integration.py::test_9_checkpoint_resume PASSED [ 42%]\ntests/test_milestone11_platform_integration.py::test_10_cooperative_cancellation PASSED [ 47%]\ntests/test_milestone11_platform_integration.py::test_11_restart_recovery PASSED [ 52%]\ntests/test_milestone11_platform_integration.py::test_12_tokenizer_bpe_and_byte_integrity PASSED [ 57%]\ntests/test_milestone11_platform_integration.py::test_13_inference_checkpoint_loading PASSED [ 61%]\ntests/test_milestone11_platform_integration.py::test_14_real_autoregressive_inference_generation PASSED [ 66%]\ntests/test_milestone11_platform_integration.py::test_15_top_p_nucleus_and_temperature_sampling PASSED [ 71%]\ntests/test_milestone11_platform_integration.py::test_16_gpu_training_inference_contention_prevention PASSED [ 76%]\ntests/test_milestone11_platform_integration.py::test_17_checkpoints_catalog_transformer_enrichment PASSED [ 80%]\ntests/test_milestone11_platform_integration.py::test_18_resnet18_regression PASSED [ 85%]\ntests/test_milestone11_platform_integration.py::test_19_baseline_mlp_and_custom_cuda_regression PASSED [ 90%]\ntests/test_milestone11_platform_integration.py::test_20_protected_artifacts_and_benchmarks_intact PASSED [ 95%]\ntests/test_milestone11_platform_integration.py::test_21_frontend_production_build_artifact_validation PASSED [100%]\n\n================================== FAILURES ===================================\n______________________ test_1_model_registry_integration ______________________\n\nclient = <starlette.testclient.TestClient object at 0x00000282DF9C4210>\n\n    def test_1_model_registry_integration(client):\n        \"\"\"Verifies that NEXORA GPT-100M is truthfully registered in /api/models.\"\"\"\n        res = client.get(\"/api/models\")\n        assert res.status_code == 200\n        data = res.json()\n        assert \"models\" in data\n    \n        model_names = [m[\"name\"] for m in data[\"models\"]]\n>       assert \"NEXORA GPT-100M\" in model_names or \"transformer_100m\" in model_names\nE       AssertionError: assert ('NEXORA GPT-100M' in ['ResNet18', 'NEXORA GPT-86.8M', 'CIFAR10MLP', 'BaselineMLP'] or 'transformer_100m' in ['ResNet18', 'NEXORA GPT-86.8M', 'CIFAR10MLP', 'BaselineMLP'])\n\ntests\\test_milestone11_platform_integration.py:76: AssertionError\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  C:\\Projects\\CUDA-GPU-Acceleration-Engine\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_milestone11_platform_integration.py::test_1_model_registry_integration\n================== 1 failed, 20 passed, 1 warning in 16.90s ===================\n"
+    },
+    {
+      "suite": "tests/test_milestone10_flagship_transformer.py",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 13.59,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone9_transformer.py",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 12.32,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_milestone8_training_reliability.py",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 12.01,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_stage2_milestone7_resnet.py",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 12.87,
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "suite": "tests/test_custom_kernels.py",
+      "passed": 104,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 7.26,
+      "exit_code": 0,
+      "stdout": ""
+    }
+  ]
+}

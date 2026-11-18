@@ -1,0 +1,188 @@
+{
+  "milestone": "Phase 13 Milestone 6",
+  "mode": "diagnostic",
+  "timestamp": "2026-10-28T18:51:37.461095+00:00",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "vram_total_mb": 6143.5,
+    "compute_capability": "8.6"
+  },
+  "token_accounting": {
+    "start_step": 2492,
+    "final_step": 2497,
+    "steps_executed": 5,
+    "start_tokens": 10205184,
+    "additional_tokens": 20480,
+    "cumulative_tokens": 10225664,
+    "target_cumulative_tokens": 50000000,
+    "tokens_per_step": 4096
+  },
+  "performance": {
+    "total_wall_time_sec": 24.77,
+    "total_wall_time_min": 0.41,
+    "tokens_per_sec": 826.9,
+    "peak_vram_alloc_mb": 3917.41,
+    "peak_vram_res_mb": 4262.0
+  },
+  "scientific_evaluation": {
+    "initial_validation_loss": 2.5095,
+    "initial_validation_perplexity": 12.3,
+    "final_validation_loss": 2.4707,
+    "final_validation_perplexity": 11.83,
+    "best_validation_loss": 2.4707,
+    "best_validation_perplexity": 11.83,
+    "best_validation_step": 2497,
+    "initial_test_loss": 2.9229,
+    "initial_test_perplexity": 18.59,
+    "final_test_loss": 2.9042,
+    "final_test_perplexity": 18.25,
+    "best_test_loss": 2.9042,
+    "best_test_perplexity": 18.25
+  },
+  "recovery_fidelity": {
+    "max_logit_diff": 0.0,
+    "status": "PASSED"
+  },
+  "checkpoints": [
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\best_model.pt",
+      "step": 2494,
+      "tokens": 10213376,
+      "sha256": "6f368f1df2f78d561a90988cda4bef6726aae21f868f518dd9b46d39fd59ebad",
+      "size_bytes": 1042091280
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\step_2494.pt",
+      "step": 2494,
+      "tokens": 10213376,
+      "sha256": "543b55c219759a50ec852995bc603367c86cad1d81be0d626466d1425d5fdbbe",
+      "size_bytes": 1042090682
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\latest_model.pt",
+      "step": 2494,
+      "tokens": 10213376,
+      "sha256": "867b2ea40f159991395ed970c87cf195dc3fde884f0efbad6f30948336d7e778",
+      "size_bytes": 1042092476
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\best_model.pt",
+      "step": 2496,
+      "tokens": 10221568,
+      "sha256": "c95c4eeddeb44fc58100e21ceada6d38c0696f5c5fd1b7a55f93b9c33ed95847",
+      "size_bytes": 1042091280
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\step_2496.pt",
+      "step": 2496,
+      "tokens": 10221568,
+      "sha256": "7221d002bd19309f3c9207605f6eb83653e011b4e987eae692b836ee0d0fff49",
+      "size_bytes": 1042090682
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\latest_model.pt",
+      "step": 2496,
+      "tokens": 10221568,
+      "sha256": "46a12c652cef7dd093c93fcfab314345e70da323896e01469baee13db8ded7e0",
+      "size_bytes": 1042092476
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\best_model.pt",
+      "step": 2497,
+      "tokens": 10225664,
+      "sha256": "d78a758a69a20c6c0b05ebe04cc771577fcb2d83457f48e68b686efbce3840d9",
+      "size_bytes": 1042091280
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\latest_model.pt",
+      "step": 2497,
+      "tokens": 10225664,
+      "sha256": "6e2c9e70ad66b2f2f34d41c4d0dcab28096fe2a0113ffe11ba74fbcad1547e21",
+      "size_bytes": 1042092476
+    },
+    {
+      "filepath": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_50m_campaign\\final_model.pt",
+      "step": 2497,
+      "tokens": 10225664,
+      "sha256": "d57cc7da8178dba914fe295a74b281b063693f8078ea1af3a8136063413def3a",
+      "size_bytes": 1042091878
+    }
+  ],
+  "telemetry_sample": [
+    {
+      "step": 2493,
+      "tokens": 10209280,
+      "train_loss": 2.4119,
+      "train_perplexity": 11.16,
+      "learning_rate": 3.000171093464898e-05,
+      "grad_norm": 0.7841,
+      "tokens_per_sec": 6693.6,
+      "step_latency_ms": 611.93,
+      "peak_vram_alloc_mb": 1034.7,
+      "peak_vram_res_mb": 2154.0,
+      "temperature_c": 57.0,
+      "gpu_utilization_pct": 100.0,
+      "elapsed_sec": 0.71
+    },
+    {
+      "step": 2494,
+      "tokens": 10213376,
+      "train_loss": 2.383,
+      "train_perplexity": 10.84,
+      "learning_rate": 3.0000962401629436e-05,
+      "grad_norm": 0.6729,
+      "tokens_per_sec": 12272.8,
+      "step_latency_ms": 333.75,
+      "peak_vram_alloc_mb": 1034.7,
+      "peak_vram_res_mb": 2866.0,
+      "temperature_c": 57.0,
+      "gpu_utilization_pct": 84.0,
+      "elapsed_sec": 1.1
+    },
+    {
+      "step": 2495,
+      "tokens": 10217472,
+      "train_loss": 2.4321,
+      "train_perplexity": 11.38,
+      "learning_rate": 3.0000427734339854e-05,
+      "grad_norm": 0.6466,
+      "tokens_per_sec": 4708.4,
+      "step_latency_ms": 869.94,
+      "peak_vram_alloc_mb": 1034.7,
+      "peak_vram_res_mb": 2866.0,
+      "temperature_c": 53.0,
+      "gpu_utilization_pct": 100.0,
+      "elapsed_sec": 10.82
+    },
+    {
+      "step": 2496,
+      "tokens": 10221568,
+      "train_loss": 2.4003,
+      "train_perplexity": 11.03,
+      "learning_rate": 3.000010693362731e-05,
+      "grad_norm": 0.6295,
+      "tokens_per_sec": 10611.9,
+      "step_latency_ms": 385.98,
+      "peak_vram_alloc_mb": 1034.7,
+      "peak_vram_res_mb": 2866.0,
+      "temperature_c": 54.0,
+      "gpu_utilization_pct": 52.0,
+      "elapsed_sec": 11.27
+    },
+    {
+      "step": 2497,
+      "tokens": 10225664,
+      "train_loss": 2.3483,
+      "train_perplexity": 10.47,
+      "learning_rate": 2.9999999999999997e-05,
+      "grad_norm": 0.6251,
+      "tokens_per_sec": 7556.3,
+      "step_latency_ms": 542.06,
+      "peak_vram_alloc_mb": 1034.7,
+      "peak_vram_res_mb": 2866.0,
+      "temperature_c": 53.0,
+      "gpu_utilization_pct": 100.0,
+      "elapsed_sec": 20.67
+    }
+  ]
+}

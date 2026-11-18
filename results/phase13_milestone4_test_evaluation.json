@@ -1,0 +1,83 @@
+{
+  "evaluation_name": "Phase 13 Milestone 4 Independent Held-Out Test Evaluation",
+  "timestamp": "2026-10-25T15:08:41Z",
+  "test_dataset": {
+    "document": "Sir Isaac Newton: Opticks (1704)",
+    "tokens": 331918,
+    "chunks_256": 1296,
+    "batches_b4": 324,
+    "unexposed_during_training": true
+  },
+  "models": [
+    {
+      "label": "Phase 12 Baseline (0.5M Tokens)",
+      "step": 125,
+      "cumulative_tokens": 512000,
+      "validation_loss": 3.7435,
+      "validation_perplexity": 42.25,
+      "test_loss": 4.1199,
+      "test_perplexity": 61.55,
+      "generalization_gap_delta": 0.3764,
+      "generalization_gap_ratio": 1.101,
+      "top1_token_accuracy_pct": 32.17,
+      "mean_sequence_nll": 1054.69,
+      "test_eval_duration_sec": 9.22,
+      "test_throughput_tok_per_sec": 35986.6,
+      "peak_vram_mb": 543.4,
+      "generation_ms_per_token": 25.24,
+      "sample_completion": "Sir Isaac Newton discovered that light and of and and the in of I of to my the the s to and and and to the"
+    },
+    {
+      "label": "Phase 13 M2 Diagnostic (1.0M Tokens)",
+      "step": 245,
+      "cumulative_tokens": 1003520,
+      "validation_loss": 3.5308,
+      "validation_perplexity": 34.15,
+      "test_loss": 3.9675,
+      "test_perplexity": 52.85,
+      "generalization_gap_delta": 0.4367,
+      "generalization_gap_ratio": 1.124,
+      "top1_token_accuracy_pct": 33.17,
+      "mean_sequence_nll": 1015.69,
+      "test_eval_duration_sec": 8.92,
+      "test_throughput_tok_per_sec": 37183.0,
+      "peak_vram_mb": 545.4,
+      "generation_ms_per_token": 18.56,
+      "sample_completion": "Sir Isaac Newton discovered that light of and the I a that the\n\nwas the that the\n\nwered. to I to the\n\n\u201cThe"
+    },
+    {
+      "label": "Phase 13 M3 Extended (10.0M Tokens)",
+      "step": 2442,
+      "cumulative_tokens": 10002432,
+      "validation_loss": 2.3976,
+      "validation_perplexity": 11.0,
+      "test_loss": 3.0731,
+      "test_perplexity": 21.61,
+      "generalization_gap_delta": 0.6755,
+      "generalization_gap_ratio": 1.282,
+      "top1_token_accuracy_pct": 41.37,
+      "mean_sequence_nll": 786.71,
+      "test_eval_duration_sec": 9.41,
+      "test_throughput_tok_per_sec": 35264.0,
+      "peak_vram_mb": 548.77,
+      "generation_ms_per_token": 18.29,
+      "sample_completion": "Sir Isaac Newton discovered that light to the tyard\n\nof the lady, and I found the public of the lamp of"
+    }
+  ],
+  "held_out_comparison": {
+    "test_loss_progression": [
+      4.1199,
+      3.9675,
+      3.0731
+    ],
+    "test_perplexity_progression": [
+      61.55,
+      52.85,
+      21.61
+    ],
+    "test_loss_reduction": -1.0468,
+    "test_perplexity_ratio": 2.85,
+    "accuracy_gain_pct": 9.2,
+    "scientific_conclusion": "Extended pretraining yields genuine out-of-domain generalization on unexposed 18th-century scientific optical literature."
+  }
+}

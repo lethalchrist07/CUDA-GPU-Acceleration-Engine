@@ -1,5 +1,2 @@
-# Install into .venv-phase3; keep the verified .venv unchanged.
-fastapi>=0.115,<1
-uvicorn>=0.30,<1
-httpx>=0.27,<1
-pytest>=8,<10
+# Backend-specific dependencies (mirrors root requirements.txt)
+-r ../requirements.txt

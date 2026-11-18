@@ -1,0 +1,45 @@
+{
+  "audit_name": "Phase 13 Milestone 4 Checkpoint and Scientific Integrity Audit",
+  "timestamp": "2026-10-25T15:07:46Z",
+  "architecture": {
+    "parameters": 86825472,
+    "non_embedding_parameters": 85056000,
+    "tied_weights": true,
+    "layers": 12,
+    "heads": 12,
+    "d_model": 768,
+    "d_ff": 3072,
+    "vocab_size": 2048
+  },
+  "checkpoints": {
+    "best_model": {
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_10m_extended\\best_model.pt",
+      "size_bytes": 1042095250,
+      "sha256": "4b0d59c40edd607d3dea8024f92d9381e79dcfa26b3b399574230fd2a739908e",
+      "step": 2442,
+      "val_loss": 2.3976,
+      "val_perplexity": 11.0,
+      "cumulative_tokens": 10000384
+    },
+    "final_model": {
+      "path": "C:\\Projects\\CUDA-GPU-Acceleration-Engine\\checkpoints\\transformer\\pretraining_10m_extended\\final_model.pt",
+      "size_bytes": 1042095848,
+      "sha256": "1883613fecc89d6ce377b095a1441ddec6462da4db7c016166c06d587b42a553",
+      "step": 2442
+    }
+  },
+  "tokenizer": {
+    "vocab_size": 2048,
+    "sha256": "ffd4aac665204b09488cd84e5428a72aa93223e06708947520768c001c163841"
+  },
+  "datasets": {
+    "train_tokens": 2114151,
+    "val_tokens": 104180,
+    "test_tokens": 331918,
+    "total_tokens": 2550249,
+    "validation_isolated": true,
+    "test_isolated": true
+  },
+  "cpu_gpu_numerical_parity_max_diff": 1.1444091796875e-05,
+  "audit_status": "ALL_10_CHECKS_VERIFIED"
+}

@@ -89,6 +89,10 @@ class KernelDispatchTracker:
             self.native_fallbacks[op] = 0
 
     def get_summary(self) -> Dict[str, Any]:
+        mod = ck._get_module()
+        is_fallback = getattr(mod, "is_fallback", False)
+        is_native = getattr(mod, "is_native", not is_fallback)
+
         forward_dispatches = {
             op: count for op, count in self.counts.items()
             if not op.endswith("_backward") and count > 0
@@ -107,7 +111,9 @@ class KernelDispatchTracker:
             "total_custom_backward": total_custom_backward,
             "total_custom_dispatches": total_custom_forward + total_custom_backward,
             "native_fallbacks": {k: v for k, v in self.native_fallbacks.items() if v > 0},
-            "is_custom_dispatched": (total_custom_forward + total_custom_backward) > 0,
+            "is_custom_dispatched": (total_custom_forward + total_custom_backward) > 0 and not is_fallback,
+            "is_native_custom": is_native and (total_custom_forward + total_custom_backward) > 0,
+            "is_fallback_active": is_fallback,
         }
 
     def __enter__(self):
