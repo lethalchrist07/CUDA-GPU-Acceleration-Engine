@@ -1,0 +1,79 @@
+NEXORA — CUDA GPU Acceleration Engine
+Copyright (c) 2026 CUDA GPU Acceleration Engine Contributors
+
+This product includes software developed by the NEXORA Project.
+
+========================================================================
+NVIDIA CUDA Toolkit Attribution Notice
+========================================================================
+Portions of this software are based on NVIDIA CUDA Toolkit components.
+This software is independently developed and is neither sponsored,
+endorsed, nor certified by NVIDIA Corporation. NVIDIA, CUDA, and
+GeForce RTX are trademarks or registered trademarks of NVIDIA Corporation
+in the United States and other countries.
+
+========================================================================
+Third-Party Runtime Dependency Attributions
+========================================================================
+NEXORA depends upon third-party open-source libraries that are obtained
+and installed out-of-band by end-users via package managers (PyPI, npm).
+Pre-compiled binaries and upstream sources for these packages are NOT
+bundled within the NEXORA source distribution archive.
+
+In accordance with upstream license conditions, the following statutory
+notices are retained:
+
+------------------------------------------------------------------------
+Requests (Apache License, Version 2.0 - Section 4(d))
+------------------------------------------------------------------------
+Requests
+Copyright 2019 Kenneth Reitz
+
+------------------------------------------------------------------------
+OpenTelemetry Python API (Apache License, Version 2.0 - Section 4(d))
+------------------------------------------------------------------------
+OpenTelemetry Python API
+Copyright The OpenTelemetry Authors
+
+------------------------------------------------------------------------
+PyTorch Attribution Notices (BSD-3-Clause / Caffe2 BSD)
+------------------------------------------------------------------------
+Early development of Caffe2 in 2015 and early 2016 is licensed under the
+BSD license:
+
+All contributions by Facebook:
+Copyright (c) 2016 Facebook Inc.
+
+All contributions by Google:
+Copyright (c) 2015 Google Inc.
+All rights reserved.
+
+All contributions by Yangqing Jia:
+Copyright (c) 2015 Yangqing Jia
+All rights reserved.
+
+All contributions by Kakao Brain:
+Copyright 2019-2020 Kakao Brain
+
+All other contributions:
+Copyright(c) 2015, 2016 the respective contributors
+All rights reserved.
+
+Some parts of the caffe2 code is derived from the original Caffe code:
+All contributions by the University of California:
+Copyright (c) 2014, The Regents of the University of California (Regents)
+All rights reserved.
+
+------------------------------------------------------------------------
+TypeScript Attribution Notice (Apache License, Version 2.0 - Section 4(d))
+------------------------------------------------------------------------
+TypeScript
+Copyright (c) Microsoft Corporation. All rights reserved.
+Incorporates third-party material from DefinitelyTyped.
+
+========================================================================
+Supply-Chain & Comprehensive Disclosure Reference
+========================================================================
+For the complete master inventory of direct and transitive dependencies,
+license texts, copyright holders, and subcomponent notices, see:
+THIRD_PARTY_LICENSES.md
