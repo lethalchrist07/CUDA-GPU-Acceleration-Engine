@@ -5,7 +5,7 @@
 **Project:** CUDA GPU Acceleration Engine (NEXORA)  
 **Organization / Author:** CUDA GPU Acceleration Engine Contributors  
 **Primary Hardware Certified:** NVIDIA GeForce RTX 3050 Laptop GPU 6GB (Ampere SM 8.6, 20 SMs, 70W TGP)  
-**Status:** **AUTHORITATIVE MODEL DOCUMENTATION — WEIGHT REDISTRIBUTION PENDING OWNER DECISION**  
+**Status:** **AUTHORITATIVE MODEL DOCUMENTATION — GPT-86.8M CC-BY-4.0 SELECTED (DISTRIBUTION PENDING FINAL OWNER AUTHORIZATION) | GPT-100M PILOT INTERNAL ONLY**  
 
 ---
 
@@ -15,8 +15,8 @@ This Model Card provides standardized documentation for the two autoregressive t
 
 | Model Characteristic | Model 1: NEXORA GPT-86.8M | Model 2: NEXORA GPT-100M Pilot |
 |---|---|---|
-| **Model Classification** | **Certified Pretrained Foundation Model** | **Exploratory Architecture Pilot** |
-| **Operational Readiness** | **Production Feasible / Converged** | **Exploratory Feasibility Prototype Only** |
+| **Model Classification** | **Certified Pretrained Foundation Model** | **Exploratory Architecture Pilot (Internal Engineering Material)** |
+| **Operational Readiness** | **Production Feasible / Converged** | **Internal Feasibility Prototype (Withheld from Public Distribution)** |
 | **Partially Trained Flag**| `is_partially_trained: false` | `is_partially_trained: true` |
 | **Total Exact Parameters**| **86,825,472** | **85,940,736** (active pilot configuration) |
 | **Preset Spec Parameters**| 86,825,472 | 92,133,888 (target preset architecture) |
@@ -51,6 +51,7 @@ This Model Card provides standardized documentation for the two autoregressive t
 - **Pilot Configuration:** Uses an active vocabulary of 512 tokens and context length of 128 tokens, yielding 85,940,736 parameters.
 - **Target Flagship Preset:** Designed to scale to 92,133,888 parameters with an expanded 8,192 token vocabulary and 1,024 context window.
 - **Status Disclosure:** This checkpoint has been trained for only **15 optimizer steps** (~7,936 tokens). Its validation loss is **5.6888** and perplexity is **295.53**. **It does NOT produce coherent natural language text.** It is preserved solely as a technical artifact demonstrating architectural initialization and forward/backward computational viability.
+- **Distribution Classification:** Strictly designated as **Internal Engineering Material**. This checkpoint is permanently withheld from public distribution, release asset attachments, and external model hubs. It is retained strictly on private development infrastructure to preserve architectural validation and backward autograd stability records.
 
 ---
 
@@ -198,59 +199,113 @@ To ensure bit-for-bit authenticity and detect corruption prior to loading weight
 
 ### 8.3 Exploratory Pilot Checkpoint (`NEXORA GPT-100M Pilot`)
 - **Artifact Role:** Exploratory 15-step architectural initialization prototype (partially trained).
+- **Distribution Status:** **Internal Engineering Benchmark Fixture (Withheld from Public Distribution)**. Retained locally for development validation; excluded from public release assets, download packages, and external model hubs.
 - **Relative Path:** `checkpoints/transformer/flagship_100m_pilot/best_model.pt`
 - **Expected Size:** `1,026,758,674 bytes` (979.19 MB)
 - **Expected SHA-256:** `F8B0B9F9D4FB2E9CE482AEA9C619E2C588404CAA7E5691606E9340F381932F9F`
-- **Verification Command (Windows PowerShell):**
+- **Verification Command (Windows PowerShell — Internal Developer Environments):**
   ```powershell
   Get-FileHash -Algorithm SHA256 checkpoints\transformer\flagship_100m_pilot\best_model.pt
   ```
 
 ---
 
-## 9. Model Licensing & Redistribution Decision Block
+## 9. Model Licensing & Distribution Policy Determination
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Model weights do NOT automatically inherit open-source software licenses.**  
-> While the software source code of NEXORA is licensed under the permissive MIT License, machine learning model weight checkpoints represent distinct computational artifacts. This section documents the legal status and sets forth the explicit decision required by the Project Owner.
+> While the software source code of NEXORA is licensed under the permissive MIT License, machine learning model weight checkpoints represent distinct computational artifacts. This section documents the official licensing determination authorized by the Project Owner.
 
 ```
 ====================================================================================================
-                        MODEL WEIGHTS LICENSING STATUS AUDIT
+                        MODEL WEIGHTS & SOFTWARE DUAL-REGIME LICENSING STRUCTURE
 ====================================================================================================
-  PROJECT SOFTWARE LICENSE:          MIT License (Copyright (c) 2026 Contributors)
-  PRETRAINING DATASET RIGHTS:        100% Public Domain & IETF Open Standards (Verified Compliant)
+  PROJECT SOFTWARE SOURCE CODE:      MIT License (Copyright (c) 2026 Contributors)
+  NEXORA GPT-86.8M MODEL WEIGHTS:    Creative Commons Attribution 4.0 International (CC-BY-4.0)
+  NEXORA GPT-100M PILOT CHECKPOINT:  Internal Engineering Material (Withheld from Public Distribution)
+  PRETRAINING DATASET RIGHTS:        100% Public Domain & IETF Open Standards (Unencumbered)
   THIRD-PARTY IP IN WEIGHTS:         0% (Trained from scratch; zero teacher model distillation)
-  METADATA LICENSE DECLARATION:      ABSENT (Checkpoints do not contain serialized license fields)
-  MODEL WEIGHT REDISTRIBUTION:       >>> NOT VERIFIED — HOSTING PAUSED <<<
+  LICENSE SELECTION:                 CC-BY-4.0 (Approved by Project Owner)
+  INTENDED DISTRIBUTION:             Public (External Model Hubs / Release Assets)
+  FINAL RELEASE AUTHORIZATION:       >>> PENDING EXPLICIT OWNER RELEASE AUTHORIZATION <<<
 ====================================================================================================
 ```
 
-### 9.1 Legal Analysis & Pre-Conditions
-1. **Software vs. Weights Separation:** The root `LICENSE` file governs code in `backend/`, `frontend/`, `custom_kernels/`, and `engine/`. It does not explicitly state terms for neural network parameter tensors.
-2. **Dataset Freedom:** Because the training data consists entirely of Public Domain literature and IETF RFCs, there are no upstream restrictive copyleft or non-commercial data clauses encumbering the weights.
-3. **Third-Party Model Rights:** No third-party base weights (e.g. LLaMA, Mistral, GPT-2) were fine-tuned or pruned. The checkpoints are 100% original numerical weights.
+### 9.1 Software vs. Weights Separation
+1. **Software Source Code:** Governed by the root `LICENSE` file under the permissive **MIT License**. Applies to all human-written code in `backend/`, `frontend/`, `custom_kernels/`, `engine/`, `include/`, and `tests/`.
+2. **Model Weights (NEXORA GPT-86.8M):** Governed by **Creative Commons Attribution 4.0 International (CC-BY-4.0)**. Checkpoint parameter tensors (`best_model.pt`) and custom BPE tokenizer vocabulary (`bpe_vocab.json`) are licensed under CC-BY-4.0, which explicitly covers copyright and *Sui Generis Database Rights* (EU Directive 96/9/EC).
+3. **Internal Engineering Fixture (NEXORA GPT-100M Pilot):** Classified strictly as internal engineering material and permanently withheld from public distribution.
 
-### 9.2 Project Owner Action Required
-Public hosting and distribution (e.g. on Hugging Face Model Hub, GitHub Release Assets, or S3 buckets) **MUST REMAIN PAUSED** until the Project Owner explicitly selects and signs one of the following model licensing frameworks:
+### 9.2 NEXORA GPT-86.8M CC-BY-4.0 Attribution & Terms
+
+Downstream distributors of `best_model.pt`, quantized formats (`.gguf`, `.onnx`, `.safetensors`), fine-tuned weights, or applications integrating the model weights must provide attribution as specified below:
+
+#### Attribution Notice
+```text
+NEXORA GPT-86.8M Model Weights (c) 2026 by CUDA GPU Acceleration Engine Contributors
+is licensed under Creative Commons Attribution 4.0 International (CC-BY-4.0).
+To view a copy of this license, visit: https://creativecommons.org/licenses/by/4.0/
+or read the full legal text at: https://creativecommons.org/licenses/by/4.0/legalcode.txt
+
+Original Model Repository: https://github.com/project/cuda-acceleration-engine
+Original Checkpoint SHA-256: ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC
+Pretraining Corpus: 36 Classical Literature, Historical Science & Open RFC Works (100% Public Domain)
+```
+
+#### Academic Citation (BibTeX)
+```bibtex
+@misc{nexora_gpt_86m_2026,
+  title={NEXORA GPT-86.8M: An Ampere-Optimized Pretrained Decoder Transformer for Edge GPU Computing},
+  author={CUDA GPU Acceleration Engine Contributors},
+  year={2026},
+  publisher={GitHub / Hugging Face},
+  howpublished={\url{https://github.com/project/cuda-acceleration-engine}},
+  note={Licensed under Creative Commons Attribution 4.0 International (CC-BY-4.0)}
+}
+```
+
+#### Hugging Face Model Card YAML Metadata
+When hosting weights on Hugging Face Model Hub, the model repository `README.md` must declare:
+```yaml
+---
+language:
+- en
+license: cc-by-4.0
+tags:
+- pytorch
+- cuda
+- transformer
+- causal-lm
+- ampere-sm86
+pipeline_tag: text-generation
+model_name: NEXORA GPT-86.8M
+datasets:
+- custom-public-domain-literature-rfc
+inference: true
+---
+```
+
+### 9.3 Project Owner Determination Record
+
+In accordance with explicit Project Owner authorization:
 
 ```
-[ ] OPTION 1: Permissive Open-Source Model License (Creative Commons Attribution 4.0 - CC-BY-4.0)
+[X] OPTION 1: Creative Commons Attribution 4.0 International (CC-BY-4.0) — APPROVED (LICENSE SELECTION ONLY)
+    Applies to NEXORA GPT-86.8M model weights (best_model.pt).
     Allows unrestricted commercial and academic use, modification, and redistribution with attribution.
 
-[ ] OPTION 2: OpenRAIL-M (Responsible AI License)
-    Permits royalty-free commercial and academic use while prohibiting designated harmful use cases.
+[ ] OPTION 2: OpenRAIL-M (Responsible AI License) — NOT SELECTED
+[ ] OPTION 3: Explicit MIT License Extension — NOT SELECTED
+[ ] OPTION 4: Non-Commercial Research Only (CC-BY-NC-4.0) — NOT SELECTED
 
-[ ] OPTION 3: Explicit MIT License Extension for Model Binaries
-    Formal declaration that the root MIT license applies equally to the binary weight tensors.
-
-[ ] OPTION 4: Non-Commercial Research Only (CC-BY-NC-4.0)
-    Restricts model weights to academic and experimental research purposes.
-
-Project Owner Decision:  __________________________________
-Authorized Signature:    __________________________________
-Date:                    __________________________________
+Operational Directives & Release Governance Boundary:
+1. License Selected: CC-BY-4.0 is approved as the governing license framework for NEXORA GPT-86.8M (best_model.pt).
+2. Intended Distribution: Public distribution is the intended target for NEXORA GPT-86.8M upon release.
+3. Final Release Authorization: PENDING. License selection does NOT constitute authorization for immediate publication or distribution. Public hosting and external upload (GitHub Releases, Hugging Face) remain on HOLD until explicit final release authorization is granted by the Project Owner.
+4. NEXORA GPT-100M Pilot is classified as INTERNAL ENGINEERING MATERIAL and permanently WITHHELD from public release.
+5. Root software source code remains governed exclusively by the MIT License.
+6. Sole contributor declaration remains pending owner review and personal signature.
 ```
 
-**Current Operational Mandate:** Until the Project Owner completes this authorization, model checkpoints must be retained strictly on private infrastructure and flagged as **NOT FOR PUBLIC UPLOAD**.
+*Policy Disclaimer: This document records the operational licensing and distribution policies established by the Project Owner. It documents technical provenance and open-source licensing designations, and does not claim independent third-party legal certification.*
 

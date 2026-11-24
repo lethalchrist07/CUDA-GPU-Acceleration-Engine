@@ -191,21 +191,21 @@ The platform maintains absolute scientific integrity by strictly distinguishing 
 
 ```mermaid
 graph TD
-    subgraph M1 ["Certified Foundation Model (Production Ready)"]
+    subgraph M1 ["Certified Foundation Model (Intended Public Release — CC-BY-4.0; Release Auth Pending)"]
         A1["NEXORA GPT-86.8M"]
         A2["Weights: checkpoints/transformer/pretraining_50m_campaign/best_model.pt"]
         A3["Pretraining: 12,208 Steps | 50,004,608 Tokens"]
         A4["Validation: Loss 1.9383 | Perplexity 6.95"]
-        A5["Status Flag: is_partially_trained = False"]
+        A5["Status: Production Ready | CC-BY-4.0 Selected (Release Auth Pending)"]
         A1 --> A2 --> A3 --> A4 --> A5
     end
 
-    subgraph M2 ["Exploratory Architecture Pilot (Feasibility Prototype)"]
+    subgraph M2 ["Exploratory Architecture Pilot (Internal Engineering Material)"]
         B1["NEXORA GPT-100M Pilot"]
         B2["Weights: checkpoints/transformer/flagship_100m_pilot/best_model.pt"]
         B3["Pretraining: 15 Steps (Exploratory Smoke Run)"]
         B4["Validation: Step Loss 5.3174"]
-        B5["Status Flag: is_partially_trained = True"]
+        B5["Status: Internal Fixture | Withheld from Public Distribution"]
         B1 --> B2 --> B3 --> B4 --> B5
     end
 ```
@@ -213,7 +213,7 @@ graph TD
 ### Model Architectural Comparison
 | Parameter / Metric | NEXORA GPT-86.8M (Production Campaign) | NEXORA GPT-100M (Preset Target) | NEXORA GPT-100M (Pilot Checkpoint) |
 | :--- | :--- | :--- | :--- |
-| **Model Role** | Certified Pretrained Foundation Model | Full Flagship Architecture Specification | Exploratory Architecture Verification |
+| **Model Role** | Certified Pretrained Foundation Model (Intended Public — CC-BY-4.0; Release Auth Pending) | Full Flagship Architecture Specification | Exploratory Architecture Verification (Internal Only) |
 | **Exact Parameters** | **86,825,472** | **92,133,888** | **85,940,736** (pilot vocab subset) |
 | **Layers / Heads / Hidden** | 12 Layers / 12 Heads / $d=768$ | 12 Layers / 12 Heads / $d=768$ | 12 Layers / 12 Heads / $d=768$ |
 | **Feed-Forward Dimension** | $d_{\text{ff}} = 3072$ | $d_{\text{ff}} = 3072$ | $d_{\text{ff}} = 3072$ |
@@ -344,10 +344,12 @@ The repository includes a comprehensive 787-test catalog covering unit, integrat
 The platform follows strict packaging rules configured via [`.gitignore`](.gitignore):
 - **Included in Package**: Core CUDA C++ sources, PyTorch engines, FastAPI backend, React/Vite frontend source, production static build (`frontend/dist`), verified benchmark artifacts (`results/`), and master configuration files.
 - **Excluded from Package**: Local Python virtual environments (`.venv/`, `.venv*/`), Node dependency trees (`node_modules/`), intermediate build objects (`build/`, `*.obj`, `*.o`), raw pretraining datasets (`data/*.bin`, `data/cifar-10-batches-py/`), temporary scratch files (`scratch/`, `*.tmp`), and raw exploratory checkpoint dumps.
-- **Protected Checkpoints**: Production certified checkpoint (`checkpoints/transformer/pretraining_50m_campaign/best_model.pt`) and exploratory pilot checkpoint (`checkpoints/transformer/flagship_100m_pilot/best_model.pt`) are permanently preserved.
+- **Protected Checkpoints**: Production certified checkpoint (`checkpoints/transformer/pretraining_50m_campaign/best_model.pt`, CC-BY-4.0) and exploratory pilot checkpoint (`checkpoints/transformer/flagship_100m_pilot/best_model.pt`, internal only) are permanently preserved.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Software Source Code & Custom CUDA Kernels**: Licensed under the [MIT License](LICENSE) (Copyright © 2026 CUDA GPU Acceleration Engine Contributors).
+- **NEXORA GPT-86.8M Model Weights**: Governed by [Creative Commons Attribution 4.0 International (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/) — see [MODEL_CARD.md](MODEL_CARD.md) (Intended distribution: Public; Final release authorization: Pending).
+- **NEXORA GPT-100M Pilot Checkpoint**: Internal engineering benchmark material (withheld from public distribution).

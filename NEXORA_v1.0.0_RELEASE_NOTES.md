@@ -4,7 +4,7 @@
 **Release Date:** November 8, 2026  
 **Target Hardware:** NVIDIA GeForce RTX 3050 Laptop GPU 6GB (Ampere GA107, SM 8.6)  
 **Host Platform:** Windows 11 Home 64-bit / Linux x86_64, CUDA 12.4, PyTorch 2.6.0+cu124  
-**License:** MIT License  
+**License:** MIT License (Software Source Code) | CC-BY-4.0 (NEXORA GPT-86.8M Model Weights; Release Auth Pending)  
 **Distribution Archive:** `dist/cuda-acceleration-engine-v1.0.0-rc4-source.zip`  
 **Distribution Checksum:** `DBDD670654F15955FEF46F9CEF9EB5E8E5CDCDD7E2ECB407C566C28EDECB5AF0`  
 
@@ -34,9 +34,9 @@ The platform couples a high-throughput **FastAPI** asynchronous backend service 
   - High-Speed KV-Cache Generation: Sustained **54.1 – 56.6 tokens/second** on RTX 3050 Laptop GPU with a minimal **343.64 MB** VRAM footprint.
 - **Seamless CPU Fallback Runtime:**
   - Full architectural fallback to system host CPU (`device: "cpu"`), requiring **0.0 MB VRAM** and delivering 2.9 tokens/second for testing and non-GPU environments.
-- **Scientific Lineage Disclosure (Exploratory Architecture Pilot):**
-  - Includes checkpoint for **NEXORA GPT-100M Pilot** (85.94M active parameters, 15 steps trained, loss 5.3174).
-  - Transparently categorized as an exploratory feasibility prototype (`is_partially_trained: true`), preventing misleading production claims while validating the path to 92.13M parameter flagship presets.
+- **Scientific Lineage Disclosure & Pilot Model Restriction:**
+  - Checkpoint for **NEXORA GPT-100M Pilot** (85.94M active parameters, 15 steps trained, loss 5.3174) is classified strictly as **Internal Engineering Material** and is **withheld from public release**.
+  - Transparently categorized as an exploratory feasibility prototype (`is_partially_trained: true`), preserving internal research records while preventing misleading production claims.
 
 ### 2.3 Training Studio & Comparative Laboratory
 - **Multi-Backend Training Orchestration:** Run standardized training runs across four comparative configurations:
@@ -87,27 +87,22 @@ pip install -r requirements.txt
 pip check
 ```
 
-### 4.2 External Model Weights Placement
-Because binary weight files exceed GitHub repository limits (>100 MB each), place the model checkpoints into their designated subdirectories:
+### 4.2 External Model Weights Placement (Intended Public Release — Pending Final Release Authorization)
+Because binary weight files exceed GitHub repository limits (>100 MB each), placement instructions for the intended public release model checkpoint are provided below (public hosting and external download remain on hold pending final Project Owner release authorization):
 ```powershell
 mkdir -p checkpoints/transformer/pretraining_50m_campaign
-mkdir -p checkpoints/transformer/flagship_100m_pilot
 
-# Copy best_model.pt (NEXORA GPT-86.8M, 1,042,091,280 bytes)
+# Place best_model.pt (NEXORA GPT-86.8M, 1,042,091,280 bytes, governed by CC-BY-4.0)
 # Target: checkpoints/transformer/pretraining_50m_campaign/best_model.pt
-
-# Copy best_model.pt (NEXORA GPT-100M Pilot, 1,026,758,674 bytes)
-# Target: checkpoints/transformer/flagship_100m_pilot/best_model.pt
 ```
 
 Verify integrity:
 ```powershell
 Get-FileHash -Algorithm SHA256 checkpoints\transformer\pretraining_50m_campaign\best_model.pt
 # Expected: ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC
-
-Get-FileHash -Algorithm SHA256 checkpoints\transformer\flagship_100m_pilot\best_model.pt
-# Expected: F8B0B9F9D4FB2E9CE482AEA9C619E2C588404CAA7E5691606E9340F381932F9F
 ```
+
+*(Note: The exploratory `checkpoints/transformer/flagship_100m_pilot/best_model.pt` is an internal engineering fixture withheld from public distribution and is not required for public deployments.)*
 
 ### 4.3 Frontend Installation & Launch
 ```powershell
@@ -165,7 +160,7 @@ All metrics were captured empirically on the certified physical RTX 3050 Laptop 
 |---|:---:|:---:|---|
 | `dist/cuda-acceleration-engine-v1.0.0-rc4-source.zip` | ZIP Archive | 1,558,575 | `DBDD670654F15955FEF46F9CEF9EB5E8E5CDCDD7E2ECB407C566C28EDECB5AF0` |
 | `checkpoints/transformer/pretraining_50m_campaign/best_model.pt` | PyTorch Binary | 1,042,091,280 | `ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC` |
-| `checkpoints/transformer/flagship_100m_pilot/best_model.pt` | PyTorch Binary | 1,026,758,674 | `F8B0B9F9D4FB2E9CE482AEA9C619E2C588404CAA7E5691606E9340F381932F9F` |
+| `checkpoints/transformer/flagship_100m_pilot/best_model.pt` | PyTorch Binary (Internal Only) | 1,026,758,674 | `F8B0B9F9D4FB2E9CE482AEA9C619E2C588404CAA7E5691606E9340F381932F9F` |
 | `dist/cuda-acceleration-engine-v1.0.0-rc3-source.zip` *(Archived)* | ZIP Archive | 867,299 | `A464CE92120BCDFBD7367B804EB65A1501BEAEF558CF3AE40A3959FE37FFDFEE` |
 | `dist/cuda-acceleration-engine-v1.0.0-rc2-source.zip` *(Archived)* | ZIP Archive | 801,536 | `DFF94F528EFD6FDCDB38B1C9FAFC7A50B2D262F8B6811BAE666986FEE52F8EDD` |
 | `dist/cuda-acceleration-engine-v1.0.0-rc1-source.zip` *(Archived)* | ZIP Archive | 366,932 | `02AC0EBEFD8D52D7F39359B29ED5CFAEB08E2B25E9CE442EFD4C82A2E46A72FA` |
@@ -174,7 +169,10 @@ All metrics were captured empirically on the certified physical RTX 3050 Laptop 
 
 ## 8. Licensing & Credits
 
-**NEXORA v1.0.0** is licensed under the **MIT License**.  
-Copyright © 2026 CUDA GPU Acceleration Engine Contributors.  
+**Dual-Regime Licensing:**
+- **Software Source Code & Custom CUDA Kernels:** Licensed under the **MIT License** (Copyright © 2026 CUDA GPU Acceleration Engine Contributors) — see [LICENSE](LICENSE).
+- **NEXORA GPT-86.8M Model Weights:** Governed by **Creative Commons Attribution 4.0 International (CC-BY-4.0)** — see [MODEL_CARD.md](MODEL_CARD.md) (Intended distribution: Public; Final release authorization: Pending).
+- **NEXORA GPT-100M Pilot Checkpoint:** Internal engineering material (withheld from public distribution).
+
 All third-party libraries (PyTorch, FastAPI, React, Vite, Tailwind CSS, Lucide) are distributed in accordance with their respective permissive open-source licenses.
 

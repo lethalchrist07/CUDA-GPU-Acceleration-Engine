@@ -18,7 +18,7 @@ This document specifies the exact, cryptographically verified asset manifest for
 
 To maintain strict compliance with release governance, the certified `v1.0.0-rc4` source distribution archive is preserved **completely unmodified** (byte size: `1,558,575 bytes`, SHA-256: `DBDD670654F15955FEF46F9CEF9EB5E8E5CDCDD7E2ECB407C566C28EDECB5AF0`). Release Candidate 4 embeds canonical root `LICENSE`, `NOTICE`, and `THIRD_PARTY_LICENSES.md` documents, along with pre-built production frontend assets (`frontend/dist/`), ensuring autonomous single-server deployment out of the box. Historical candidates (RC1, RC2, RC3) remain preserved in `dist/`.
 
-Furthermore, in strict adherence to model redistribution compliance, both large model checkpoints (>1 GB each) are formally cataloged but **marked as PAUSED / NOT FOR UPLOAD** until the Project Owner clears an explicit model licensing grant and model card.
+Furthermore, in strict adherence to model redistribution compliance, model weights are governed under a dual-regime licensing structure: the production foundation model (**NEXORA GPT-86.8M**) has been assigned **Creative Commons Attribution 4.0 International (CC-BY-4.0)** for intended public distribution (final public release authorization remains pending owner approval), while the exploratory prototype (**NEXORA GPT-100M Pilot**) is classified strictly as internal engineering material and permanently withheld from public release.
 
 ---
 
@@ -69,22 +69,21 @@ Due to GitHub's 100 MB per-file upload ceiling and open-source licensing governa
 +--------------------------+--------------------+----------------+------------------+----------------+
 | Model Identifier         | Parameter Count    | Byte Size      | Checksum (SHA256)| Hosting Status |
 +--------------------------+--------------------+----------------+------------------+----------------+
-| NEXORA GPT-86.8M         | 86,825,472 (Exact) | 1,042,091,280  | ABCD0FE7B305CD1C | PAUSED / PENDING
-|                          | (50M Pretrained)   | (993.82 MB)    | ...CA1406AAC     | OWNER CLEARANCE|
+| NEXORA GPT-86.8M         | 86,825,472 (Exact) | 1,042,091,280  | ABCD0FE7B305CD1C | CC-BY-4.0 (REL |
+|                          | (50M Pretrained)   | (993.82 MB)    | ...CA1406AAC     | AUTH PENDING)  |
 +--------------------------+--------------------+----------------+------------------+----------------+
-| NEXORA GPT-100M Pilot    | 85,940,736 (Active)| 1,026,758,674  | F8B0B9F9D4FB2E9C | PAUSED / PENDING
-|                          | (15-Step Feasibility)|(979.19 MB)   | ...381932F9F     | OWNER CLEARANCE|
+| NEXORA GPT-100M Pilot    | 85,940,736 (Active)| 1,026,758,674  | F8B0B9F9D4FB2E9C | EXCLUDED FROM  |
+|                          | (15-Step Feasibility)|(979.19 MB)   | ...381932F9F     | RELEASE (INT)  |
 +--------------------------+--------------------+----------------+------------------+----------------+
 ```
 
-### 4.1 Legal & Redistribution Audit Findings
+### 4.1 Legal & Redistribution Determination
 1. **Training Data Lineage:** Pre-trained on public domain literature (Project Gutenberg) and open standards (IETF RFCs). 100% compliant with public domain re-use.
 2. **Tokenizer Architecture:** In-house trained BPE tokenizer (`bpe_vocab.json`, 2048 vocab) with zero proprietary token dependencies.
 3. **Model Redistribution Rights Determination:**
-   - While the source code is licensed under MIT, neural network weight matrices do not automatically inherit software copyright under various legal jurisdictions without explicit licensing terms.
-   - Neither checkpoint file contains an embedded license statement in its serialized metadata dictionary.
-   - The repository currently lacks an explicit **Model Card** (`MODEL_CARD.md`) defining acceptable use, downstream redistribution terms, and ethical limitations.
-   - **Compliance Directive:** Model checkpoint redistribution is marked as **NOT VERIFIED / PAUSED**. External hosting and upload to public registries (e.g., Hugging Face) must remain paused until the Project Owner provides an explicit model licensing statement.
+   - **Dual-Regime Licensing Structure:** The software source code is governed by the permissive **MIT License**, while neural network weight parameters for **NEXORA GPT-86.8M** are governed by **Creative Commons Attribution 4.0 International (CC-BY-4.0)** as documented in `MODEL_CARD.md` Section 9.
+   - **NEXORA GPT-86.8M:** License framework selected as CC-BY-4.0 with required attribution to *"CUDA GPU Acceleration Engine Contributors"*. Intended for public distribution, but final external release authorization and public upload remain **PENDING** explicit Project Owner sign-off.
+   - **NEXORA GPT-100M Pilot:** Permanently excluded from public distribution and release assets. Retained strictly on private engineering infrastructure as an internal architecture verification fixture.
 
 ---
 
