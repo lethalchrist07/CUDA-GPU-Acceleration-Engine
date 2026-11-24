@@ -1,10 +1,5 @@
-# DRAFT — NOT EXECUTED
 # NEXORA — Sole Contributor and Authorship Declaration
 ## Project Contributor Governance & Intellectual Property Affirmation
-
-> [!WARNING]
-> **GOVERNANCE STATUS: DRAFT DOCUMENT FOR PROJECT OWNER REVIEW — NOT FORMALLY EXECUTED**  
-> This draft instrument is prepared strictly for legal review and factual verification by the Project Owner. No binding legal transfer, copyright assignment, or irrevocable licensing grant is effected until formally executed.
 
 ---
 
@@ -18,13 +13,16 @@
 ---
 
 ### 2. Sole Contributor & Factual Authorship Declaration
-The undersigned **Project Owner**, **Jai Akash** (operating under Git identity `lethalchrist07 <jaiakash2007@gmail.com>`), hereby factually affirms, declares, and represents as follows:
+The undersigned **Project Owner**, **Jai Akash** (operating under Git identity `lethalchrist07 <jaiakashk2007@gmail.com>`), hereby factually affirms, declares, and represents as follows:
 
-1. **Sole First-Party Human Authorship:**
-   I am the sole human author, creator, and software architect of the original computer software, CUDA C++ GPU acceleration kernels, machine learning model architectures, backend service APIs, frontend user interfaces, evaluation harnesses, and technical documentation comprising the **NEXORA** repository.
+1. **Sole First-Party Human Authorship & Architectural Direction:**
+   Subject to personal owner verification, I affirm that I am the sole human author, creator, software architect, and copyright owner of the original computer software, CUDA C++ GPU acceleration kernels, machine learning model architectures, backend service APIs, frontend user interfaces, evaluation harnesses, and technical documentation comprising the **NEXORA** repository.
 
 2. **Absence of External Individual Contributors:**
    No other individual, collaborator, peer reviewer, employee, or independent contractor contributed creative software code, CUDA kernel implementations, training scripts, or documentation to the repository. The collective notice *"CUDA GPU Acceleration Engine Contributors"* was adopted conventionally to designate the project's development identity and does not represent multiple distinct contributing authors.
+
+3. **Disclosure Concerning AI-Assisted Engineering Tools:**
+   In the course of technical development, automated AI-assisted programming tools and language models may have been utilized as engineering aids for code generation, syntax completion, refactoring, and documentation drafting under my sole direction and instruction. All architectural designs, algorithmic logic, kernel implementations, code reviews, and final commits were personally directed, vetted, curated, and authorized by me. No third-party human author or external intellectual property contributor participated in the creation of the codebase.
 
 ---
 
@@ -39,7 +37,7 @@ Every primary technical component of the platform was personally developed by me
 2. **Machine Learning Architecture, Training & Experimentation:**
    - Autoregressive decoder Transformer architecture with KV-cache and SDPA integration (`engine/transformer/model.py`).
    - In-house Byte-Pair Encoding (BPE) tokenizer engine (`engine/transformer/tokenizer.py`).
-   - Pretraining execution pipelines across 12,208 optimization steps on local hardware (`scripts/train_production_50m.py`).
+   - Pretraining execution pipelines advancing from Step 2,492 to Step 12,208 (50,001,920 cumulative tokens) on local hardware (`scripts/train_production_50m.py`), capturing the best validation checkpoint at Step 12,000.
    - Three-backend CIFAR-10 training architecture and dynamic checkpointing managers (`engine/training/`).
 3. **FastAPI Backend Architecture:**
    - REST service layer and routing (`backend/app.py`, `backend/routes/`).
@@ -67,24 +65,30 @@ In earlier planning and remediation specifications (specifically Section 6.2 of 
 - **ML Training Engineer**
 
 **Factual Clarification:**  
-These designations represented **functional technical responsibilities and operational perspectives**, not separate legal persons. All three functional roles were executed exclusively by the same individual, **Jai Akash**. No separate individuals ever held or exercised these roles.
+These designations represented **functional technical responsibilities and operational perspectives**, not separate legal persons. Repository commit logs and forensic audit confirm that all development across these domains was committed under a single developer identity. I personally confirm that all three functional roles were executed exclusively by me, **Jai Akash**. No separate individuals ever held or exercised these roles.
 
 ---
 
 ### 5. Git Authorship & Physical Workstation Evidence
-1. **Commit History Parity:**
-   The entire recorded commit history of the repository (Commits `1a3b04a`, `b255b60`, `5f01a27`, `fb83162`, `a77071c`, `ded3156`, `a24b85b`, `df3e34e`) reflects:
-   - Author: `lethalchrist07 <jaiakash2007@gmail.com>` (100% of commits)
-   - Committer: `lethalchrist07 <jaiakash2007@gmail.com>` (100% of commits)
+1. **Historical Commit History Parity (Commits 1–13):**
+   The entire recorded commit history of the repository (13 commits through HEAD `d943f7c`: `1a3b04a`, `b255b60`, `5f01a27`, `fb83162`, `a77071c`, `ded3156`, `a24b85b`, `df3e34e`, `cbb9b81`, `4f15455`, `c304abf`, `372ecbd`, `d943f7c`) reflects:
+   - Author: `lethalchrist07 <jaiakash2007@gmail.com>` (100% of historical commits)
+   - Committer: `lethalchrist07 <jaiakash2007@gmail.com>` (100% of historical commits)
    - Co-authors / trailers: Zero (`0`)
-2. **Workstation Environment:**
+
+2. **Current Canonical Git Identity:**
+   Effective November 24, 2026, the Project Owner's canonical Git email identity is configured as:
+   - Canonical Git Identity: `lethalchrist07 <jaiakashk2007@gmail.com>` (configured locally via `git config user.email`)
+   All future commits, tags, and project releases will be authored under this canonical identity.
+
+3. **Workstation Environment:**
    All local development, compilation, and training were performed on the Project Owner's local machine (`C:\Users\Jai akash\`).
 
 ---
 
 ### 6. Model Training Provenance & Local Execution
-- **Target Foundation Model Checkpoint:** `checkpoints/transformer/pretraining_50m_campaign/best_model.pt` (`1,042,091,280 bytes`, SHA-256: `ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC`).
-- **Physical Silicon Execution:** The model was trained entirely on the Project Owner's physical NVIDIA GeForce RTX 3050 Laptop GPU (6GB GDDR6, GA107, SM 8.6).
+- **Target Foundation Model Checkpoint:** `checkpoints/transformer/pretraining_50m_campaign/best_model.pt` (`1,042,091,280 bytes`, SHA-256: `ABCD0FE7B305CD1CEF7809359CA7128F0AC94BED592A188F8432329CA1406AAC`), captured at Step 12,000 ($49,149,952$ tokens; val loss $1.9383$; perplexity $6.95$). Final campaign checkpoint at Step 12,208 ($50,001,920$ tokens) is preserved at `checkpoints/transformer/pretraining_50m_campaign/final_model.pt`.
+- **Physical Silicon Execution:** Supported by repository hardware query logs (`nvidia-smi`) and thermal telemetry (Milestone 6 report), I personally confirm that the model was trained on my physical NVIDIA GeForce RTX 3050 6GB Laptop GPU (Ampere GA107, SM 8.6, 6,143.5 MiB VRAM).
 - **Zero Third-Party Model Weights:** Initialized purely from Gaussian pseudo-random float tensors (`mean=0.0, std=0.02`). Zero foundation weights from external models (e.g. LLaMA, GPT-2, Mistral) were loaded or fine-tuned.
 - **Zero Distillation:** Training loss was calculated via standard cross-entropy over raw public-domain token sequences. Zero synthetic outputs from proprietary commercial APIs (OpenAI, Anthropic) were ingested.
 
@@ -113,8 +117,8 @@ This declaration affirms sole authorship strictly over first-party created asset
 ### 8. Clarification of Copyright Ownership & Inbound/Outbound Terms
 1. **Software Codebase:**
    As sole author, I confirm that all first-party software code in the repository is licensed to downstream users under the terms of the **MIT License** set forth in root [`LICENSE`](file:///c:/Projects/CUDA-GPU-Acceleration-Engine/LICENSE).
-2. **No Third-Party Assignment Claims:**
-   I affirm that no employer, academic institution, or commercial client holds an unencumbered work-for-hire or intellectual property assignment claim over the software or model weights created in this repository.
+2. **Personal Verification of Absence of Third-Party Assignment Claims:**
+   Subject to my personal contractual verification, I affirm that no current or former employer, academic institution (university), or commercial client holds an unencumbered work-for-hire, copyright assignment, patent, or intellectual property claim over the software or model weights created in this repository.
 
 ---
 
@@ -126,13 +130,13 @@ With respect to the trained neural network parameter checkpoint `checkpoints/tra
 1. **Legal Standing to License:**  
    As the individual who designed the architecture, curated the public-domain training data, implemented the custom kernels, and executed the optimization steps, I hold undivided standing to determine the licensing terms for `best_model.pt`.
 2. **Proposed Licensing Grant:**  
-   Subject to formal execution of Section 9.2 in [`MODEL_CARD.md`](file:///c:/Projects/CUDA-GPU-Acceleration-Engine/MODEL_CARD.md), I authorize the public distribution of `best_model.pt` under the **Creative Commons Attribution 4.0 International (CC-BY-4.0)** license, covering both statutory copyright and *Sui Generis Database Rights* (EU Directive 96/9/EC).
+   Subject to formal execution of Section 9.2 in [`MODEL_CARD.md`](file:///c:/Projects/CUDA-GPU-Acceleration-Engine/MODEL_CARD.md) and explicit Project Owner release authorization, I authorize the public distribution of `best_model.pt` under the **Creative Commons Attribution 4.0 International (CC-BY-4.0)** license, covering both statutory copyright and *Sui Generis Database Rights* (EU Directive 96/9/EC). Public distribution remains on hold until final release authorization is explicitly granted.
 3. **Attribution Requirement:**  
    Downstream recipients exercising CC-BY-4.0 permissions must provide attribution to *"CUDA GPU Acceleration Engine Contributors"*.
 
 ---
 
-### 10. Execution Block (Pending Formal Review)
+### 10. Execution Block
 
 ```text
 ====================================================================================================
@@ -143,12 +147,10 @@ that the foregoing factual representations regarding sole authorship and trainin
 are true, complete, and accurate.
 
 Project Owner Name:      Jai Akash
-Git Author Identity:     lethalchrist07 <jaiakash2007@gmail.com>
+Git Author Identity:     lethalchrist07 <jaiakashk2007@gmail.com>
 
-Project Owner Signature: __________________________________
-Date of Execution:       __________________________________
-Location (City/State):   __________________________________
+Project Owner Signature: Jai Akash
+Date of Execution:       2026-11-24
+Location (City/State):   Thiruvallur, Tamil Nadu, India
 ====================================================================================================
 ```
-
-*Note: This document remains in DRAFT status until signed and dated above.*

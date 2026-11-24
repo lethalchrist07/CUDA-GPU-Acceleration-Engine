@@ -7,8 +7,8 @@
 **Authority Role:** Production Release Engineer & Open-Source Compliance Auditor  
 **Certified Target Hardware:** NVIDIA GeForce RTX 3050 Laptop GPU 6GB (Ampere SM 8.6)  
 **Host Platform:** Windows 11 Home 64-bit (10.0.26100), Python 3.11.9, PyTorch 2.6.0+cu124, CUDA 12.4, Node.js v20.18.0  
-**Specification Date:** November 17, 2026 (Updated from November 8, 2026 Baseline)  
-**Status:** **READY FOR PROJECT OWNER AUTHORIZATION**  
+**Specification Date:** November 24, 2026 (Updated from November 8, 2026 Baseline)  
+**Status:** **AUTHORIZED BY PROJECT OWNER FOR PRODUCTION RELEASE**  
 
 ---
 
@@ -69,8 +69,8 @@ Due to GitHub's 100 MB per-file upload ceiling and open-source licensing governa
 +--------------------------+--------------------+----------------+------------------+----------------+
 | Model Identifier         | Parameter Count    | Byte Size      | Checksum (SHA256)| Hosting Status |
 +--------------------------+--------------------+----------------+------------------+----------------+
-| NEXORA GPT-86.8M         | 86,825,472 (Exact) | 1,042,091,280  | ABCD0FE7B305CD1C | CC-BY-4.0 (REL |
-|                          | (50M Pretrained)   | (993.82 MB)    | ...CA1406AAC     | AUTH PENDING)  |
+| NEXORA GPT-86.8M         | 86,825,472 (Exact) | 1,042,091,280  | ABCD0FE7B305CD1C | CC-BY-4.0      |
+|                          | (50M Pretrained)   | (993.82 MB)    | ...CA1406AAC     | (PUBLIC/HOSTED) |
 +--------------------------+--------------------+----------------+------------------+----------------+
 | NEXORA GPT-100M Pilot    | 85,940,736 (Active)| 1,026,758,674  | F8B0B9F9D4FB2E9C | EXCLUDED FROM  |
 |                          | (15-Step Feasibility)|(979.19 MB)   | ...381932F9F     | RELEASE (INT)  |
@@ -82,7 +82,7 @@ Due to GitHub's 100 MB per-file upload ceiling and open-source licensing governa
 2. **Tokenizer Architecture:** In-house trained BPE tokenizer (`bpe_vocab.json`, 2048 vocab) with zero proprietary token dependencies.
 3. **Model Redistribution Rights Determination:**
    - **Dual-Regime Licensing Structure:** The software source code is governed by the permissive **MIT License**, while neural network weight parameters for **NEXORA GPT-86.8M** are governed by **Creative Commons Attribution 4.0 International (CC-BY-4.0)** as documented in `MODEL_CARD.md` Section 9.
-   - **NEXORA GPT-86.8M:** License framework selected as CC-BY-4.0 with required attribution to *"CUDA GPU Acceleration Engine Contributors"*. Intended for public distribution, but final external release authorization and public upload remain **PENDING** explicit Project Owner sign-off.
+   - **NEXORA GPT-86.8M:** License framework selected as CC-BY-4.0 with required attribution to *"CUDA GPU Acceleration Engine Contributors"*. Public distribution authorized by Project Owner on November 24, 2026.
    - **NEXORA GPT-100M Pilot:** Permanently excluded from public distribution and release assets. Retained strictly on private engineering infrastructure as an internal architecture verification fixture.
 
 ---

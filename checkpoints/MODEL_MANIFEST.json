@@ -1,6 +1,6 @@
 {
-  "release_version": "v1.0.0-rc4",
-  "release_date": "2026-11-07",
+  "release_version": "v1.0.0",
+  "release_date": "2026-11-24",
   "platform": "CUDA GPU Acceleration Engine",
   "hardware_target": "NVIDIA GeForce RTX 3050 Laptop GPU 6GB (Ampere SM 8.6)",
   "models": [
@@ -12,7 +12,7 @@
       "license_url": "https://creativecommons.org/licenses/by/4.0/",
       "attribution": "CUDA GPU Acceleration Engine Contributors",
       "intended_distribution": "public",
-      "distribution_status": "pending_final_release_authorization",
+      "distribution_status": "released",
       "relative_path": "checkpoints/transformer/pretraining_50m_campaign/best_model.pt",
       "size_bytes": 1042091280,
       "size_mb": 993.82,
@@ -78,4 +78,3 @@
     }
   ]
 }
-
