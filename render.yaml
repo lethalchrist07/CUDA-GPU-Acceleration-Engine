@@ -1,0 +1,32 @@
+# Render Blueprint Specification for NEXORA v1.0.0 Production Web Service
+# Reference: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: nexora-gpu-acceleration-engine
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: CUDA_ENGINE_HOST
+        value: 0.0.0.0
+      - key: CUDA_ENGINE_ENV
+        value: production
+      - key: CUDA_ENGINE_DEVICE
+        value: cpu
+      - key: NEXORA_FORCE_FALLBACK
+        value: "1"
+      - key: CUDA_ENGINE_LOG_LEVEL
+        value: INFO
+      - key: CUDA_ENGINE_DB_PATH
+        value: /app/data/training_jobs.db
+
+    # Optional Persistent Storage Configuration:
+    # On Render's Starter plan and above, persistent disks can be mounted
+    # to retain the SQLite training database across service spin-downs and redeployments:
+    # disk:
+    #   name: nexora-data
+    #   mountPath: /app/data
+    #   sizeGB: 1
