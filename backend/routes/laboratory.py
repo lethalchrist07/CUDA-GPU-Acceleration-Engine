@@ -152,6 +152,13 @@ def create_comparative_experiment(req: CreateExperimentRequest):
     Initiate or schedule a controlled comparative training experiment.
     Validates configuration parameters and enforces mutual exclusion to prevent GPU OOM on the 6GB RTX 3050.
     """
+    from backend.config import get_settings
+    if get_settings().demo_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Comparative Training Laboratory experiment execution is disabled in public demo mode.",
+        )
+
     # Configuration Validation
     if not req.configurations:
         raise HTTPException(
@@ -353,6 +360,14 @@ def get_laboratory_checkpoints():
                 )
             )
 
+    from backend.config import get_settings
+    if get_settings().demo_mode:
+        # Hide any pilot or unapproved checkpoints in demo mode
+        checkpoints = [
+            c for c in checkpoints
+            if "pilot" not in c.filename.lower() and "flagship" not in c.filename.lower()
+        ]
+
     return LaboratoryCheckpointsResponse(
         status="available",
         total_checkpoints=len(checkpoints),
@@ -447,6 +462,13 @@ PATH_METADATA: Dict[str, Dict[str, Any]] = {
 @router.post("/adaptive-select", response_model=AdaptiveSelectResponse)
 def select_adaptive_execution_path(req: AdaptiveSelectRequest) -> AdaptiveSelectResponse:
     """Query the evidence-based adaptive engine to select an execution path."""
+    from backend.config import get_settings
+    if get_settings().demo_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Adaptive execution path selection mutation is disabled in public demo mode.",
+        )
+
     engine = AdaptiveExecutionEngine()
     decision = engine.select_execution_path(
         workload=req.workload,
