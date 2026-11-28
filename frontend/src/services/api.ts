@@ -28,39 +28,155 @@ import {
   AdaptiveSelectResponse,
 } from '../types/api';
 
-const API_BASE = '/api';
+export function getApiBase(): string {
+  if (typeof window !== 'undefined') {
+    if ((window as any).__NEXORA_API_BASE__) {
+      return (window as any).__NEXORA_API_BASE__.replace(/\/+$/, '');
+    }
+    if ((window as any).__NEXORA_BACKEND_URL__) {
+      return `${(window as any).__NEXORA_BACKEND_URL__.replace(/\/+$/, '')}/api`;
+    }
+    if ((import.meta as any)?.env?.VITE_API_BASE_URL) {
+      return ((import.meta as any).env.VITE_API_BASE_URL as string).replace(/\/+$/, '');
+    }
+  }
+  return '/api';
+}
+
+export function getOwnerKey(): string | null {
+  if (typeof window !== 'undefined') {
+    // Purge any legacy localStorage entry
+    if (localStorage.getItem('nexora_owner_key')) {
+      localStorage.removeItem('nexora_owner_key');
+    }
+    return sessionStorage.getItem('nexora_owner_key') || null;
+  }
+  return null;
+}
+
+export function setOwnerKey(key: string | null): void {
+  if (typeof window !== 'undefined') {
+    // Purge any legacy localStorage entry
+    localStorage.removeItem('nexora_owner_key');
+    if (key && key.trim()) {
+      sessionStorage.setItem('nexora_owner_key', key.trim());
+    } else {
+      sessionStorage.removeItem('nexora_owner_key');
+    }
+  }
+}
+
+export interface ApiError extends Error {
+  isNetworkError?: boolean;
+  isAuthRedirect?: boolean;
+  status?: number;
+}
 
 async function fetchJson<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({ detail: response.statusText }));
-    throw new Error(err.detail || `API Error ${response.status}: ${response.statusText}`);
+  let response: Response;
+  const baseUrl = getApiBase();
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  };
+  const ownerKey = getOwnerKey();
+  if (ownerKey) {
+    headers['X-Owner-Key'] = ownerKey;
+  }
+  try {
+    response = await fetch(`${baseUrl}${endpoint}`, {
+      credentials: 'include',
+      headers,
+    });
+  } catch (netErr: any) {
+    const error: ApiError = new Error(`Network failure connecting to ${endpoint}: ${netErr?.message || 'Failed to fetch'}`);
+    error.isNetworkError = true;
+    throw error;
   }
 
-  return response.json();
+  const contentType = response.headers.get('content-type') || '';
+  if (response.redirected || contentType.includes('text/html')) {
+    const error: ApiError = new Error(`Authentication required or HTML returned from ${endpoint}`);
+    error.isAuthRedirect = true;
+    error.status = response.status;
+    throw error;
+  }
+
+  if (!response.ok) {
+    let detail = response.statusText;
+    try {
+      const errJson = await response.json();
+      detail = errJson?.detail || detail;
+    } catch {
+      // Non-JSON response body fallback
+    }
+    const error: ApiError = new Error(detail || `API Error ${response.status}: ${response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    const error: ApiError = new Error(`Invalid JSON received from ${endpoint}`);
+    error.status = response.status;
+    throw error;
+  }
 }
 
 async function postJson<T, B = Record<string, any>>(endpoint: string, body?: B): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({ detail: response.statusText }));
-    throw new Error(err.detail || `API Error ${response.status}: ${response.statusText}`);
+  let response: Response;
+  const baseUrl = getApiBase();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  };
+  const ownerKey = getOwnerKey();
+  if (ownerKey) {
+    headers['X-Owner-Key'] = ownerKey;
+  }
+  try {
+    response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (netErr: any) {
+    const error: ApiError = new Error(`Network failure posting to ${endpoint}: ${netErr?.message || 'Failed to fetch'}`);
+    error.isNetworkError = true;
+    throw error;
   }
 
-  return response.json();
+  const contentType = response.headers.get('content-type') || '';
+  if (response.redirected || contentType.includes('text/html')) {
+    const error: ApiError = new Error(`Authentication required or HTML returned from ${endpoint}`);
+    error.isAuthRedirect = true;
+    error.status = response.status;
+    throw error;
+  }
+
+  if (!response.ok) {
+    let detail = response.statusText;
+    try {
+      const errJson = await response.json();
+      detail = errJson?.detail || detail;
+    } catch {
+      // Non-JSON response body fallback
+    }
+    const error: ApiError = new Error(detail || `API Error ${response.status}: ${response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    const error: ApiError = new Error(`Invalid JSON received from ${endpoint}`);
+    error.status = response.status;
+    throw error;
+  }
 }
 
 export const api = {
@@ -72,7 +188,7 @@ export const api = {
   getInference: () => fetchJson<InferenceResponse>('/inference'),
   getHardware: () => fetchJson<HardwareResponse>('/hardware'),
   getVerification: () => fetchJson<VerificationResponse>('/verification'),
-  getArtifactUrl: (artifactId: string) => `${API_BASE}/artifacts/${artifactId}`,
+  getArtifactUrl: (artifactId: string) => `${getApiBase()}/artifacts/${artifactId}`,
 
   // Phase 9 Model Serving & Checkpoints
   getModels: () => fetchJson<ModelsListResponse>('/models'),

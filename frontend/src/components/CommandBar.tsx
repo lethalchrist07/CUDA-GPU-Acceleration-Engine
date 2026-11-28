@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Menu, 
   RotateCw, 
@@ -9,10 +9,14 @@ import {
   Database,
   Sparkles,
   LayoutDashboard,
-  Server
+  Server,
+  Key,
+  ShieldCheck,
+  X,
 } from 'lucide-react';
 import { SectionTab } from '../types/navigation';
 import { HealthResponse, HardwareResponse } from '../types/api';
+import { getOwnerKey, setOwnerKey } from '../services/api';
 
 interface CommandBarProps {
   activeTab: SectionTab;
@@ -24,6 +28,7 @@ interface CommandBarProps {
   hardwareData: HardwareResponse | null;
   onRefreshHardware: () => void;
   isRefreshing?: boolean;
+  onRefreshHealth?: () => void;
 }
 
 const SECTION_TITLES: Record<SectionTab, { title: string; subtitle: string }> = {
@@ -48,7 +53,45 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   hardwareData,
   onRefreshHardware,
   isRefreshing = false,
+  onRefreshHealth,
 }) => {
+  const [showOwnerModal, setShowOwnerModal] = useState(false);
+  const [ownerKeyInput, setOwnerKeyInput] = useState(() => getOwnerKey() || '');
+  const [authMsg, setAuthMsg] = useState<string | null>(null);
+
+  // Keyboard shortcut: Ctrl+Shift+O to toggle Owner Mode authentication dialog
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'O' || e.key === 'o')) {
+        e.preventDefault();
+        setShowOwnerModal((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  const handleSaveKey = () => {
+    setOwnerKey(ownerKeyInput);
+    setAuthMsg('Owner Key saved. Refreshing session...');
+    onRefreshHealth?.();
+    setTimeout(() => {
+      setAuthMsg(null);
+      setShowOwnerModal(false);
+    }, 800);
+  };
+
+  const handleClearKey = () => {
+    setOwnerKey(null);
+    setOwnerKeyInput('');
+    setAuthMsg('Owner key cleared. Public demo restored.');
+    onRefreshHealth?.();
+    setTimeout(() => {
+      setAuthMsg(null);
+      setShowOwnerModal(false);
+    }, 800);
+  };
+
   const currentSection = SECTION_TITLES[activeTab] || SECTION_TITLES.overview;
   const gpu = hardwareData?.gpus?.[0];
 
@@ -114,7 +157,15 @@ export const CommandBar: React.FC<CommandBarProps> = ({
         {/* Backend Status Pill */}
         <div 
           id="backend-status-pill"
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#30353D] text-xs font-mono shadow-sm"
+          onClick={() => setShowOwnerModal(true)}
+          title={
+            health?.mode === 'owner' 
+              ? 'Owner Mode Active. Click to manage key.' 
+              : health?.mode === 'public-demo' 
+                ? 'Public Demo Mode. Click or press Ctrl+Shift+O to authenticate as Owner.' 
+                : 'Server Active. Click to manage Owner authentication.'
+          }
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#30353D] text-xs font-mono shadow-sm cursor-pointer hover:border-[#76B900]/40 transition-colors"
         >
           {healthError ? (
             <div className="flex items-center gap-1.5 text-[#FB7185]">
@@ -124,11 +175,28 @@ export const CommandBar: React.FC<CommandBarProps> = ({
           ) : health ? (
             <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#76B900] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#76B900]"></span>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  health.mode === 'owner' ? 'bg-[#38BDF8]' : 'bg-[#76B900]'
+                }`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                  health.mode === 'owner' ? 'bg-[#38BDF8]' : 'bg-[#76B900]'
+                }`}></span>
               </span>
               <span className="text-[#F5F5F4] hidden sm:inline">v{health.version}</span>
-              <span className="text-[10px] text-[#76B900] font-semibold tracking-wider">ONLINE</span>
+              {health.mode === 'owner' ? (
+                <span className="flex items-center gap-1 text-[10px] text-[#38BDF8] font-semibold tracking-wider">
+                  <ShieldCheck className="w-3 h-3" />
+                  OWNER
+                </span>
+              ) : health.mode === 'public-demo' ? (
+                <span className="text-[10px] text-[#70D6C2] font-semibold tracking-wider">
+                  DEMO
+                </span>
+              ) : (
+                <span className="text-[10px] text-[#76B900] font-semibold tracking-wider">
+                  ONLINE
+                </span>
+              )}
             </div>
           ) : (
             <span className="text-[#FBBF24] text-[11px]">Connecting...</span>
@@ -179,6 +247,94 @@ export const CommandBar: React.FC<CommandBarProps> = ({
           <RotateCw className={`w-4 h-4 text-[#70D6C2] ${isRefreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
+
+      {/* Owner Mode Authentication Modal */}
+      {showOwnerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-[#13161B] border border-[#30353D] rounded-xl shadow-2xl p-6 relative font-sans">
+            <button
+              onClick={() => setShowOwnerModal(false)}
+              aria-label="Close modal"
+              className="absolute top-4 right-4 p-1.5 text-[#A6ADB7] hover:text-[#F5F5F4] rounded-lg hover:bg-[#20242A] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="p-2 rounded-lg bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/20">
+                <Key className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-[#F5F5F4]">Owner Mode Authentication</h3>
+                <p className="text-xs text-[#A6ADB7]">Access full remote GPU training & model execution</p>
+              </div>
+            </div>
+
+            <div className="my-4 p-3 rounded-lg bg-[#0D0F12] border border-[#30353D] text-xs font-mono space-y-1.5">
+              <div className="flex justify-between items-center text-[#A6ADB7]">
+                <span>Server Mode:</span>
+                <span className="font-semibold text-[#F5F5F4]">{health?.mode || 'unknown'}</span>
+              </div>
+              <div className="flex justify-between items-center text-[#A6ADB7]">
+                <span>Authorization:</span>
+                <span className={`font-semibold ${health?.mode === 'owner' ? 'text-[#38BDF8]' : 'text-[#FBBF24]'}`}>
+                  {health?.mode === 'owner' ? 'Authorized Owner' : 'Public Demo (Restricted)'}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-[#A6ADB7] mb-1">
+                  Owner Secret Key (Header: X-Owner-Key)
+                </label>
+                <input
+                  type="password"
+                  value={ownerKeyInput}
+                  onChange={(e) => setOwnerKeyInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveKey();
+                  }}
+                  placeholder="Enter CUDA_ENGINE_OWNER_KEY..."
+                  className="w-full px-3 py-2 rounded-lg bg-[#0D0F12] border border-[#30353D] text-[#F5F5F4] placeholder-[#4A5568] text-xs font-mono focus:outline-none focus:border-[#38BDF8]"
+                />
+              </div>
+
+              {authMsg && (
+                <div className="text-xs font-mono text-[#76B900] py-1">
+                  {authMsg}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={handleClearKey}
+                  className="px-3 py-1.5 rounded-lg border border-[#FB7185]/40 text-[#FB7185] hover:bg-[#FB7185]/10 text-xs font-medium transition-colors cursor-pointer"
+                >
+                  Clear / Lock
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowOwnerModal(false)}
+                    className="px-3 py-1.5 rounded-lg border border-[#30353D] text-[#A6ADB7] hover:text-[#F5F5F4] hover:bg-[#20242A] text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveKey}
+                    className="px-4 py-1.5 rounded-lg bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#08090B] text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Authenticate
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

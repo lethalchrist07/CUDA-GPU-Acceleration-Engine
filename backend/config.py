@@ -38,6 +38,12 @@ class EngineSettings:
             if origin.strip()
         ]
     )
+    cors_origin_regex: str = field(
+        default_factory=lambda: os.getenv(
+            "CUDA_ENGINE_CORS_ORIGIN_REGEX",
+            r"^https://.*(\.ngrok-free\.app|\.ngrok\.app|\.ngrok\.io|\.trycloudflare\.com|\.github\.io|\.pages\.dev)$",
+        )
+    )
     log_level: str = field(
         default_factory=lambda: os.getenv("CUDA_ENGINE_LOG_LEVEL", "INFO").upper()
     )
@@ -55,6 +61,9 @@ class EngineSettings:
     )
     demo_mode: bool = field(
         default_factory=lambda: os.getenv("CUDA_ENGINE_DEMO_MODE", "0").strip().lower() in ("1", "true", "yes", "on")
+    )
+    owner_key: str = field(
+        default_factory=lambda: os.getenv("CUDA_ENGINE_OWNER_KEY", "").strip()
     )
     demo_max_request_bytes: int = 32768
     demo_min_vram_reserve_mb: float = 1024.0

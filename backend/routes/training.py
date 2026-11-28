@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, Request, status
 
 from backend.schemas.training import (
     AdaptiveHardwareResponse,
@@ -79,13 +79,14 @@ def get_adaptive_hardware():
 
 
 @router.post("/adaptive/recommend", response_model=AdaptiveRecommendationResponse)
-def get_adaptive_recommendation(req: AdaptiveRecommendationRequest):
+def get_adaptive_recommendation(req: AdaptiveRecommendationRequest, request: Request):
     """
     Evaluate training configuration and recommend optimal batch size, precision,
     and gradient accumulation steps based on live GPU VRAM headroom.
     """
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Adaptive training recommendation is disabled in public demo mode.",
@@ -130,13 +131,14 @@ def get_adaptive_recommendation(req: AdaptiveRecommendationRequest):
 
 
 @router.post("/jobs", response_model=TrainingJobResponse, status_code=status.HTTP_201_CREATED)
-def create_training_job(req: TrainingJobCreateRequest):
+def create_training_job(req: TrainingJobCreateRequest, request: Request):
     """
     Register and queue a new training job across CPU_NATIVE, GPU_NATIVE, or GPU_CUSTOM.
     Enforces GPU mutual exclusion and safety bounds. Applies adaptive recommendations if enabled.
     """
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="AI Training Studio job creation and execution is disabled in public demo mode.",
@@ -207,12 +209,14 @@ def create_training_job(req: TrainingJobCreateRequest):
 
 @router.get("/jobs", response_model=TrainingJobListResponse)
 def list_training_jobs(
+    request: Request,
     job_status: Optional[str] = Query(None, alias="status", description="Filter by status (QUEUED, RUNNING, COMPLETED, etc.)"),
     backend: Optional[str] = Query(None, description="Filter by backend (CPU_NATIVE, GPU_NATIVE, GPU_CUSTOM)"),
     limit: int = Query(50, ge=1, le=200, description="Max jobs to return"),
 ):
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         return TrainingJobListResponse(
             status="available",
             fetched_at=utc_now(),
@@ -233,10 +237,11 @@ def list_training_jobs(
 
 
 @router.get("/jobs/{job_id}", response_model=TrainingJobResponse)
-def get_training_job(job_id: str):
+def get_training_job(job_id: str, request: Request):
     """Retrieve full status, live progress, and completion summary of a specific job."""
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Training job '{job_id}' not found.",
@@ -254,10 +259,11 @@ def get_training_job(job_id: str):
 
 
 @router.get("/jobs/{job_id}/metrics", response_model=TrainingJobMetricsResponse)
-def get_training_job_metrics(job_id: str):
+def get_training_job_metrics(job_id: str, request: Request):
     """Retrieve fine-grained epoch and batch metrics for an active or completed job."""
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Training job '{job_id}' not found.",
@@ -283,13 +289,14 @@ def get_training_job_metrics(job_id: str):
 
 
 @router.post("/jobs/{job_id}/cancel", response_model=CancelJobResponse)
-def cancel_training_job(job_id: str):
+def cancel_training_job(job_id: str, request: Request):
     """
     Request cooperative cancellation of a queued or running training job.
     Releases GPU resources and transitions status safely to CANCELLED.
     """
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Training job cancellation is disabled in public demo mode.",
@@ -323,10 +330,11 @@ def cancel_training_job(job_id: str):
 
 
 @router.get("/jobs/{job_id}/checkpoints", response_model=TrainingJobCheckpointsResponse)
-def get_training_job_checkpoints(job_id: str):
+def get_training_job_checkpoints(job_id: str, request: Request):
     """Retrieve saved model checkpoint metadata for a specific job."""
     from backend.config import get_settings
-    if get_settings().demo_mode:
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Training job '{job_id}' not found.",

@@ -301,9 +301,12 @@ class ModelServer:
         checkpoint_path: Optional[str] = None,
         device_str: Optional[str] = None,
         device: Optional[str] = None,
+        is_owner: bool = False,
     ) -> Dict[str, Any]:
         """
         Load weights into memory and assign to requested device with isolated model slots.
+        In demo mode, strictly resticts public callers to approved public models, while
+        allowing verified owner to load any valid repository checkpoint.
         """
         global _VISION_MODEL, _VISION_MODEL_NAME, _VISION_DEVICE, _VISION_CHECKPOINT
         global _TRANSFORMER_MODEL, _TRANSFORMER_MODEL_NAME, _TRANSFORMER_DEVICE, _TRANSFORMER_CHECKPOINT, _TRANSFORMER_TOKENIZER
@@ -334,7 +337,7 @@ class ModelServer:
 
         with _SERVING_LOCK:
             settings = get_settings()
-            if settings.demo_mode:
+            if settings.demo_mode and not is_owner:
                 # 1. Reject arbitrary checkpoint paths
                 if checkpoint_path is not None and str(checkpoint_path).strip() != "":
                     raise HTTPException(
@@ -394,7 +397,7 @@ class ModelServer:
                 # 4. Enforce hardware safety before loading weights on GPU
                 cls._enforce_demo_hardware_safeguards(dev)
             else:
-                # Standard Mode Checkpoint Resolution
+                # Standard Mode or Verified Owner Checkpoint Resolution
                 if checkpoint_path is None:
                     if model_name.lower() in ("resnet18", "resnet-18"):
                         expected_loc = "checkpoints/resnet18_cifar10/best_model.pt"
@@ -432,11 +435,19 @@ class ModelServer:
                         )
                 else:
                     resolved_path = (PROJECT_ROOT / checkpoint_path).resolve()
+                    # Verify path traversal containment within project root
+                    if not resolved_path.is_relative_to(PROJECT_ROOT.resolve()):
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Path traversal outside project boundaries detected.",
+                        )
                     if not resolved_path.is_file():
                         raise FileNotFoundError(
                             f"Checkpoint not found at '{checkpoint_path}'. "
                             f"Please verify the file path or refer to checkpoints/README.md for model placement."
                         )
+                # Enforce hardware safety before loading weights on GPU
+                cls._enforce_demo_hardware_safeguards(dev)
 
             # Instantiate architecture
             is_vision = False
@@ -550,10 +561,10 @@ class ModelServer:
             }
 
     @classmethod
-    def unload_model(cls, target: str = "all") -> Dict[str, Any]:
+    def unload_model(cls, target: str = "all", is_owner: bool = False) -> Dict[str, Any]:
         """Unload active model(s) from memory and release VRAM."""
         settings = get_settings()
-        if settings.demo_mode:
+        if settings.demo_mode and not is_owner:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Model unloading is forbidden in public demo mode.",
@@ -606,14 +617,16 @@ class ModelServer:
         top_p: Optional[float] = 0.95,
         seed: Optional[int] = 42,
         device_str: Optional[str] = None,
+        is_owner: bool = False,
     ) -> Dict[str, Any]:
         """
         Execute real autoregressive next-token generation on loaded Transformer model.
         Thread-safe and completely isolated from vision model state.
-        In demo mode, enforces token/prompt clamps, atomic concurrency lock, and hardware safeguards.
+        In demo mode, enforces token/prompt clamps and concurrency locks for public users,
+        while allowing verified owner unclamped generation under full hardware safeguards.
         """
         settings = get_settings()
-        if settings.demo_mode:
+        if settings.demo_mode and not is_owner:
             # Clamp generation to 48 tokens and prompts to 256 characters
             clamped_tokens = min(max(1, max_new_tokens), settings.demo_max_gen_tokens)
             clamped_prompt = (prompt[:settings.demo_max_prompt_chars]) if prompt and len(prompt) > settings.demo_max_prompt_chars else prompt
@@ -627,12 +640,19 @@ class ModelServer:
             try:
                 torch = get_torch()
                 effective_device_str = device_str or _TRANSFORMER_DEVICE or ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
+                if effective_device_str == "auto":
+                    effective_device_str = _TRANSFORMER_DEVICE if (_TRANSFORMER_DEVICE and _TRANSFORMER_DEVICE != "auto") else ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
                 cls._enforce_demo_hardware_safeguards(torch.device(effective_device_str))
                 return cls._execute_generate(clamped_prompt, clamped_tokens, temperature, top_k, top_p, seed, device_str)
             finally:
                 _INFERENCE_LOCK.release()
         else:
             with _SERVING_LOCK:
+                torch = get_torch()
+                effective_device_str = device_str or _TRANSFORMER_DEVICE or ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
+                if effective_device_str == "auto":
+                    effective_device_str = _TRANSFORMER_DEVICE if (_TRANSFORMER_DEVICE and _TRANSFORMER_DEVICE != "auto") else ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
+                cls._enforce_demo_hardware_safeguards(torch.device(effective_device_str))
                 return cls._execute_generate(prompt, max_new_tokens, temperature, top_k, top_p, seed, device_str)
 
     @classmethod
@@ -764,14 +784,16 @@ class ModelServer:
         cls,
         sample_index: Optional[int] = None,
         tensor_data: Optional[List[Any]] = None,
+        is_owner: bool = False,
     ) -> Dict[str, Any]:
         """
         Execute prediction on active vision model with confidence outputs and measured latency.
         Thread-safe and completely isolated from transformer text model state.
-        In demo mode, enforces tensor float limits, atomic concurrency lock, and hardware safeguards.
+        In demo mode, enforces tensor float limits and concurrency locks for public users,
+        while allowing verified owner unclamped prediction under full hardware safeguards.
         """
         settings = get_settings()
-        if settings.demo_mode:
+        if settings.demo_mode and not is_owner:
             if tensor_data is not None:
                 def _count_floats(obj):
                     if isinstance(obj, (list, tuple)):
@@ -792,12 +814,19 @@ class ModelServer:
             try:
                 torch = get_torch()
                 effective_dev_str = _VISION_DEVICE or ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
+                if effective_dev_str == "auto":
+                    effective_dev_str = "cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu"
                 cls._enforce_demo_hardware_safeguards(torch.device(effective_dev_str))
                 return cls._execute_predict(sample_index, tensor_data)
             finally:
                 _INFERENCE_LOCK.release()
         else:
             with _SERVING_LOCK:
+                torch = get_torch()
+                effective_dev_str = _VISION_DEVICE or ("cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu")
+                if effective_dev_str == "auto":
+                    effective_dev_str = "cuda:0" if (torch and torch.cuda.is_available() and settings.device != "cpu") else "cpu"
+                cls._enforce_demo_hardware_safeguards(torch.device(effective_dev_str))
                 return cls._execute_predict(sample_index, tensor_data)
 
     @classmethod

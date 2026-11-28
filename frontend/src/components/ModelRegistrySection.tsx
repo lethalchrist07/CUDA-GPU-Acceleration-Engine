@@ -11,6 +11,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { SectionTab } from '../types/navigation';
+import { api } from '../services/api';
 
 interface ModelRegistrySectionProps {
   onNavigateTab: (tab: SectionTab) => void;
@@ -32,11 +33,7 @@ export const ModelRegistrySection: React.FC<ModelRegistrySectionProps> = ({ onNa
   const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'PRODUCTION' | 'EXPERIMENTAL' | 'ROADMAP'>('ALL');
 
   useEffect(() => {
-    fetch('/api/checkpoints')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch checkpoints');
-        return res.json();
-      })
+    api.getCheckpoints()
       .then((data) => {
         setCheckpoints(data.checkpoints || []);
       })

@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import logging
 import re
+import secrets
 from pathlib import Path
 from typing import Any, List, Optional
 
@@ -11,6 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from backend.auth import is_owner_authorized
 from backend.config import get_settings, setup_logging, log_hardware_diagnostic_banner
 from backend.data import (
     ArtifactStore,
@@ -77,30 +79,47 @@ class RequestSizeLimitMiddleware:
     """
     Pure ASGI middleware enforcing 32 KB request size limit before body parsing in public demo mode.
     Protects against memory exhaustion from oversized payloads and unbounded chunked transfer streams.
+    Verified owner requests bypass this restriction up to 50 MB.
     """
 
-    def __init__(self, app, max_bytes: int = 32768):
+    def __init__(self, app, max_bytes: int = 32768, owner_max_bytes: int = 52428800):
         self.app = app
         self.max_bytes = max_bytes
+        self.owner_max_bytes = owner_max_bytes
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
             settings = get_settings()
             if settings.demo_mode:
+                headers = dict(scope.get("headers", []))
+                # Check owner authorization at ASGI layer
+                is_owner = False
+                if settings.owner_key:
+                    x_key = headers.get(b"x-owner-key", b"").decode("latin1").strip()
+                    auth_hdr = headers.get(b"authorization", b"").decode("latin1").strip()
+                    token = x_key
+                    if not token and auth_hdr:
+                        if auth_hdr.lower().startswith("bearer "):
+                            token = auth_hdr[7:].strip()
+                        else:
+                            token = auth_hdr
+                    if token and secrets.compare_digest(token.encode("utf-8"), settings.owner_key.encode("utf-8")):
+                        is_owner = True
+
+                effective_max = self.owner_max_bytes if is_owner else self.max_bytes
                 method = scope.get("method", "").upper()
                 if method in ("POST", "PUT", "PATCH"):
-                    headers = dict(scope.get("headers", []))
                     cl_header = headers.get(b"content-length")
                     if cl_header:
                         try:
                             cl_val = int(cl_header.decode("latin1"))
-                            if cl_val > self.max_bytes:
+                            if cl_val > effective_max:
                                 response = JSONResponse(
                                     status_code=413,
                                     content={
                                         "status": "error",
                                         "error_type": "PAYLOAD_TOO_LARGE",
-                                        "detail": f"Request payload exceeds maximum allowed size of {self.max_bytes} bytes in public demo mode.",
+                                        "detail": f"Request payload exceeds maximum allowed size of {effective_max} bytes in public demo mode.",
                                     },
                                 )
                                 await response(scope, receive, send)
@@ -117,7 +136,7 @@ class RequestSizeLimitMiddleware:
                         if message["type"] == "http.request":
                             body = message.get("body", b"")
                             total_bytes += len(body)
-                            if total_bytes > self.max_bytes:
+                            if total_bytes > effective_max:
                                 class StreamPayloadTooLarge(Exception):
                                     pass
                                 raise StreamPayloadTooLarge()
@@ -133,7 +152,7 @@ class RequestSizeLimitMiddleware:
                                 content={
                                     "status": "error",
                                     "error_type": "PAYLOAD_TOO_LARGE",
-                                    "detail": f"Request stream payload exceeds maximum allowed size of {self.max_bytes} bytes in public demo mode.",
+                                    "detail": f"Request stream payload exceeds maximum allowed size of {effective_max} bytes in public demo mode.",
                                 },
                             )
                             await response(scope, receive, send)
@@ -152,12 +171,15 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
         lifespan=lifespan,
     )
     app.add_middleware(RequestSizeLimitMiddleware, max_bytes=settings.demo_max_request_bytes)
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Accept", "Content-Type", "Authorization"],
-    )
+    cors_kwargs = {
+        "allow_origins": settings.cors_origins,
+        "allow_credentials": True,
+        "allow_methods": ["GET", "POST", "OPTIONS", "HEAD"],
+        "allow_headers": ["*"],
+    }
+    if getattr(settings, "cors_origin_regex", None):
+        cors_kwargs["allow_origin_regex"] = settings.cors_origin_regex
+    app.add_middleware(CORSMiddleware, **cors_kwargs)
 
     @app.middleware("http")
     async def add_security_headers(request: Request, call_next):
@@ -219,8 +241,14 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
     # Core Historical & Telemetry Endpoints (Preserved 100%)
     # ---------------------------------------------------------
     @app.get("/api/health")
-    def health():
-        mode = "public-demo" if settings.demo_mode else "read-write"
+    def health(request: Request):
+        is_owner = is_owner_authorized(request)
+        if is_owner:
+            mode = "owner"
+        elif settings.demo_mode:
+            mode = "public-demo"
+        else:
+            mode = "read-write"
         return {"status": "ok", "version": app.version, "time": utc_now(), "mode": mode}
 
     @app.get("/api/overview")
@@ -291,9 +319,10 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
         return {"status": "available", "fetched_at": utc_now(), "models": ModelServer.list_available_models()}
 
     @app.post("/api/models/load")
-    def load_model(req: LoadModelRequest):
+    def load_model(req: LoadModelRequest, request: Request):
         try:
-            if settings.demo_mode:
+            is_owner = is_owner_authorized(request)
+            if settings.demo_mode and not is_owner:
                 if req.checkpoint is not None and str(req.checkpoint).strip() != "":
                     raise HTTPException(
                         status_code=403,
@@ -312,6 +341,7 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
                 model_name=req.model_name,
                 checkpoint_path=req.checkpoint,
                 device_str=req.device,
+                is_owner=is_owner,
             )
             return result
         except HTTPException:
@@ -322,20 +352,22 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
             raise HTTPException(status_code=400, detail=str(exc))
 
     @app.post("/api/models/unload")
-    def unload_model():
+    def unload_model(request: Request):
         try:
-            if settings.demo_mode:
+            is_owner = is_owner_authorized(request)
+            if settings.demo_mode and not is_owner:
                 raise HTTPException(status_code=403, detail="Model unloading is forbidden in public demo mode.")
-            return ModelServer.unload_model()
+            return ModelServer.unload_model(is_owner=is_owner)
         except HTTPException:
             raise
         except Exception as exc:
             raise HTTPException(status_code=400, detail=str(exc))
 
     @app.post("/api/models/predict")
-    def predict(req: PredictRequest):
+    def predict(req: PredictRequest, request: Request):
         try:
-            if settings.demo_mode and req.tensor is not None:
+            is_owner = is_owner_authorized(request)
+            if settings.demo_mode and not is_owner and req.tensor is not None:
                 def _count_floats(obj):
                     if isinstance(obj, (list, tuple)):
                         return sum(_count_floats(x) for x in obj)
@@ -345,7 +377,7 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
                         status_code=400,
                         detail=f"Input tensor exceeds maximum allowed {settings.demo_max_tensor_floats} floats in demo mode.",
                     )
-            return ModelServer.predict(sample_index=req.sample_index, tensor_data=req.tensor)
+            return ModelServer.predict(sample_index=req.sample_index, tensor_data=req.tensor, is_owner=is_owner)
         except HTTPException:
             raise
         except FileNotFoundError as fnf:
@@ -354,14 +386,22 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
             raise HTTPException(status_code=400, detail=str(exc))
 
     @app.post("/api/models/generate")
-    def generate_text(req: GenerateTextRequest):
+    def generate_text(req: GenerateTextRequest, request: Request):
         try:
-            if settings.demo_mode:
+            is_owner = is_owner_authorized(request)
+            if settings.demo_mode and not is_owner:
                 if req.checkpoint is not None and str(req.checkpoint).strip() != "":
-                    raise HTTPException(
-                        status_code=403,
-                        detail="Arbitrary checkpoint paths are forbidden in demo mode.",
+                    cleaned = str(req.checkpoint).strip().replace("\\", "/").lower()
+                    is_approved_50m = (
+                        cleaned == "checkpoints/transformer/pretraining_50m_campaign/best_model.pt"
+                        or cleaned == "checkpoints/transformer/pretraining_50m_campaign/final_model.pt"
+                        or cleaned in ("transformer_50m", "50m", "nexora gpt-86.8m")
                     )
+                    if not is_approved_50m:
+                        raise HTTPException(
+                            status_code=403,
+                            detail="Arbitrary checkpoint paths are forbidden in demo mode. Only approved public model IDs are permitted.",
+                        )
                 # Clamp generation parameters in demo mode
                 req.max_new_tokens = min(max(1, req.max_new_tokens), settings.demo_max_gen_tokens)
                 if req.prompt and len(req.prompt) > settings.demo_max_prompt_chars:
@@ -372,6 +412,7 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
                     model_name=resolved_model_name,
                     checkpoint_path=req.checkpoint,
                     device_str=req.device,
+                    is_owner=is_owner,
                 )
             return ModelServer.generate(
                 prompt=req.prompt,
@@ -381,6 +422,7 @@ def create_app(root: Path = PROJECT_ROOT) -> FastAPI:
                 top_p=req.top_p,
                 seed=req.seed,
                 device_str=req.device,
+                is_owner=is_owner,
             )
         except HTTPException:
             raise
