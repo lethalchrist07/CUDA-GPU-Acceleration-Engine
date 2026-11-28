@@ -46,6 +46,7 @@ _DIGEST_CACHE_MAX_ENTRIES = 2048
 _CACHE_STATS = {"hits": 0, "misses": 0, "invalidations": 0}
 
 _CATALOG_CACHE: dict[str, Any] | None = None
+_CATALOG_CACHE_MODE: Optional[bool] = None
 _CATALOG_LOCK = threading.RLock()
 
 
@@ -85,9 +86,10 @@ _load_persistent_cache()
 
 def clear_catalog_cache() -> None:
     """Clear the cached catalog response."""
-    global _CATALOG_CACHE
+    global _CATALOG_CACHE, _CATALOG_CACHE_MODE
     with _CATALOG_LOCK:
         _CATALOG_CACHE = None
+        _CATALOG_CACHE_MODE = None
 
 
 def get_digest_cache_stats() -> dict[str, int]:
@@ -256,6 +258,8 @@ class ArtifactStore:
             return self._unavailable(f"Cannot read {kind} artifact: {exc}")
 
     def artifact_paths(self) -> dict[str, Path]:
+        from backend.config import get_settings
+        settings = get_settings()
         paths = {
             "training-json": self.results / "training_experiments.json",
             "training-csv": self.results / "training_experiments.csv",
@@ -271,14 +275,19 @@ class ArtifactStore:
                 "benchmark-json": directory / "final_run/benchmark_results.json",
                 "benchmark-csv": directory / "final_run/benchmark_results.csv",
                 "phase2-report": directory / "VERIFICATION_REPORT.md",
-                "phase2-commands": directory / "COMMANDS.md",
-                "phase2-manifest": directory / "manifest.json",
-                "benchmark-log": directory / "final_run.log",
-                "python-test-log": directory / "pytest-final.log",
-                "native-test-log": directory / "ctest-final.log",
-                "foundation-log": directory / "foundation-final.log",
-                "artifact-audit-log": directory / "artifact_audit-final.log",
             })
+            # In public demo mode, restrict artifact responses to explicitly approved public result files
+            # and disallow execution logs, developer commands, or manifests containing absolute host paths.
+            if not settings.demo_mode:
+                paths.update({
+                    "phase2-commands": directory / "COMMANDS.md",
+                    "phase2-manifest": directory / "manifest.json",
+                    "benchmark-log": directory / "final_run.log",
+                    "python-test-log": directory / "pytest-final.log",
+                    "native-test-log": directory / "ctest-final.log",
+                    "foundation-log": directory / "foundation-final.log",
+                    "artifact-audit-log": directory / "artifact_audit-final.log",
+                })
         return {key: self._inside_root(path) for key, path in paths.items()
                 if path.is_file() and path.resolve().is_relative_to(self.root)}
 
@@ -307,10 +316,12 @@ class ArtifactStore:
             return self._unavailable(f"Failed to read Phase 9 experiments: {exc}")
 
     def checkpoints_catalog(self, force_rehash: bool = False) -> dict[str, Any]:
-        global _CATALOG_CACHE
+        from backend.config import get_settings
+        settings = get_settings()
+        global _CATALOG_CACHE, _CATALOG_CACHE_MODE
         if not force_rehash:
             with _CATALOG_LOCK:
-                if _CATALOG_CACHE is not None:
+                if _CATALOG_CACHE is not None and _CATALOG_CACHE_MODE == settings.demo_mode:
                     return _CATALOG_CACHE
 
         checkpoints_root = self.root / "checkpoints"
@@ -320,6 +331,17 @@ class ArtifactStore:
         for p in sorted(checkpoints_root.rglob("*.pt")):
             try:
                 rel = p.relative_to(self.root).as_posix()
+                # In public demo mode: Hide flagship_100m_pilot and all private model metadata
+                if settings.demo_mode:
+                    if "flagship_100m" in rel or "pilot" in rel or "training_jobs" in rel or "phase10" in rel or "pretraining_10m" in rel:
+                        continue
+                    # Only admit approved public demo models
+                    is_50m = "pretraining_50m_campaign" in rel
+                    is_resnet = "resnet18_cifar10" in rel
+                    is_base_mlp = p.name in ("test_checkpoint.pt", "latest_checkpoint.pt") and p.parent == checkpoints_root
+                    if not (is_50m or is_resnet or is_base_mlp):
+                        continue
+
                 if "transformer" in rel:
                     model_type = "transformer"
                     if "50m" in rel or "pretraining_50m" in rel:
@@ -372,6 +394,7 @@ class ArtifactStore:
         result = {"status": "available", "fetched_at": utc_now(), "checkpoints": items}
         with _CATALOG_LOCK:
             _CATALOG_CACHE = result
+            _CATALOG_CACHE_MODE = settings.demo_mode
         return result
 
     def verification(self) -> dict[str, Any]:
@@ -410,10 +433,16 @@ class ArtifactStore:
 
 def collect_hardware() -> dict[str, Any]:
     """Read NVIDIA's current counters; N/A stays null, never synthetic zero."""
+    from backend.config import get_settings
+    settings = get_settings()
+
     query = "index,name,uuid,driver_version,memory.total,memory.used,memory.free,utilization.gpu,temperature.gpu,power.draw,power.limit"
     command = shutil.which("nvidia-smi")
+    host_platform = "Windows 11 (64-bit)" if settings.demo_mode else platform.platform()
+    host_processor = "x86_64 Family 6 Model 154 (Redacted)" if settings.demo_mode else platform.processor()
+
     result: dict[str, Any] = {"status": "unavailable", "fetched_at": utc_now(), "gpus": [],
-                              "host": {"platform": platform.platform(), "processor": platform.processor()},
+                              "host": {"platform": host_platform, "processor": host_processor},
                               "warnings": [], "source": "nvidia-smi"}
     if not command:
         result["warnings"].append("nvidia-smi is not installed or not on PATH.")
@@ -426,11 +455,14 @@ def collect_hardware() -> dict[str, Any]:
             if len(fields) != 11:
                 raise ValueError("Unexpected NVIDIA telemetry format")
             fields = [value.strip() for value in fields]
-            result["gpus"].append(dict(zip(
+            gpu_data = dict(zip(
                 ("index", "name", "uuid", "driver_version", "memory_total_mib", "memory_used_mib",
                  "memory_free_mib", "utilization_percent", "temperature_c", "power_w", "power_limit_w"),
                 [int(fields[0]), *fields[1:4], *[_number(v) for v in fields[4:]]],
-            )))
+            ))
+            if settings.demo_mode:
+                gpu_data["uuid"] = "GPU-DEMO-REDACTED"
+            result["gpus"].append(gpu_data)
         result["status"] = "available" if result["gpus"] else "unavailable"
     except (OSError, subprocess.SubprocessError, ValueError) as exc:
         result["warnings"].append(f"Live GPU telemetry unavailable: {exc}")
@@ -439,13 +471,19 @@ def collect_hardware() -> dict[str, Any]:
 
 def collect_capabilities() -> dict[str, Any]:
     """Collect platform, CUDA, and model execution capability matrix."""
+    from backend.config import get_settings
+    settings = get_settings()
+
+    host_os = "Windows 11 (64-bit)" if settings.demo_mode else platform.platform()
+    host_proc = "x86_64 Processor (Demo Mode)" if settings.demo_mode else platform.processor()
+
     caps: dict[str, Any] = {
         "status": "available",
         "fetched_at": utc_now(),
         "platform": {
-            "os": platform.platform(),
+            "os": host_os,
             "python": platform.python_version(),
-            "processor": platform.processor(),
+            "processor": host_proc,
         },
         "cuda": {
             "available": False,

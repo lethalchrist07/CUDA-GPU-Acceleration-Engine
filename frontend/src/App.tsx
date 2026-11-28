@@ -109,8 +109,13 @@ export const App: React.FC = () => {
       const h = await api.getHealth();
       setHealth(h);
       setHealthError(false);
-    } catch {
-      setHealthError(true);
+    } catch (err: any) {
+      // Differentiate genuine backend network/server drop from auth redirects or app responses
+      if (err?.isNetworkError || (err?.status && [502, 503, 504].includes(err.status))) {
+        setHealthError(true);
+      } else {
+        console.warn('Health check non-fatal response:', err?.message || err);
+      }
     }
   }, []);
 
@@ -248,6 +253,7 @@ export const App: React.FC = () => {
           hardwareData={hardwareData}
           onRefreshHardware={fetchHardware}
           isRefreshing={isRefreshingHardware}
+          onRefreshHealth={checkHealth}
         />
 
         {/* Section Router */}

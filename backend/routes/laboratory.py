@@ -13,7 +13,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 import torch
 
 from backend.data import utc_now
@@ -147,11 +147,19 @@ _VALID_CONFIG_NAMES = {
 
 
 @router.post("/experiments", status_code=status.HTTP_201_CREATED)
-def create_comparative_experiment(req: CreateExperimentRequest):
+def create_comparative_experiment(req: CreateExperimentRequest, request: Request):
     """
     Initiate or schedule a controlled comparative training experiment.
     Validates configuration parameters and enforces mutual exclusion to prevent GPU OOM on the 6GB RTX 3050.
     """
+    from backend.config import get_settings
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Comparative Training Laboratory experiment execution is disabled in public demo mode.",
+        )
+
     # Configuration Validation
     if not req.configurations:
         raise HTTPException(
@@ -311,7 +319,7 @@ def get_gpu_monitoring_state():
 # 6. Checkpoint Metadata Catalog
 # ---------------------------------------------------------------------------
 @router.get("/checkpoints", response_model=LaboratoryCheckpointsResponse)
-def get_laboratory_checkpoints():
+def get_laboratory_checkpoints(request: Request):
     """Return verified metadata and cryptographic hashes for all pretraining checkpoints."""
     audit_file = PROJECT_ROOT / "results" / "phase13_milestone7_artifact_audit.json"
     audit_data = {}
@@ -352,6 +360,15 @@ def get_laboratory_checkpoints():
                     verified=True,
                 )
             )
+
+    from backend.config import get_settings
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
+        # Hide any pilot or unapproved checkpoints in demo mode
+        checkpoints = [
+            c for c in checkpoints
+            if "pilot" not in c.filename.lower() and "flagship" not in c.filename.lower()
+        ]
 
     return LaboratoryCheckpointsResponse(
         status="available",
@@ -445,8 +462,16 @@ PATH_METADATA: Dict[str, Dict[str, Any]] = {
 
 
 @router.post("/adaptive-select", response_model=AdaptiveSelectResponse)
-def select_adaptive_execution_path(req: AdaptiveSelectRequest) -> AdaptiveSelectResponse:
+def select_adaptive_execution_path(req: AdaptiveSelectRequest, request: Request) -> AdaptiveSelectResponse:
     """Query the evidence-based adaptive engine to select an execution path."""
+    from backend.config import get_settings
+    from backend.auth import is_owner_authorized
+    if get_settings().demo_mode and not is_owner_authorized(request):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Adaptive execution path selection mutation is disabled in public demo mode.",
+        )
+
     engine = AdaptiveExecutionEngine()
     decision = engine.select_execution_path(
         workload=req.workload,

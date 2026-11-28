@@ -16,21 +16,69 @@ import {
   AdaptiveRecommendationResponse,
 } from '../types/training';
 
-const BASE_URL = '/api/training';
+export function getTrainingApiBase(): string {
+  if (typeof window !== 'undefined') {
+    if ((window as any).__NEXORA_API_BASE__) {
+      return `${(window as any).__NEXORA_API_BASE__.replace(/\/+$/, '')}/training`;
+    }
+    if ((window as any).__NEXORA_BACKEND_URL__) {
+      return `${(window as any).__NEXORA_BACKEND_URL__.replace(/\/+$/, '')}/api/training`;
+    }
+    if ((import.meta as any)?.env?.VITE_API_BASE_URL) {
+      return `${((import.meta as any).env.VITE_API_BASE_URL as string).replace(/\/+$/, '')}/training`;
+    }
+  }
+  return '/api/training';
+}
+
+export interface TrainingApiError extends Error {
+  isNetworkError?: boolean;
+  isAuthRedirect?: boolean;
+  status?: number;
+}
 
 async function request<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint}`;
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(options?.headers || {}),
-    },
-  });
+  const url = `${getTrainingApiBase()}${endpoint}`;
+  const method = (options?.method || 'GET').toUpperCase();
+  const ownerKey = typeof window !== 'undefined'
+    ? sessionStorage.getItem('nexora_owner_key')
+    : null;
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+    ...(ownerKey ? { 'X-Owner-Key': ownerKey } : {}),
+    ...(options?.headers as Record<string, string> || {}),
+  };
+  // Only inject Content-Type: application/json for methods with a request body
+  if (method !== 'GET' && method !== 'HEAD') {
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      credentials: 'include',
+      headers,
+    });
+  } catch (netErr: any) {
+    const error: TrainingApiError = new Error(`Network failure connecting to ${endpoint}: ${netErr?.message || 'Failed to fetch'}`);
+    error.isNetworkError = true;
+    throw error;
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (response.redirected || contentType.includes('text/html')) {
+    const error: TrainingApiError = new Error(`Authentication required or HTML returned from ${endpoint}`);
+    error.isAuthRedirect = true;
+    error.status = response.status;
+    throw error;
+  }
 
   if (!response.ok) {
     let errorDetail = `HTTP ${response.status}: ${response.statusText}`;
@@ -46,10 +94,18 @@ async function request<T>(
     } catch {
       // Non-JSON response fallback
     }
-    throw new Error(errorDetail);
+    const err: TrainingApiError = new Error(errorDetail);
+    err.status = response.status;
+    throw err;
   }
 
-  return response.json();
+  try {
+    return await response.json();
+  } catch {
+    const error: TrainingApiError = new Error(`Invalid JSON received from ${endpoint}`);
+    error.status = response.status;
+    throw error;
+  }
 }
 
 export const trainingApi = {

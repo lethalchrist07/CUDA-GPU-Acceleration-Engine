@@ -38,6 +38,12 @@ class EngineSettings:
             if origin.strip()
         ]
     )
+    cors_origin_regex: str = field(
+        default_factory=lambda: os.getenv(
+            "CUDA_ENGINE_CORS_ORIGIN_REGEX",
+            r"^https://.*(\.ngrok-free\.app|\.ngrok\.app|\.ngrok\.io|\.trycloudflare\.com|\.github\.io|\.pages\.dev)$",
+        )
+    )
     log_level: str = field(
         default_factory=lambda: os.getenv("CUDA_ENGINE_LOG_LEVEL", "INFO").upper()
     )
@@ -53,6 +59,18 @@ class EngineSettings:
     thermal_throttle_threshold_c: float = field(
         default_factory=lambda: float(os.getenv("CUDA_ENGINE_THERMAL_LIMIT_C", "82.0"))
     )
+    demo_mode: bool = field(
+        default_factory=lambda: os.getenv("CUDA_ENGINE_DEMO_MODE", "0").strip().lower() in ("1", "true", "yes", "on")
+    )
+    owner_key: str = field(
+        default_factory=lambda: os.getenv("CUDA_ENGINE_OWNER_KEY", "").strip()
+    )
+    demo_max_request_bytes: int = 32768
+    demo_min_vram_reserve_mb: float = 1024.0
+    demo_max_temperature_c: float = 75.0
+    demo_max_prompt_chars: int = 256
+    demo_max_gen_tokens: int = 48
+    demo_max_tensor_floats: int = 128
 
 
 _SETTINGS: Optional[EngineSettings] = None
@@ -63,6 +81,13 @@ def get_settings() -> EngineSettings:
     global _SETTINGS
     if _SETTINGS is None:
         _SETTINGS = EngineSettings()
+    return _SETTINGS
+
+
+def reload_settings() -> EngineSettings:
+    """Reinitialize application settings from environment (used for testing and lifecycle reloads)."""
+    global _SETTINGS
+    _SETTINGS = EngineSettings()
     return _SETTINGS
 
 
@@ -111,6 +136,16 @@ def log_hardware_diagnostic_banner() -> None:
             logger.warning("  PyTorch did not detect an accessible CUDA-enabled GPU.")
             logger.warning("  Workloads will execute on the host CPU with reduced throughput.")
             logger.warning("======================================================================")
+
+        settings = get_settings()
+        if settings.demo_mode:
+            logger.info("======================================================================")
+            logger.info("  [SECURITY] PUBLIC DEMO MODE ACTIVE (CUDA_ENGINE_DEMO_MODE=1)")
+            logger.info("  Mutating training & laboratory endpoints: BLOCKED (403)")
+            logger.info("  Public model whitelist active: resnet18_cifar10, transformer_50m, baseline_mlp")
+            logger.info("  Request limit: 32 KB | Max Gen Tokens: 48 | Max Prompt: 256 chars")
+            logger.info("  Hardware limits: >=1024 MB free VRAM reserve, <=75.0 C GPU temperature")
+            logger.info("======================================================================")
     except Exception as e:
         logger.error(f"Error querying hardware during startup: {e}")
 
