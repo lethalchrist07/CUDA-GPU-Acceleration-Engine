@@ -8,6 +8,7 @@ client IP resolution. Fail-safe closed if owner key is not configured.
 from __future__ import annotations
 
 import ipaddress
+import math
 import secrets
 import threading
 import time
@@ -26,6 +27,7 @@ class AuthRateLimiter:
     Tracks timestamps of failed attempts per client IP.
     Enforces maximum `max_failures` within `window_seconds`.
     Exceeding limit raises HTTP 429 Too Many Requests with Retry-After header.
+    Guarantees atomic check-and-record under a single lock to eliminate TOCTOU races.
     """
 
     def __init__(self, max_failures: int = 10, window_seconds: float = 300.0):
@@ -34,48 +36,94 @@ class AuthRateLimiter:
         self._lock = threading.Lock()
         self._failures: Dict[str, deque[float]] = {}
 
+    def _purge_expired_locked(self, client_ip: str, now: float) -> Optional[deque[float]]:
+        """Purge timestamps older than window_seconds for client_ip. Assumes self._lock is held."""
+        history = self._failures.get(client_ip)
+        if not history:
+            return None
+
+        cutoff = now - self.window_seconds
+        while history and history[0] < cutoff:
+            if isinstance(history, deque):
+                history.popleft()
+            else:
+                history.pop(0)
+
+        if not history:
+            del self._failures[client_ip]
+            return None
+
+        return history
+
+    def _raise_rate_limited(self, history: deque[float], now: float) -> None:
+        """Helper to compute Retry-After and raise HTTP 429. Assumes self._lock is held."""
+        retry_after = max(1, min(int(self.window_seconds), math.ceil(self.window_seconds - (now - history[0]))))
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many failed authentication attempts. Access locked for {retry_after} seconds.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
     def check_rate_limit(self, client_ip: str) -> None:
         """Raise HTTP 429 if client_ip has exceeded max_failures within window_seconds."""
         now = time.time()
         with self._lock:
-            history = self._failures.get(client_ip)
-            if not history:
-                return
-
-            # Purge expired timestamps outside the sliding window
-            cutoff = now - self.window_seconds
-            while history and history[0] < cutoff:
-                if isinstance(history, deque):
-                    history.popleft()
-                else:
-                    history.pop(0)
-
-            if not history:
-                del self._failures[client_ip]
-                return
-
-            if len(history) >= self.max_failures:
-                retry_after = max(1, int(self.window_seconds - (now - history[0])) + 1)
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail=f"Too many failed authentication attempts. Access locked for {retry_after} seconds.",
-                    headers={"Retry-After": str(retry_after)},
-                )
+            history = self._purge_expired_locked(client_ip, now)
+            if history and len(history) >= self.max_failures:
+                self._raise_rate_limited(history, now)
 
     def record_failure(self, client_ip: str) -> None:
         """Record a failed authentication attempt."""
         now = time.time()
         with self._lock:
-            if client_ip not in self._failures:
-                self._failures[client_ip] = deque()
-            history = self._failures[client_ip]
-
-            # Purge expired timestamps
-            cutoff = now - self.window_seconds
-            while history and history[0] < cutoff:
-                history.popleft()
-
+            history = self._purge_expired_locked(client_ip, now)
+            if history is None:
+                history = deque()
+                self._failures[client_ip] = history
             history.append(now)
+
+    def check_and_record_failure(self, client_ip: str) -> None:
+        """
+        Atomically check whether client_ip has exceeded max_failures within window_seconds,
+        and if not, record the failed authentication attempt under the same lock.
+        Raises HTTP 429 Too Many Requests if the limit is reached/exceeded.
+        """
+        now = time.time()
+        with self._lock:
+            history = self._purge_expired_locked(client_ip, now)
+            if history and len(history) >= self.max_failures:
+                self._raise_rate_limited(history, now)
+            if history is None:
+                history = deque()
+                self._failures[client_ip] = history
+            history.append(now)
+
+    def check_and_record_success(self, client_ip: str) -> None:
+        """
+        Atomically check whether client_ip is currently rate-limited before confirming success.
+        If locked out, raises HTTP 429 Too Many Requests.
+        Otherwise, clears any failure history for client_ip under the same lock.
+        """
+        now = time.time()
+        with self._lock:
+            history = self._purge_expired_locked(client_ip, now)
+            if history and len(history) >= self.max_failures:
+                self._raise_rate_limited(history, now)
+            if client_ip in self._failures:
+                del self._failures[client_ip]
+
+    def process_attempt(self, client_ip: str, is_valid: bool) -> bool:
+        """
+        Atomically evaluate and record an authentication attempt under a single lock.
+        If is_valid is False: records failure or raises 429 if limit already reached.
+        If is_valid is True: clears failure history or raises 429 if already locked out.
+        """
+        if is_valid:
+            self.check_and_record_success(client_ip)
+            return True
+        else:
+            self.check_and_record_failure(client_ip)
+            return False
 
     def record_success(self, client_ip: str) -> None:
         """Clear failure history upon successful owner authentication."""
@@ -188,12 +236,9 @@ def is_owner_authorized(
 
     client_ip = get_trusted_client_ip(request)
 
-    if enforce_rate_limit:
-        AUTH_RATE_LIMITER.check_rate_limit(client_ip)
-
     if not configured_key:
         if enforce_rate_limit:
-            AUTH_RATE_LIMITER.record_failure(client_ip)
+            AUTH_RATE_LIMITER.check_and_record_failure(client_ip)
         return False
 
     is_valid = secrets.compare_digest(
@@ -201,11 +246,6 @@ def is_owner_authorized(
         configured_key.encode("utf-8"),
     )
 
-    if is_valid:
-        if enforce_rate_limit:
-            AUTH_RATE_LIMITER.record_success(client_ip)
-        return True
-    else:
-        if enforce_rate_limit:
-            AUTH_RATE_LIMITER.record_failure(client_ip)
-        return False
+    if enforce_rate_limit:
+        return AUTH_RATE_LIMITER.process_attempt(client_ip, is_valid)
+    return is_valid
